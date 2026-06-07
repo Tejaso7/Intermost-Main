@@ -23,12 +23,11 @@ venv/
 env/
 .env/
 ENV/
-bin/
-include/
-lib/
-share/
 pyvenv.cfg
 pip-selfcheck.json
+
+# Explicitly keep frontend source directories
+!Intermost-Frontend/src/lib/
 
 # Python compilation and caching
 __pycache__/
