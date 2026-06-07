@@ -1,0 +1,105 @@
+name: CI/CD & Auto-Deployment
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  frontend-ci:
+    name: Frontend CI & Security
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Intermost-Frontend
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: './Intermost-Frontend/package-lock.json'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run lint
+      run: npm run lint
+
+    - name: Run npm audit security scan
+      run: |
+        npm audit --audit-level=high || true
+
+    - name: Build Frontend Docker Image
+      run: |
+        docker build \
+          --build-arg NEXT_PUBLIC_API_URL=https://intermost.in/api/v1 \
+          --build-arg NEXT_PUBLIC_WHATSAPP_NUMBER=919058501818 \
+          -t intermost-frontend:latest .
+
+  backend-ci:
+    name: Backend CI & Security
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Intermost-Backend
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install flake8 bandit pip-audit
+
+    - name: Lint with flake8
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run Django System Checks
+      run: |
+        python manage.py check
+
+    - name: Run Bandit SAST security scan
+      run: |
+        bandit -r . -x ./venv -ll -ii
+
+    - name: Run pip-audit dependency scan
+      run: |
+        pip-audit -r requirements.txt
+
+    - name: Build Backend Docker Image
+      run: |
+        docker build -t intermost-backend:latest .
+
+  deploy:
+    name: Deploy to AWS EC2
+    needs: [frontend-ci, backend-ci]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Deploy to EC2 via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USERNAME }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          cd ~/intermost
+          git pull origin main
+          docker compose -f docker-compose.prod.yml up -d --build
+          docker compose -f docker-compose.prod.yml exec -T backend python manage.py migrate
