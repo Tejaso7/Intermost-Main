@@ -3,14 +3,8 @@ name: Frontend CI & Security
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'Intermost-Frontend/**'
-      - '.github/workflows/frontend.yml'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'Intermost-Frontend/**'
-      - '.github/workflows/frontend.yml'
 
 jobs:
   ci-checks:

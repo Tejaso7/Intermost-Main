@@ -3,14 +3,8 @@ name: Backend CI & Security
 on:
   push:
     branches: [ main ]
-    paths:
-      - 'Intermost-Backend/**'
-      - '.github/workflows/backend.yml'
   pull_request:
     branches: [ main ]
-    paths:
-      - 'Intermost-Backend/**'
-      - '.github/workflows/backend.yml'
 
 jobs:
   ci-checks:
