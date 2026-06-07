@@ -74,14 +74,14 @@ services:
       context: ./Intermost-Frontend
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=https://api.intermost.in
+        - NEXT_PUBLIC_API_URL=https://intermost.in/api/v1
         - NEXT_PUBLIC_WHATSAPP_NUMBER=${NEXT_PUBLIC_WHATSAPP_NUMBER:-919058501818}
     container_name: intermost-web-prod
     ports:
       - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=https://api.intermost.in
+      - NEXT_PUBLIC_API_URL=https://intermost.in/api/v1
       - NEXT_PUBLIC_SITE_URL=https://intermost.in
     depends_on:
       - backend
