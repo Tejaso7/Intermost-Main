@@ -86,24 +86,14 @@ newgrp docker
 ---
 
 ## 5. Project Directory Layout & Cloning
-We will clone the backend and frontend into a single main directory on the server.
+We will clone the unified main repository directly on the server. All Docker Compose and Nginx configuration files are already in the root directory.
 
 ```bash
-# Create main project directory
-mkdir -p ~/intermost && cd ~/intermost
+# Clone the unified main repository
+git clone https://github.com/Tejaso7/Intermost-Main.git ~/intermost
 
-# Clone Frontend Repository
-git clone https://github.com/Tejaso7/Intermost-Frontend.git Intermost-Frontend
-
-# Clone Backend Repository
-git clone https://github.com/Tejaso7/Intermost-Backend.git Intermost-Backend
-```
-
-Now copy the production compose configuration and nginx configuration into the root directory. You can download or create them:
-```bash
-# Copy compose files from the backend/repo to root:
-cp Intermost-Backend/docker-compose.prod.yml ./docker-compose.prod.yml
-cp Intermost-Backend/nginx.prod.conf ./nginx.prod.conf
+# Navigate to the project directory
+cd ~/intermost
 ```
 
 Confirm your directory layout looks like this:
