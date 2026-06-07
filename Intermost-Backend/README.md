@@ -6,7 +6,7 @@
 
 ## 🛠️ System Architecture
 
-The Intermost platform is divided into two separate, optimized repositories orchestrated using Docker Compose:
+The Intermost platform is structured as a unified repository containing both the frontend and backend, orchestrated using Docker Compose:
 
 ```mermaid
 graph TD
@@ -18,9 +18,9 @@ graph TD
 
 ---
 
-## 📂 Project Repository Directory Layout
+## 📂 Project Directory Layout
 
-The workspace is organized to support separate code repositories while maintaining unified environment configs for Dockerized local and production runs:
+The workspace is structured as a unified repository containing both the frontend and backend, while maintaining unified environment configs for Dockerized local and production runs:
 
 ```
 intermost/
@@ -51,7 +51,7 @@ Deploy the entire workspace locally with a single command:
 
 ```bash
 # 1. Clone the repository structure
-git clone <parent-repo-url> intermost && cd intermost
+git clone https://github.com/Tejaso7/Intermost-Main.git intermost && cd intermost
 
 # 2. Set up the local environment file
 cp .env.example .env
@@ -70,7 +70,7 @@ Access the applications locally:
 
 ## 🌍 Enterprise Production Setup (AWS EC2)
 
-For deploying the separate frontend and backend repositories on a single Linux EC2 host with Nginx and Let's Encrypt SSL, refer to the detailed:
+For deploying the application on a single Linux EC2 host with Nginx and Let's Encrypt SSL, refer to the detailed:
 
 👉 **[AWS EC2 Setup & Deployment Guide (EC2_DEPLOYMENT.md)](file:///c:/Users/Neha/Desktop/intermost/EC2_DEPLOYMENT.md)**
 
@@ -78,7 +78,7 @@ For deploying the separate frontend and backend repositories on a single Linux E
 
 ## 🤖 CI/CD & Security Audits
 
-Both code repositories are configured with automated **GitHub Actions** checks to ensure code stability and protect against dependency vulnerabilities:
+Both frontend and backend subprojects are configured with automated **GitHub Actions** checks to ensure code stability and protect against dependency vulnerabilities:
 
 ### 1. Frontend Repository Actions
 * **Continuous Integration (`frontend-ci.yml`)**: Installs dependencies (`npm ci`), checks formatting (`npm run lint`), and builds the production Next.js package in Docker to guarantee compiling correctness.
