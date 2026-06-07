@@ -239,7 +239,7 @@ export default function AdminLoginPage() {
                 <code className="bg-gray-200 px-2 py-0.5 rounded">Intermost@2025</code>
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Back to site */}
           <p className="text-center text-gray-500 text-sm mt-6">
