@@ -1,0 +1,48 @@
+name: Frontend CI & Security
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'Intermost-Frontend/**'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'Intermost-Frontend/**'
+      - '.github/workflows/frontend.yml'
+
+jobs:
+  ci-checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./Intermost-Frontend
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: './Intermost-Frontend/package-lock.json'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run lint
+      run: npm run lint
+
+    - name: Run npm audit security scan
+      run: |
+        npm audit --audit-level=high
+
+    - name: Build Frontend Docker Image
+      run: |
+        docker build \
+          --build-arg NEXT_PUBLIC_API_URL=https://api.intermost.in \
+          --build-arg NEXT_PUBLIC_WHATSAPP_NUMBER=919058501818 \
+          -t intermost-frontend:latest .
