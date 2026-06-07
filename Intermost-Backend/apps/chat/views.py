@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 GEMINI_API_KEY = getattr(django_settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
 
 # Create client
-client = genai.Client(api_key=GEMINI_API_KEY)
+client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 # Use available model
 CHAT_MODEL = "gemini-2.0-flash"
@@ -33,6 +33,8 @@ CHAT_MODEL = "gemini-2.0-flash"
 
 def generate_response(prompt: str) -> str:
     """Generate response using Gemini."""
+    if not client:
+        raise ValueError("Gemini client is not initialized. Please configure GEMINI_API_KEY.")
     response = client.models.generate_content(
         model=CHAT_MODEL,
         contents=prompt
