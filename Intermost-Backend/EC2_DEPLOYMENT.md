@@ -22,7 +22,6 @@ This guide outlines the step-by-step process of deploying the Intermost platform
 - A registered domain name (e.g., `intermost.in`) with DNS records pointing to your EC2 elastic IP:
   - `A` record pointing `intermost.in` to your EC2 IP.
   - `A` record pointing `www.intermost.in` to your EC2 IP.
-  - `A` record pointing `api.intermost.in` to your EC2 IP.
 
 ---
 
@@ -119,7 +118,7 @@ Confirm your directory layout looks like this:
 ---
 
 ## 6. SSL Certificates via Let's Encrypt
-We need SSL certificates for `intermost.in`, `www.intermost.in`, and `api.intermost.in` before starting Nginx.
+We need SSL certificates for `intermost.in` and `www.intermost.in` before starting Nginx.
 
 ```bash
 # Install Certbot
@@ -129,7 +128,6 @@ sudo apt-get install -y certbot
 sudo certbot certonly --standalone \
   -d intermost.in \
   -d www.intermost.in \
-  -d api.intermost.in \
   --email admissionintermost@gmail.com \
   --agree-tos --no-eff-email
 
@@ -164,7 +162,7 @@ Paste and configure the following template with your production credentials:
 # ===== DJANGO/BACKEND PRODUCTION =====
 SECRET_KEY=generate-a-strong-random-key-here
 DEBUG=False
-ALLOWED_HOSTS=api.intermost.in,intermost.in,www.intermost.in
+ALLOWED_HOSTS=intermost.in,www.intermost.in,localhost,127.0.0.1,backend
 
 # Database Configuration (Atlas or Managed MongoDB Recommended)
 MONGODB_URI=mongodb+srv://<dbuser>:<dbpassword>@<your-cluster>.mongodb.net/intermost_db?retryWrites=true&w=majority
@@ -198,7 +196,7 @@ DJANGO_LOG_LEVEL=WARNING
 
 # ===== NEXT.JS/FRONTEND PRODUCTION =====
 NODE_ENV=production
-NEXT_PUBLIC_API_URL=https://api.intermost.in/api/v1
+NEXT_PUBLIC_API_URL=https://intermost.in/api/v1
 NEXT_PUBLIC_SITE_URL=https://intermost.in
 NEXT_PUBLIC_WHATSAPP_NUMBER=919058501818
 ```
