@@ -43,6 +43,6 @@ jobs:
     - name: Build Frontend Docker Image
       run: |
         docker build \
-          --build-arg NEXT_PUBLIC_API_URL=https://api.intermost.in \
+          --build-arg NEXT_PUBLIC_API_URL=https://intermost.in/api/v1 \
           --build-arg NEXT_PUBLIC_WHATSAPP_NUMBER=919058501818 \
           -t intermost-frontend:latest .
