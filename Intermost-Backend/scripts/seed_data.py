@@ -1445,6 +1445,227 @@ def seed_offices():
     print(f"Inserted {len(result.inserted_ids)} offices")
 
 
+def seed_news():
+    """Seed news and events from intermost.eu."""
+    collection = get_collection('news')
+    collection.delete_many({})
+    
+    news_items = [
+        {
+            'title': '15th June - Seminar in Panipat',
+            'description': 'We Invite you all to join our program for MBBS Abroad EXPO.',
+            'media_type': 'video',
+            'media_url': '/video/news/panipat.mp4',
+            'location': 'Arya Bal Bharti Public School, GT Road, Panipat, India',
+            'date': '2026-06-15',
+            'badge_text': '📍 Arya Bal Bharti Public School, GT Road, Panipat, India',
+            'badge_color': 'green',
+            'is_active': True,
+            'is_featured': True,
+            'display_order': 1,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'title': '14th June - Seminar Kolkata',
+            'description': 'A Seminar at Kolkata Connecting for Future of the Student to go Abroad.',
+            'media_type': 'marquee',
+            'media_urls': [
+                '/images/kalkata/1.jpg',
+                '/images/kalkata/2.jpg',
+                '/images/kalkata/3.jpg',
+                '/images/kalkata/4.jpg',
+                '/images/kalkata/5.jpg'
+            ],
+            'location': 'Hotel Hindusthan International, Kolkata, India',
+            'date': '2026-06-14',
+            'badge_text': '📍 Hotel Hindusthan International, Kolkata, India',
+            'badge_color': 'blue',
+            'is_active': True,
+            'is_featured': True,
+            'display_order': 2,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'title': '27th May - Seminar Lucknow MBBS',
+            'description': 'Students registered for abroad studies.',
+            'media_type': 'video',
+            'media_url': '/video/news/n1.mp4',
+            'location': 'Lucknow, India',
+            'date': '2026-05-27',
+            'badge_text': '🎉 India-Wide',
+            'badge_color': 'green',
+            'is_active': True,
+            'is_featured': False,
+            'display_order': 3,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'title': '23rd May - ERA University Lucknow',
+            'description': 'A Team of members from ERA University Lucknow Connecting for Future of the Student to go Abroad.',
+            'media_type': 'image',
+            'media_url': '/images/kanpur/team.jpg',
+            'location': 'Lucknow, India',
+            'date': '2026-05-23',
+            'badge_text': '📍 Lucknow, India',
+            'badge_color': 'blue',
+            'is_active': True,
+            'is_featured': False,
+            'display_order': 4,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'title': 'Start your Journey - Today for MBBS',
+            'description': '5+ Country Partnership for abroad studies.',
+            'media_type': 'video',
+            'media_url': '/video/news/and.mp4',
+            'location': 'World-Wide',
+            'date': '2026-05-20',
+            'badge_text': '🎉 World-Wide',
+            'badge_color': 'green',
+            'is_active': True,
+            'is_featured': False,
+            'display_order': 5,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'title': '18th May - Grand Opening In India',
+            'description': 'A major initiative is underway in Agra with the establishment of a new office, featuring the involvement of top-tier members.',
+            'media_type': 'image',
+            'media_url': '/images/news/new1.jpg',
+            'location': 'Agra, India',
+            'date': '2026-05-18',
+            'badge_text': '📍 Agra, India',
+            'badge_color': 'blue',
+            'is_active': True,
+            'is_featured': False,
+            'display_order': 6,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+    ]
+    
+    result = collection.insert_many(news_items)
+    print(f"Inserted {len(result.inserted_ids)} news items")
+
+
+def seed_testimonials():
+    """Seed student testimonials."""
+    collection = get_collection('testimonials')
+    collection.delete_many({})
+    
+    testimonials = [
+        {
+            'name': 'Aditya Sharma',
+            'title': 'Dr.',
+            'designation': 'MBBS Graduate, Batch 2024',
+            'university': 'Bashkir State Medical University',
+            'country': 'Russia',
+            'photo': '/images/testimonials/avatar1.jpg',
+            'quote': 'Studying at Bashkir State Medical University was the best decision of my life. The faculty is extremely supportive and clinical exposure is excellent.',
+            'rating': 5,
+            'batch_year': '2024',
+            'is_active': True,
+            'display_order': 1,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'name': 'Priyesha Patel',
+            'title': 'Dr.',
+            'designation': 'MD Physician, Batch 2024',
+            'university': 'Alte University',
+            'country': 'Georgia',
+            'photo': '/images/testimonials/avatar2.jpg',
+            'quote': 'Georgia offers world-class European medical education. Intermost helped me with documentation and admission seamlessly.',
+            'rating': 5,
+            'batch_year': '2024',
+            'is_active': True,
+            'display_order': 2,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        },
+        {
+            'name': 'Aman Verma',
+            'title': 'Dr.',
+            'designation': 'MD Candidate, Batch 2025',
+            'university': 'Tashkent Medical Academy',
+            'country': 'Uzbekistan',
+            'photo': '/images/testimonials/avatar3.jpg',
+            'quote': 'Uzbekistan has highly affordable medical universities with similar climate and standard facilities. Highly recommended!',
+            'rating': 5,
+            'batch_year': '2025',
+            'is_active': True,
+            'display_order': 3,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+    ]
+    
+    result = collection.insert_many(testimonials)
+    print(f"Inserted {len(result.inserted_ids)} testimonials")
+
+
+def seed_blogs():
+    """Seed blog articles."""
+    collection = get_collection('blogs')
+    collection.delete_many({})
+    
+    blogs = [
+        {
+            'title': 'NMC Regulations for MBBS Abroad: What You Need to Know',
+            'slug': 'nmc-regulations-for-mbbs-abroad',
+            'excerpt': 'An essential guide to understanding the latest National Medical Commission (NMC) guidelines for studying medicine overseas.',
+            'content': 'Pursuing an MBBS degree abroad is an attractive option for many Indian students. However, it is crucial to stay aligned with the guidelines set by the National Medical Commission (NMC) in India. This article breaks down the core requirements including the mandatory 54-month course duration, English medium of instruction, clinical internship requirements, and registration details in the host country to ensure your degree is fully recognized back home.',
+            'featured_image': '/images/blog/nmc-blog.jpg',
+            'category': 'Regulations',
+            'tags': ['NMC', 'MBBS Abroad', 'Guidelines', 'FMGE', 'NEXT'],
+            'author': 'Intermost Editorial Team',
+            'read_time': '5 min read',
+            'is_published': True,
+            'is_featured': True,
+            'seo': {
+                'title': 'NMC Regulations for MBBS Abroad 2025 | Intermost',
+                'description': 'Understand NMC rules for MBBS abroad: course duration, English medium, internship & NEXT registration guidelines.',
+                'keywords': ['NMC regulations', 'MBBS abroad NMC rules', 'study medicine abroad']
+            },
+            'views': 120,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow(),
+            'published_at': datetime.utcnow()
+        },
+        {
+            'title': 'How to Choose the Right Medical University Abroad',
+            'slug': 'how-to-choose-the-right-medical-university-abroad',
+            'excerpt': 'Key factors to consider, including global rankings, language of instruction, tuition fees, and clinical internship quality.',
+            'content': 'Selecting a medical university abroad is a decision that shapes your entire career. With options spanning Russia, Georgia, Uzbekistan, Nepal, and Vietnam, students must evaluate universities on multiple parameters: WHO and NMC approvals, historical background (established years), tuition and hostel costs, accessibility of Indian food, safety, and the quality of clinical laboratories. Here is our comprehensive roadmap to choosing the university that fits your goals.',
+            'featured_image': '/images/blog/university-choice.jpg',
+            'category': 'Guides',
+            'tags': ['MBBS Abroad', 'University Choice', 'Admission Tips'],
+            'author': 'Intermost Admission Desk',
+            'read_time': '7 min read',
+            'is_published': True,
+            'is_featured': False,
+            'seo': {
+                'title': 'Choose Right MBBS University Abroad Guide | Intermost',
+                'description': 'Learn how to compare and choose medical universities abroad in Russia, Georgia, Uzbekistan, and Nepal.',
+                'keywords': ['choose MBBS university', 'medical university abroad comparison', 'study MBBS guides']
+            },
+            'views': 85,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow(),
+            'published_at': datetime.utcnow()
+        }
+    ]
+    
+    result = collection.insert_many(blogs)
+    print(f"Inserted {len(result.inserted_ids)} blogs")
+
+
 if __name__ == '__main__':
     print("Starting database seeding...")
     seed_countries()
@@ -1452,4 +1673,7 @@ if __name__ == '__main__':
     seed_site_settings()
     seed_team_members()
     seed_offices()
+    seed_news()
+    seed_testimonials()
+    seed_blogs()
     print("Database seeding completed!")
