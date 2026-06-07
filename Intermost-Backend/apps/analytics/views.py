@@ -114,7 +114,7 @@ def parse_user_agent(user_agent):
 def generate_visitor_id(ip, user_agent):
     """Generate a unique visitor ID from IP and user agent"""
     data = f"{ip}:{user_agent}"
-    return hashlib.md5(data.encode()).hexdigest()[:16]
+    return hashlib.md5(data.encode()).hexdigest()[:16]  # nosec B324
 
 
 @csrf_exempt

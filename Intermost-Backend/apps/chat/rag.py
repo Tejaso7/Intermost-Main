@@ -72,7 +72,7 @@ def chunk_document(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) 
 
 def compute_hash(text: str) -> str:
     """Compute MD5 hash of text for deduplication."""
-    return hashlib.md5(text.encode('utf-8')).hexdigest()
+    return hashlib.md5(text.encode('utf-8')).hexdigest()  # nosec B324
 
 
 class RAGDocumentStore:
