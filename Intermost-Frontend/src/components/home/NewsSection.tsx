@@ -1,0 +1,218 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { Play, MapPin, Calendar, ArrowRight } from 'lucide-react';
+import { newsApi } from '@/lib/services';
+import type { News } from '@/lib/api';
+
+// Fallback news data
+const fallbackNews: News[] = [
+  {
+    _id: '1',
+    title: 'Intermost Education Fair 2025',
+    description: 'Join us at our upcoming education fair to learn about MBBS opportunities abroad.',
+    media_type: 'image',
+    media_url: '/images/news/fair.jpg',
+    location: 'New Delhi',
+    badge_text: 'Upcoming',
+    is_active: true,
+    display_order: 1,
+    created_at: new Date().toISOString(),
+  },
+  {
+    _id: '2',
+    title: 'Student Success Stories',
+    description: 'Our students share their experiences studying MBBS abroad.',
+    media_type: 'image',
+    media_url: '/images/countries/georgia.jpg',
+    location: 'Russia',
+    badge_text: 'Featured',
+    is_active: true,
+    display_order: 2,
+    created_at: new Date().toISOString(),
+  },
+  {
+    _id: '3',
+    title: 'Admissions Open for 2026',
+    description: 'Apply now for MBBS admissions in Russia, Georgia, and Uzbekistan.',
+    media_type: 'marquee',
+    is_active: true,
+    display_order: 3,
+    created_at: new Date().toISOString(),
+  },
+];
+
+export default function NewsSection() {
+  const [news, setNews] = useState<News[]>(fallbackNews);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const data = await newsApi.getAll({ active: true });
+        if (data && data.length > 0) {
+          setNews(data);
+        }
+      } catch (error) {
+        console.error('Error fetching news:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
+
+  // Get marquee news
+  const marqueeNews = news.filter((n) => n.media_type === 'marquee');
+  const gridNews = news.filter((n) => n.media_type !== 'marquee').slice(0, 6);
+
+  return (
+    <section id="news-section" className="py-16 sm:py-20 md:py-24 bg-gray-50">
+      <div className="container-custom">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10 sm:mb-12 md:mb-16 px-4"
+        >
+          <span className="text-primary-600 font-semibold text-xs sm:text-sm uppercase tracking-wider">
+            Latest Updates
+          </span>
+          <h2 className="section-title mt-2">News & Updates</h2>
+          <p className="section-subtitle mt-4 px-2">
+            Stay informed about our latest events, student achievements, and admission updates
+          </p>
+        </motion.div>
+
+        {/* Marquee Banner */}
+        {marqueeNews.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl mb-8 sm:mb-10 overflow-hidden"
+          >
+            <div className="animate-marquee whitespace-nowrap text-xs sm:text-sm md:text-base">
+              {marqueeNews.map((item, index) => (
+                <span key={item._id} className="mx-4 sm:mx-8 inline-flex items-center">
+                  <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
+                  {item.title}
+                  {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                </span>
+              ))}
+              {/* Duplicate for seamless loop */}
+              {marqueeNews.map((item, index) => (
+                <span key={`dup-${item._id}`} className="mx-4 sm:mx-8 inline-flex items-center">
+                  <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
+                  {item.title}
+                  {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                </span>
+              ))}
+            </div>
+          </motion.div>
+        )}
+
+        {/* News Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
+          {gridNews.map((item, index) => (
+            <motion.div
+              key={item._id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              className="card card-hover overflow-hidden group flex flex-col h-full"
+              whileHover={{ y: -4 }}
+            >
+              {/* Media */}
+              <div className="relative h-40 sm:h-48 overflow-hidden">
+                {item.media_type === 'video' ? (
+                  <>
+                    <video
+                      src={item.media_url}
+                      poster={item.media_url}
+                      className="w-full h-full object-cover"
+                      muted
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <motion.div 
+                        className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
+                      </motion.div>
+                    </div>
+                  </>
+                ) : (
+                  <Image
+                    src={item.media_url || '/images/placeholder.jpg'}
+                    alt={item.title}
+                    fill
+                    className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                )}
+                
+                {/* Badge */}
+                {item.badge_text && (
+                  <motion.span 
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="absolute top-2 sm:top-4 left-2 sm:left-4 px-2 sm:px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full"
+                  >
+                    {item.badge_text}
+                  </motion.span>
+                )}
+              </div>
+
+              {/* Content */}
+              <div className="p-4 sm:p-5 flex flex-col flex-1">
+                <h3 className="font-semibold text-base sm:text-lg text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
+                  {item.title}
+                </h3>
+                <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2 flex-1">
+                  {item.description}
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 gap-2">
+                  {item.location && (
+                    <span className="flex items-center text-xs sm:text-sm text-gray-500">
+                      <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                      <span className="truncate">{item.location}</span>
+                    </span>
+                  )}
+                  {item.link && (
+                    <Link
+                      href={item.link}
+                      className="text-primary-600 text-xs sm:text-sm font-medium flex items-center hover:text-primary-700 whitespace-nowrap"
+                    >
+                      Read More
+                      <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" />
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* View All Link */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mt-8 sm:mt-10 md:mt-12"
+        >
+          <Link href="/news" className="btn-outline">
+            View All News
+            <ArrowRight className="ml-2 w-5 h-5" />
+          </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,140 @@
+version: '3.9'
+
+# Production Docker Compose with SSL, optimizations, and external MongoDB
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+
+services:
+  # Backend API Service (Production)
+  backend:
+    build:
+      context: ./Intermost-Backend
+      dockerfile: Dockerfile
+    container_name: intermost-api-prod
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=False
+      - SECRET_KEY=${SECRET_KEY}
+      - ALLOWED_HOSTS=api.intermost.in,intermost.in,www.intermost.in
+      - MONGODB_URI=${MONGODB_URI}
+      - MONGODB_NAME=${MONGODB_NAME}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - CORS_ALLOWED_ORIGINS=https://intermost.in,https://www.intermost.in
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - EMAIL_USE_TLS=True
+      - SECURE_SSL_REDIRECT=True
+      - SESSION_COOKIE_SECURE=True
+      - CSRF_COOKIE_SECURE=True
+      - DJANGO_LOG_LEVEL=WARNING
+    volumes:
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn config.wsgi:application 
+               --bind 0.0.0.0:8000 
+               --workers 8
+               --worker-class sync
+               --worker-connections 1000
+               --max-requests 1000
+               --max-requests-jitter 50
+               --timeout 60
+               --access-logfile -
+               --error-logfile -
+               --log-level info"
+    networks:
+      - intermost-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '1'
+          memory: 1G
+
+  # Frontend Application (Production)
+  frontend:
+    build:
+      context: ./Intermost-Frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.intermost.in
+        - NEXT_PUBLIC_WHATSAPP_NUMBER=${NEXT_PUBLIC_WHATSAPP_NUMBER:-919058501818}
+    container_name: intermost-web-prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=https://api.intermost.in
+      - NEXT_PUBLIC_SITE_URL=https://intermost.in
+    depends_on:
+      - backend
+    networks:
+      - intermost-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 60s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # Nginx Reverse Proxy with SSL
+  nginx:
+    image: nginx:alpine
+    container_name: intermost-nginx-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl/intermost.in.crt:/etc/nginx/ssl/intermost.in.crt:ro
+      - ./ssl/intermost.in.key:/etc/nginx/ssl/intermost.in.key:ro
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      - /var/log/nginx:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - intermost-network
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+
+networks:
+  intermost-network:
+    driver: bridge
+
+volumes:
+  static_volume:
+    driver: local
+  media_volume:
+    driver: local
