@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { chatAPI, ChatMessage, LeadData } from '@/lib/api';
-import { MessageCircle, X, Send, Loader2, GraduationCap, User, Phone, Mail, MapPin, Check } from 'lucide-react';
+import { chatAPI, ChatMessage } from '@/lib/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles } from 'lucide-react';
 
 type ChatStep = 'chat' | 'lead_capture' | 'lead_complete';
 
@@ -49,7 +50,7 @@ export default function StudentChatWidget() {
   // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, isLoading]);
 
   // Focus input when chat opens
   useEffect(() => {
@@ -72,7 +73,7 @@ export default function StudentChatWidget() {
     }
   }, [isOpen, messages.length]);
 
-  // Show lead capture prompt after 5 messages
+  // Show lead capture prompt after 3 user messages
   useEffect(() => {
     const userMessages = messages.filter(m => m.role === 'user').length;
     if (userMessages >= 3 && !showLeadPrompt && step === 'chat') {
@@ -80,8 +81,8 @@ export default function StudentChatWidget() {
     }
   }, [messages, showLeadPrompt, step]);
 
-  const sendMessage = async () => {
-    const message = inputValue.trim();
+  const sendQuery = async (textToSend: string) => {
+    const message = textToSend.trim();
     if (!message || isLoading) return;
 
     const userMessage: ChatMessage = {
@@ -124,6 +125,8 @@ export default function StudentChatWidget() {
     }
   };
 
+  const sendMessage = () => sendQuery(inputValue);
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -157,7 +160,7 @@ export default function StudentChatWidget() {
       setTimeout(() => {
         setStep('chat');
         setShowLeadPrompt(false);
-      }, 1000);
+      }, 1500);
     } catch (error) {
       console.error('Lead capture error:', error);
     } finally {
@@ -169,254 +172,308 @@ export default function StudentChatWidget() {
     setStep('lead_capture');
   };
 
+  const suggestionChips = [
+    { label: 'Russia Fees 🇷🇺', query: 'What is the tuition and hostel fee structure for MBBS in Russia?' },
+    { label: 'Georgia Eligibility 🇬🇪', query: 'What is the eligibility criteria for MBBS in Georgia?' },
+    { label: 'Is NEET required? 🩺', query: 'Is qualifying NEET mandatory for studying MBBS abroad?' },
+    { label: 'Uzbekistan Duration 🇺🇿', query: 'What is the duration and medium of instruction in Uzbekistan?' }
+  ];
+
   const countries = [
     'Russia', 'Kazakhstan', 'Uzbekistan', 'Georgia', 'Nepal', 'Tajikistan'
   ];
 
   // Don't render on admin pages
-  if (pathname?.startsWith('/admin')) {
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/django-admin')) {
     return null;
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {/* Chat Window */}
-      {isOpen && (
-        <div className="absolute bottom-16 right-0 w-[360px] sm:w-96 h-[520px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden animate-scale-in">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-primary to-primary-dark text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                <GraduationCap className="w-5 h-5" />
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+            className="w-[360px] sm:w-[400px] h-[550px] bg-white/95 backdrop-blur-xl rounded-[28px] shadow-2xl border border-gray-100 flex flex-col overflow-hidden mb-4"
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 text-white p-5 flex items-center justify-between border-b border-white/10 relative">
+              <div className="flex items-center gap-3">
+                <div className="relative">
+                  <div className="w-11 h-11 bg-white/15 rounded-2xl flex items-center justify-center border border-white/20 backdrop-blur-md">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 border-2 border-primary-600 rounded-full animate-pulse shadow-lg" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm sm:text-base leading-tight tracking-wide flex items-center gap-1.5">
+                    Tejas AI Advisor
+                    <Sparkles className="w-4 h-4 text-secondary-300 fill-secondary-300" />
+                  </h3>
+                  <p className="text-xs text-white/80 mt-0.5 flex items-center gap-1">
+                    Online • Ask me anything!
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold">Tejas</h3>
-                <p className="text-xs text-white/80 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  Online - Ask me anything!
-                </p>
-              </div>
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="hover:bg-white/10 p-2 rounded-xl transition-all duration-200"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
-            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1.5 rounded-full transition">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
 
-          {/* Content */}
-          {step === 'chat' ? (
-            <>
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white">
-                {messages.map((msg) => (
-                  <div
-                    key={msg.id}
-                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[85%] rounded-2xl px-4 py-2.5 ${
-                        msg.role === 'user'
-                          ? 'bg-primary text-white rounded-br-sm'
-                          : 'bg-white text-gray-800 border border-gray-200 rounded-bl-sm shadow-sm'
-                      }`}
+            {/* Content */}
+            {step === 'chat' ? (
+              <>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50/50 to-white scrollbar-modern">
+                  <AnimatePresence initial={false}>
+                    {messages.map((msg) => (
+                      <motion.div
+                        key={msg.id}
+                        initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        transition={{ duration: 0.3 }}
+                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[85%] rounded-[20px] px-4 py-3 ${
+                            msg.role === 'user'
+                              ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-tr-sm shadow-md shadow-primary-600/10'
+                              : 'bg-white text-gray-800 border border-gray-150 rounded-tl-sm shadow-sm'
+                          }`}
+                        >
+                          <div className="text-[13px] sm:text-[14px] whitespace-pre-wrap break-words leading-relaxed">
+                            {msg.content.split('\n').map((line, i) => (
+                              <p key={i} className="mb-1.5 last:mb-0">
+                                {line.startsWith('•') ? (
+                                  <span className="flex items-start gap-2">
+                                    <span className="text-primary-500 font-bold">•</span>
+                                    <span>{line.slice(1).trim()}</span>
+                                  </span>
+                                ) : line.includes('**') ? (
+                                  line.split('**').map((part, j) =>
+                                    j % 2 === 1 ? <strong key={j} className="font-semibold text-primary-900">{part}</strong> : part
+                                  )
+                                ) : (
+                                  line
+                                )}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                  
+                  {/* Lead Capture Prompt */}
+                  {showLeadPrompt && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-100 rounded-2xl p-5 text-center shadow-sm"
                     >
-                      <div className="text-sm whitespace-pre-wrap break-words leading-relaxed">
-                        {msg.content.split('\n').map((line, i) => (
-                          <p key={i} className="mb-1 last:mb-0">
-                            {line.startsWith('•') ? (
-                              <span className="flex items-start gap-2">
-                                <span className="text-primary-dark">•</span>
-                                <span>{line.slice(1).trim()}</span>
-                              </span>
-                            ) : line.includes('**') ? (
-                              line.split('**').map((part, j) =>
-                                j % 2 === 1 ? <strong key={j}>{part}</strong> : part
-                              )
-                            ) : (
-                              line
-                            )}
-                          </p>
-                        ))}
+                      <p className="text-sm font-semibold text-gray-800 mb-1">
+                        Need Expert Human Advice? 🤝
+                      </p>
+                      <p className="text-xs text-gray-600 mb-3.5">
+                        Get direct, personalized assistance from our lead counselor.
+                      </p>
+                      <button
+                        onClick={openLeadForm}
+                        className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-5 py-2.5 rounded-full text-xs font-semibold hover:shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                      >
+                        Get Free Counseling Call
+                      </button>
+                    </motion.div>
+                  )}
+                  
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="bg-white border border-gray-150 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex items-center gap-2">
+                        <div className="flex gap-1 items-center py-1">
+                          <span className="w-1.5 h-1.5 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                          <span className="w-1.5 h-1.5 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                          <span className="w-1.5 h-1.5 bg-primary-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                        </div>
+                        <span className="text-xs text-gray-400 font-medium">Tejas is typing...</span>
                       </div>
                     </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Suggestion Chips */}
+                {messages.length > 0 && (
+                  <div className="flex gap-2 overflow-x-auto px-4 py-2.5 bg-gray-50 border-t border-gray-100 scrollbar-hide">
+                    {suggestionChips.map((chip, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => sendQuery(chip.query)}
+                        className="flex-shrink-0 px-3.5 py-1.5 bg-white border border-gray-200 hover:border-primary-400 hover:text-primary-600 rounded-full text-xs font-medium text-gray-600 shadow-sm transition-all duration-200 active:scale-95 whitespace-nowrap"
+                      >
+                        {chip.label}
+                      </button>
+                    ))}
                   </div>
-                ))}
-                
-                {/* Lead Capture Prompt */}
-                {showLeadPrompt && step === 'chat' && (
-                  <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-4 text-center">
-                    <p className="text-sm font-medium text-gray-800 mb-3">
-                      Want personalized guidance from our experts?
-                    </p>
+                )}
+
+                {/* Input */}
+                <div className="p-4 bg-white border-t border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask about MBBS abroad..."
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all duration-200"
+                      disabled={isLoading}
+                    />
                     <button
-                      onClick={openLeadForm}
-                      className="bg-primary text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-primary-dark transition"
+                      onClick={sendMessage}
+                      disabled={!inputValue.trim() || isLoading}
+                      className="w-11 h-11 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl flex items-center justify-center hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 active:scale-95 flex-shrink-0"
                     >
-                      Get Free Consultation
+                      <Send className="w-4.5 h-4.5" />
                     </button>
                   </div>
-                )}
-                
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
-                      <div className="flex items-center gap-2 text-gray-500">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span className="text-sm">Typing...</span>
-                      </div>
-                    </div>
+                </div>
+              </>
+            ) : step === 'lead_capture' ? (
+              /* Lead Capture Form */
+              <div className="flex-1 overflow-y-auto p-6 bg-gradient-to-b from-gray-50/50 to-white">
+                <div className="text-center mb-6">
+                  <div className="w-14 h-14 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-3.5 shadow-sm">
+                    <GraduationCap className="w-7 h-7 text-primary-600" />
                   </div>
-                )}
-                <div ref={messagesEndRef} />
+                  <h3 className="font-semibold text-gray-900 text-lg">Counseling Registration</h3>
+                  <p className="text-xs text-gray-500 mt-1">Our certified counselor will call you within 24 hours</p>
+                </div>
+
+                <form onSubmit={handleLeadSubmit} className="space-y-4">
+                  <div className="relative">
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Your Name *"
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all"
+                      required
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="tel"
+                      placeholder="WhatsApp Phone Number *"
+                      value={leadForm.phone}
+                      onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all"
+                      required
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="email"
+                      placeholder="Email Address (optional)"
+                      value={leadForm.email}
+                      onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <select
+                      value={leadForm.preferred_country}
+                      onChange={(e) => setLeadForm({ ...leadForm, preferred_country: e.target.value })}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all appearance-none bg-white"
+                    >
+                      <option value="">Preferred Study Destination</option>
+                      {countries.map((country) => (
+                        <option key={country} value={country}>{country}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="flex gap-3 pt-3">
+                    <button
+                      type="button"
+                      onClick={() => setStep('chat')}
+                      className="flex-1 px-4 py-3 border border-gray-200 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition active:scale-95"
+                    >
+                      Back to Chat
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isLoading || !leadForm.name || !leadForm.phone}
+                      className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl text-sm font-semibold hover:shadow-lg disabled:opacity-50 transition active:scale-95 flex items-center justify-center gap-2"
+                    >
+                      {isLoading ? (
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Register
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
               </div>
-
-              {/* Input */}
-              <div className="p-4 bg-white border-t border-gray-100">
-                <div className="flex items-center gap-2">
-                  <input
-                    ref={inputRef}
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask about MBBS abroad..."
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-sm"
-                    disabled={isLoading}
-                  />
-                  <button
-                    onClick={sendMessage}
-                    disabled={!inputValue.trim() || isLoading}
-                    className="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition"
-                  >
-                    <Send className="w-4 h-4" />
-                  </button>
+            ) : (
+              /* Lead Complete */
+              <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-gray-50/50 to-white">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-100">
+                    <Check className="w-8 h-8 text-green-600" />
+                  </div>
+                  <h3 className="font-semibold text-lg text-gray-900">Registration Successful!</h3>
+                  <p className="text-sm text-gray-500 mt-1.5 px-4">
+                    Our lead MBBS advisor will contact you within 24 hours.
+                  </p>
                 </div>
               </div>
-            </>
-          ) : step === 'lead_capture' ? (
-            /* Lead Capture Form */
-            <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white">
-              <div className="text-center mb-4">
-                <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <GraduationCap className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="font-semibold text-gray-900">Get Free Consultation</h3>
-                <p className="text-sm text-gray-600">Our expert will call you within 24 hours</p>
-              </div>
-
-              <form onSubmit={handleLeadSubmit} className="space-y-3">
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Your Name *"
-                    value={leadForm.name}
-                    onChange={(e) => setLeadForm({ ...leadForm, name: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                    required
-                  />
-                </div>
-
-                <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="tel"
-                    placeholder="Phone Number *"
-                    value={leadForm.phone}
-                    onChange={(e) => setLeadForm({ ...leadForm, phone: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                    required
-                  />
-                </div>
-
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="email"
-                    placeholder="Email (optional)"
-                    value={leadForm.email}
-                    onChange={(e) => setLeadForm({ ...leadForm, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-                  />
-                </div>
-
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <select
-                    value={leadForm.preferred_country}
-                    onChange={(e) => setLeadForm({ ...leadForm, preferred_country: e.target.value })}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm appearance-none bg-white"
-                  >
-                    <option value="">Preferred Country</option>
-                    {countries.map((country) => (
-                      <option key={country} value={country}>{country}</option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex gap-2 pt-2">
-                  <button
-                    type="button"
-                    onClick={() => setStep('chat')}
-                    className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
-                  >
-                    Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={isLoading || !leadForm.name || !leadForm.phone}
-                    className="flex-1 px-4 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-dark disabled:opacity-50 transition flex items-center justify-center gap-2"
-                  >
-                    {isLoading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4" />
-                        Submit
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          ) : (
-            /* Lead Complete */
-            <div className="flex-1 flex items-center justify-center p-6 bg-gradient-to-b from-gray-50 to-white">
-              <div className="text-center">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Check className="w-10 h-10 text-green-600" />
-                </div>
-                <h3 className="font-semibold text-lg text-gray-900 mb-2">Thank You!</h3>
-                <p className="text-sm text-gray-600">
-                  Our counselor will contact you soon.
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 ${
-          isOpen
-            ? 'bg-gray-700 hover:bg-gray-800 scale-90'
-            : 'bg-gradient-to-r from-primary to-primary-dark hover:scale-105 animate-bounce-subtle'
-        }`}
-      >
-        {isOpen ? (
-          <X className="w-6 h-6 text-white" />
-        ) : (
-          <MessageCircle className="w-6 h-6 text-white" />
-        )}
-      </button>
+      <div className="relative">
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform active:scale-90 ${
+            isOpen
+              ? 'bg-gray-800 text-white rotate-90'
+              : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:scale-105'
+          }`}
+        >
+          {isOpen ? (
+            <X className="w-6 h-6 text-white" />
+          ) : (
+            <MessageCircle className="w-6 h-6 text-white" />
+          )}
+        </button>
 
-      {/* Notification Badge */}
-      {!isOpen && (
-        <div className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-          <span className="text-[10px] text-white font-bold">1</span>
-        </div>
-      )}
+        {/* Notification Badge */}
+        {!isOpen && (
+          <span className="absolute -top-1 -left-1 w-4 h-4 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+            <span className="text-[10px] text-white font-bold">1</span>
+          </span>
+        )}
+      </div>
     </div>
   );
 }

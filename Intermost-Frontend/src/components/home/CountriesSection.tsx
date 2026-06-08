@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { ArrowRight, GraduationCap, Clock, DollarSign } from 'lucide-react';
+import { ArrowRight, GraduationCap, Clock, DollarSign, Check } from 'lucide-react';
 import { countriesApi } from '@/lib/services';
 import type { Country } from '@/lib/api';
 import { getCountryFlag } from '@/lib/utils';
@@ -134,7 +134,7 @@ export default function CountriesSection() {
             >
               <Link href={`/countries/${country.slug}`} className="block group h-full">
                 <motion.div
-                  className="card card-hover overflow-hidden h-full flex flex-col"
+                  className="bg-white rounded-[28px] border border-gray-200 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
                   whileHover={{ y: -8 }}
                   transition={{ duration: 0.3 }}
                 >
@@ -144,13 +144,13 @@ export default function CountriesSection() {
                       src={country.hero_image || country.banner_image || '/images/placeholder.jpg'}
                       alt={`MBBS in ${country.name}`}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
+                      className="object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
                     />
                     {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent group-hover:from-black/90 transition-all duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent group-hover/card:from-black/90 transition-all duration-300" />
 
                     {/* Flag */}
-                    <div className="absolute top-3 sm:top-4 left-3 sm:left-4 w-8 sm:w-10 h-6 sm:h-7 rounded overflow-hidden shadow-md">
+                    <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20">
                       <Image
                         src={country.flag_url || getCountryFlag(country.code)}
                         alt={`${country.name} flag`}
@@ -161,40 +161,53 @@ export default function CountriesSection() {
 
                     {/* Featured Badge */}
                     {country.meta?.is_featured && (
-                      <span className="absolute top-3 sm:top-4 right-3 sm:right-4 px-2.5 sm:px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full">
-                        Popular
+                      <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                        Popular Choice
                       </span>
                     )}
 
                     {/* Country Name */}
                     <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white text-shadow">
+                      <h3 className="text-xl sm:text-2xl font-bold text-white text-shadow flex items-center gap-2">
                         MBBS in {country.name}
                       </h3>
                     </div>
                   </div>
 
                   {/* Info */}
-                  <div className="p-4 sm:p-5 flex-1 flex flex-col">
+                  <div className="p-5 flex-1 flex flex-col">
+                    {/* Trust Badges */}
+                    <div className="flex flex-wrap gap-1.5 mb-5">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50/70 border border-primary-100 rounded-full text-[10px] font-semibold text-primary-700">
+                        <Check className="w-3 h-3" /> NMC Approved
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-50/70 border border-secondary-100 rounded-full text-[10px] font-semibold text-secondary-700">
+                        <Check className="w-3 h-3" /> WHO Listed
+                      </span>
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50/70 border border-green-100 rounded-full text-[10px] font-semibold text-green-700">
+                        <Check className="w-3 h-3" /> 100% English
+                      </span>
+                    </div>
+
                     {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-4">
+                    <div className="grid grid-cols-3 gap-3 mb-5 bg-gray-50/70 p-3 rounded-2xl border border-gray-100">
                       <div className="text-center">
-                        <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600 mx-auto mb-1" />
-                        <span className="text-xs text-gray-500">Duration</span>
+                        <Clock className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                        <span className="text-[10px] text-gray-500 block">Duration</span>
                         <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                           {country.course_details?.duration || '6 Years'}
                         </p>
                       </div>
                       <div className="text-center border-x border-gray-200">
-                        <GraduationCap className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600 mx-auto mb-1" />
-                        <span className="text-xs text-gray-500">Medium</span>
+                        <GraduationCap className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                        <span className="text-[10px] text-gray-500 block">Medium</span>
                         <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
                           {country.course_details?.medium || 'English'}
                         </p>
                       </div>
                       <div className="text-center">
-                        <DollarSign className="w-4 sm:w-5 h-4 sm:h-5 text-primary-600 mx-auto mb-1" />
-                        <span className="text-xs text-gray-500">Total Fee</span>
+                        <DollarSign className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                        <span className="text-[10px] text-gray-500 block">Tuition Fee</span>
                         <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5 line-clamp-2">
                           {country.pricing?.total_course_fee || 'Contact Us'}
                         </p>
@@ -202,23 +215,20 @@ export default function CountriesSection() {
                     </div>
 
                     {/* Recognition */}
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-auto pt-3 border-t border-gray-100">
-                      <div className="flex items-center space-x-1 sm:space-x-2 flex-wrap justify-center sm:justify-start gap-1">
-                        {country.course_details?.recognition?.slice(0, 2).map((rec) => (
+                    <div className="flex items-center justify-between gap-3 mt-auto pt-3.5 border-t border-gray-100">
+                      <div className="flex items-center space-x-1.5 flex-wrap">
+                        {country.course_details?.recognition?.slice(0, 3).map((rec) => (
                           <span
                             key={rec}
-                            className="px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded whitespace-nowrap"
+                            className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-semibold rounded whitespace-nowrap"
                           >
                             {rec}
                           </span>
                         ))}
-                        {country.course_details?.recognition && country.course_details.recognition.length > 2 && (
-                          <span className="text-xs text-gray-500">+{country.course_details.recognition.length - 2}</span>
-                        )}
                       </div>
-                      <span className="text-primary-600 font-medium text-xs sm:text-sm flex items-center group-hover:translate-x-1 transition-transform">
-                        <span className="hidden sm:inline">Learn More</span>
-                        <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" />
+                      <span className="text-primary-600 font-bold text-xs sm:text-sm flex items-center group-hover/card:translate-x-1 transition-transform">
+                        <span>Learn More</span>
+                        <ArrowRight className="w-4 h-4 ml-1" />
                       </span>
                     </div>
                   </div>
