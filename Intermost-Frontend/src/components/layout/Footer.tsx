@@ -18,6 +18,7 @@ const quickLinks = [
   { name: 'MBBS in Nepal', href: '/countries/nepal' },
   { name: 'MBBS in Kazakhstan', href: '/countries/kazakhstan' },
   { name: 'MBBS in Tajikistan', href: '/countries/tajikistan' },
+  { name: 'Compare Countries', href: '/compare' },
   { name: 'Apply Now', href: '/apply' },
 ];
 

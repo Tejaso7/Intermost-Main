@@ -22,6 +22,7 @@ const navigation = [
       { name: 'Tajikistan', href: '/countries/tajikistan', flag: '/flags/tajikistan.png' },
     ],
   },
+  { name: 'Compare', href: '/compare' },
   { name: 'About Us', href: '/about' },
   { name: 'Blogs', href: '/blogs' },
   { name: 'Contact', href: '/contact' },
