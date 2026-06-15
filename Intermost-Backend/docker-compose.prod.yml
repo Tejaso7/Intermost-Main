@@ -10,6 +10,7 @@ services:
       context: ./Intermost-Backend
       dockerfile: Dockerfile
     container_name: intermost-api-prod
+    user: root
     ports:
       - "8000:8000"
     environment:
