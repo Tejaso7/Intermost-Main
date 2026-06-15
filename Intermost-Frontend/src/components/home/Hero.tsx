@@ -261,12 +261,13 @@ export default function Hero() {
           </div>
 
           {/* Right Column: AI Matcher Widget */}
-          <div className="lg:col-span-5 w-full">
+          <div className="lg:col-span-5 w-full" style={{ perspective: 1200 }}>
             <motion.div
               initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="relative"
+              whileHover={{ rotateY: -3, rotateX: 2, scale: 1.015, y: -4 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="relative cursor-default"
             >
               {/* Back card decoration for 3D look */}
               <div className="absolute inset-0 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-[32px] blur-xl opacity-35 -z-10 translate-x-3 translate-y-3" />

@@ -46,6 +46,11 @@ urlpatterns = [
     path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
+# Customize Django Admin Portal Branding
+admin.site.site_header = 'Intermost Admin Portal'
+admin.site.site_title = 'Intermost Admin'
+admin.site.index_title = 'Welcome to Intermost Administration'
+
 # Serve static/media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

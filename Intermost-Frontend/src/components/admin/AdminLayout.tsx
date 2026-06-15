@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import {
@@ -133,8 +134,19 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b flex-shrink-0">
           <Link href="/admin" className="flex items-center gap-2">
-            <span className="text-xl font-bold text-primary-600">Intermost</span>
-            <span className="hidden sm:inline text-sm text-gray-500">Admin</span>
+            <div className="relative w-8 h-8 bg-white rounded-lg p-1 border border-gray-150 overflow-hidden flex-shrink-0 flex items-center justify-center">
+              <Image
+                src="/images/logo/logo.png"
+                alt="Intermost Logo"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
+            </div>
+            <div>
+              <span className="font-bold text-sm leading-tight text-primary-600 block">INTERMOST</span>
+              <span className="block text-[9px] text-gray-400 font-semibold tracking-wider">PORTAL</span>
+            </div>
           </Link>
           <motion.button
             onClick={() => setSidebarOpen(false)}

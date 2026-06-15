@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Mail, Lock, Eye, EyeOff, LogIn, AlertCircle } from 'lucide-react';
 import { storage } from '@/lib/utils';
@@ -102,8 +103,20 @@ export default function AdminLoginPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.1, duration: 0.4 }}
           >
-            <h1 className="text-3xl sm:text-4xl font-bold text-primary-600">Intermost</h1>
-            <p className="text-gray-500 mt-2 text-sm sm:text-base">Admin Dashboard</p>
+            <div className="flex justify-center mb-4">
+              <div className="relative w-16 h-16 bg-white rounded-2xl p-2.5 shadow-md border border-gray-100 flex items-center justify-center">
+                <Image
+                  src="/images/logo/logo.png"
+                  alt="Intermost Logo"
+                  width={48}
+                  height={48}
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-primary-600 tracking-tight">INTERMOST</h1>
+            <p className="text-gray-500 mt-2 text-sm sm:text-base font-medium">Administrative Portal</p>
           </motion.div>
 
           {/* Error Message */}
