@@ -233,3 +233,48 @@ class StatsView(APIView):
                 'years_experience': 21,
                 'visa_success_rate': 99
             })
+
+
+class EnvConfigView(APIView):
+    """API endpoint to get and update the .env file (Admin only)."""
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        from django.conf import settings as django_settings
+        import os
+        env_path = os.path.join(django_settings.BASE_DIR, '.env')
+        content = ""
+        if os.path.exists(env_path):
+            try:
+                with open(env_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+            except Exception as e:
+                return Response({'error': f"Failed to read .env: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return Response({'error': ".env file does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'content': content})
+
+    def post(self, request):
+        from django.conf import settings as django_settings
+        import os
+        import signal
+        content = request.data.get('content', '')
+        env_path = os.path.join(django_settings.BASE_DIR, '.env')
+        try:
+            with open(env_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+            
+            # Send SIGHUP to Gunicorn to reload configuration
+            if hasattr(signal, 'SIGHUP'):
+                try:
+                    os.kill(1, signal.SIGHUP)
+                except Exception:
+                    try:
+                        os.kill(os.getppid(), signal.SIGHUP)
+                    except:
+                        pass
+                        
+            return Response({'message': ".env file updated and server reloaded successfully!"})
+        except Exception as e:
+            return Response({'error': f"Failed to save .env: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+

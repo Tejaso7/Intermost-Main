@@ -25,5 +25,6 @@ urlpatterns = [
     
     # Site Settings
     path('settings/', views.SiteSettingsView.as_view(), name='site-settings'),
+    path('settings/env/', views.EnvConfigView.as_view(), name='env-settings'),
     path('stats/', views.StatsView.as_view(), name='stats'),
 ]

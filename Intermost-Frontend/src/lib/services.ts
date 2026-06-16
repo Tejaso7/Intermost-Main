@@ -244,6 +244,16 @@ export const coreApi = {
     return response.data;
   },
 
+  getEnv: async () => {
+    const response = await api.get<{ content: string }>('/settings/env/');
+    return response.data;
+  },
+
+  updateEnv: async (content: string) => {
+    const response = await api.post<{ message: string }>('/settings/env/', { content });
+    return response.data;
+  },
+
   login: async (email: string, password: string) => {
     const response = await api.post<{ access: string; refresh: string }>('/auth/login/', {
       email,
