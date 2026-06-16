@@ -1,5 +1,9 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import SubscriptionModal from '@/components/ui/SubscriptionModal';
 import { 
   Phone, 
   Mail, 
@@ -29,6 +33,16 @@ const legalLinks = [
 ];
 
 export default function Footer() {
+  const [email, setEmail] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSubscribeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email.trim()) {
+      setIsModalOpen(true);
+    }
+  };
+
   return (
     <footer className="bg-gray-900 text-gray-300">
       {/* Main Footer */}
@@ -141,12 +155,15 @@ export default function Footer() {
             <p className="text-gray-400 mb-4">
               Subscribe to get latest updates on MBBS admissions and offers.
             </p>
-            <form className="space-y-3">
+            <form onSubmit={handleSubscribeSubmit} className="space-y-3">
               <div className="relative">
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors text-white placeholder-gray-500"
+                  required
                 />
                 <button
                   type="submit"
@@ -181,6 +198,11 @@ export default function Footer() {
           </div>
         </div>
       </div>
+      <SubscriptionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialEmail={email}
+      />
     </footer>
   );
 }

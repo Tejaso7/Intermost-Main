@@ -198,6 +198,44 @@ export const inquiriesApi = {
     }>('/inquiries/stats/');
     return response.data;
   },
+
+  importLeads: async (leads: Array<Partial<Inquiry>>) => {
+    const response = await api.post<{ message: string; imported: number; skipped: number }>(
+      '/inquiries/import/',
+      { leads }
+    );
+    return response.data;
+  },
+
+  sendCampaign: async (payload: { recipient_ids: string[]; subject: string; body: string }) => {
+    const response = await api.post<{ message: string; sent: number; failed: number; failed_emails: string[] }>(
+      '/inquiries/campaign/',
+      payload
+    );
+    return response.data;
+  },
+
+  sendSubscriptionOtp: async (email: string, phone: string) => {
+    const response = await api.post<{ message: string }>(
+      '/inquiries/subscribe/otp/send/',
+      { email, phone }
+    );
+    return response.data;
+  },
+
+  verifySubscriptionOtp: async (payload: {
+    name: string;
+    email: string;
+    phone: string;
+    country_code?: string;
+    otp: string;
+  }) => {
+    const response = await api.post<{ message: string }>(
+      '/inquiries/subscribe/otp/verify/',
+      payload
+    );
+    return response.data;
+  },
 };
 
 // Team API

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, User, ArrowRight, Search } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import NewsletterForm from '@/components/NewsletterForm';
 
 export const metadata: Metadata = {
   title: 'Blog - MBBS Abroad News & Updates | Intermost Study Abroad',
@@ -286,19 +287,7 @@ export default function BlogsPage() {
               Get the latest updates on MBBS abroad, admission deadlines, and
               scholarship opportunities delivered to your inbox.
             </p>
-            <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 rounded-lg focus:ring-2 focus:ring-white/50 border-0"
-              />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-white text-primary font-semibold rounded-lg hover:bg-gray-100 transition-colors"
-              >
-                Subscribe
-              </button>
-            </form>
+            <NewsletterForm />
           </div>
         </div>
       </section>

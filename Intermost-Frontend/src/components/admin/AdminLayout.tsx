@@ -34,7 +34,7 @@ const navItems = [
   { name: 'Blogs', href: '/admin/blogs', icon: FileText },
   { name: 'News', href: '/admin/news', icon: Newspaper },
   { name: 'Testimonials', href: '/admin/testimonials', icon: Users },
-  { name: 'Inquiries', href: '/admin/inquiries', icon: MessageSquare },
+  { name: 'Leads', href: '/admin/leads', icon: MessageSquare },
   { name: 'Team', href: '/admin/team', icon: Users },
   { name: 'Knowledge Base', href: '/admin/knowledge-base', icon: Database },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
