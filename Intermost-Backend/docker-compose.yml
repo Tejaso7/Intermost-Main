@@ -34,6 +34,7 @@ services:
       - ./Intermost-Backend:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+      - db_volume:/app/db
     command: >
       sh -c "python manage.py migrate &&
              python manage.py collectstatic --noinput &&
@@ -134,4 +135,6 @@ volumes:
   media_volume:
     driver: local
   node_modules_volume:
+    driver: local
+  db_volume:
     driver: local

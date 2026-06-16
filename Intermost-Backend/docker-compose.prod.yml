@@ -37,20 +37,8 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn config.wsgi:application 
-               --bind 0.0.0.0:8000 
-               --workers 4
-               --worker-class sync
-               --worker-connections 1000
-               --max-requests 1000
-               --max-requests-jitter 50
-               --timeout 60
-               --access-logfile -
-               --error-logfile -
-               --log-level info"
+      - db_volume:/app/db
+    command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn config.wsgi:application --bind 0.0.0.0:8000 --workers 4 --worker-class sync --worker-connections 1000 --max-requests 1000 --max-requests-jitter 50 --timeout 60 --access-logfile - --error-logfile - --log-level info"
     networks:
       - intermost-network
     restart: always
@@ -138,4 +126,6 @@ volumes:
   static_volume:
     driver: local
   media_volume:
+    driver: local
+  db_volume:
     driver: local
