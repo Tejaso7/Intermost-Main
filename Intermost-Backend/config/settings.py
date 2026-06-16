@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
     DEBUG=(bool, False)
 )
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'), overwrite=True)
 
 # Security Settings
 SECRET_KEY = env('SECRET_KEY', default='django-insecure-change-this-in-production')
