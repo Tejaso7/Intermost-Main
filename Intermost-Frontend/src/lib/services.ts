@@ -13,7 +13,7 @@ import api, {
 
 // Countries API
 export const countriesApi = {
-  getAll: async (params?: { active?: boolean; featured?: boolean }) => {
+  getAll: async (params?: { is_active?: boolean | 'all'; featured?: boolean; active?: boolean }) => {
     const response = await api.get<{ count: number; results: Country[] }>('/countries/', { params });
     return response.data.results || [];
   },
@@ -45,7 +45,7 @@ export const countriesApi = {
 
 // Colleges API
 export const collegesApi = {
-  getAll: async (params?: { country?: string; featured?: boolean }) => {
+  getAll: async (params?: { country?: string; featured?: boolean; is_active?: boolean | 'all' }) => {
     const response = await api.get<{ results: College[] }>('/colleges/', { params });
     return response.data.results || [];
   },

@@ -33,8 +33,8 @@ export default function CollegesPage() {
   const fetchData = async () => {
     try {
       const [collegesData, countriesData] = await Promise.all([
-        collegesApi.getAll(),
-        countriesApi.getAll(),
+        collegesApi.getAll({ is_active: 'all' }),
+        countriesApi.getAll({ is_active: 'all' }),
       ]);
       setColleges(Array.isArray(collegesData) ? collegesData : []);
       setCountries(Array.isArray(countriesData) ? countriesData : []);
@@ -51,8 +51,9 @@ export default function CollegesPage() {
   }, []);
 
   const filteredColleges = colleges.filter((college) => {
+    const location = college.overview?.location || college.contact?.city || '';
     const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      college.overview?.location?.toLowerCase().includes(searchTerm.toLowerCase());
+      location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCountry = !selectedCountry || college.country_id === selectedCountry;
     return matchesSearch && matchesCountry;
   });
@@ -130,7 +131,7 @@ export default function CollegesPage() {
           >
             <option value="">All Countries</option>
             {countries.map((country) => (
-              <option key={country._id} value={country.slug}>
+              <option key={country._id} value={country._id}>
                 {country.name}
               </option>
             ))}
@@ -173,8 +174,8 @@ export default function CollegesPage() {
                     </div>
                   </td>
                   <td className="py-4 px-6 text-gray-700 capitalize">{college.country_name || college.country_id}</td>
-                  <td className="py-4 px-6 text-gray-700">{college.overview?.location || '-'}</td>
-                  <td className="py-4 px-6 text-gray-700">{college.overview?.established || '-'}</td>
+                  <td className="py-4 px-6 text-gray-700">{college.overview?.location || college.contact?.city || '-'}</td>
+                  <td className="py-4 px-6 text-gray-700">{college.overview?.established_year || '-'}</td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
                       {college.meta?.is_featured && (

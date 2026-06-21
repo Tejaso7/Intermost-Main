@@ -8,11 +8,18 @@ import sys
 import django
 
 # Setup Django
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import os
+try:
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+except NameError:
+    BASE_DIR = os.path.abspath('.')
+
+sys.path.insert(0, BASE_DIR)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
 from apps.mongodb import get_collection
+from apps.colleges.schemas import get_default_college
 from datetime import datetime
 
 def seed_countries():
@@ -1289,7 +1296,53 @@ def seed_colleges():
         }
     ]
     
-    result = collection.insert_many(colleges)
+    # Map to standard schema
+    countries_collection = get_collection('countries')
+    country_map = {c['slug']: c for c in countries_collection.find()}
+    
+    formatted_colleges = []
+    for c in colleges:
+        college = get_default_college()
+        country_slug = c.get('country_slug', '')
+        country = country_map.get(country_slug)
+        
+        college['name'] = c.get('name', '')
+        college['slug'] = c.get('slug', '')
+        if country:
+            college['country_id'] = country['_id']
+        college['country_slug'] = country_slug
+        college['country_name'] = c.get('country', '')
+        
+        college['thumbnail'] = c.get('image', '')
+        college['banner_image'] = c.get('image', '')
+        college['logo'] = c.get('logo', '')
+        
+        college['overview']['short_description'] = c.get('description', '')
+        college['overview']['established_year'] = c.get('established')
+        college['overview']['location'] = c.get('city', '')
+        
+        college['contact']['website'] = c.get('website', '')
+        college['contact']['city'] = c.get('city', '')
+        
+        college['course_details']['duration'] = c.get('course_duration', '6 Years')
+        college['course_details']['medium'] = c.get('medium', 'English')
+        
+        college['fees']['tuition_fee_per_year'] = c.get('tuition_fee', '')
+        college['fees']['hostel_fee_per_year'] = c.get('hostel_fee', '')
+        college['fees']['total_package'] = c.get('total_fee', '')
+        
+        recs = c.get('recognitions', [])
+        college['recognition'] = [{"name": r, "verified": True} for r in recs]
+        
+        college['meta']['display_order'] = c.get('display_order', 0)
+        college['meta']['is_active'] = c.get('is_active', True)
+        college['meta']['is_featured'] = c.get('is_featured', False)
+        college['meta']['created_at'] = c.get('created_at', datetime.utcnow())
+        college['meta']['updated_at'] = c.get('updated_at', datetime.utcnow())
+        
+        formatted_colleges.append(college)
+        
+    result = collection.insert_many(formatted_colleges)
     print(f"Inserted {len(result.inserted_ids)} colleges/universities")
     return result.inserted_ids
 

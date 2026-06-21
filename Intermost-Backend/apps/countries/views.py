@@ -55,11 +55,14 @@ class CountryListCreateView(APIView):
         collection = get_collection('countries')
         
         # Query parameters
-        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        is_active_param = request.query_params.get('is_active', 'true').lower()
         is_featured = request.query_params.get('is_featured', None)
         
         # Build query
-        query = {'meta.is_active': is_active}
+        query = {}
+        if is_active_param != 'all':
+            query['meta.is_active'] = is_active_param == 'true'
+            
         if is_featured is not None:
             query['meta.is_featured'] = is_featured.lower() == 'true'
         

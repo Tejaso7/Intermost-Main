@@ -30,7 +30,7 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://intermost-backend.onrender.com/api/v1',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1',
   },
   // Experimental features for better performance
   experimental: {

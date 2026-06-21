@@ -163,36 +163,69 @@ export interface College {
   country_name?: string;
   logo?: string;
   banner_image?: string;
+  thumbnail?: string;
   overview: {
-    description: string;
-    established?: number;
-    type?: string;
-    location?: string;
+    short_description: string;
+    full_description?: string;
+    established_year?: number;
+    university_type?: string;
   };
   contact?: {
     website?: string;
     email?: string;
     phone?: string;
+    address?: string;
+    city?: string;
+    map_url?: string;
   };
-  recognition: string[];
+  recognition: Array<{
+    name: string;
+    logo?: string;
+    verified?: boolean;
+  }>;
   fees?: {
-    tuition_per_year?: string;
-    hostel_per_year?: string;
-    total_course_fee?: string;
+    tuition_fee_per_year?: string;
+    hostel_fee_per_year?: string;
+    total_package?: string;
+    scholarship_available?: boolean;
+    scholarship_details?: string;
+  };
+  course_details?: {
+    degree?: string;
+    duration?: string;
+    medium?: string;
+    intake?: string;
+    seats_available?: number;
   };
   eligibility?: {
-    minimum_marks?: string;
-    entrance_exam?: string;
-    age_requirement?: string;
+    minimum_percentage?: string;
+    neet_required?: boolean;
+    neet_cutoff?: string;
+    age_limit?: string;
+    documents_required?: string[];
   };
-  facilities: string[];
+  facilities: Array<{
+    icon: string;
+    name: string;
+    description: string;
+  }>;
+  highlights?: string[];
+  gallery?: Array<{
+    type: string;
+    url: string;
+    caption: string;
+    is_featured: boolean;
+  }>;
   rankings?: {
-    world_rank?: number;
-    country_rank?: number;
+    world_rank?: string;
+    country_rank?: string;
+    other_rankings?: string[];
   };
   meta: {
     is_active: boolean;
     is_featured: boolean;
+    is_nmc_approved: boolean;
+    is_who_listed: boolean;
     display_order: number;
     created_at: string;
     updated_at: string;

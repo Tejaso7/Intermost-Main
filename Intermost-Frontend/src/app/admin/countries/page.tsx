@@ -35,7 +35,7 @@ export default function AdminCountriesPage() {
 
   const fetchCountries = async () => {
     try {
-      const data = await countriesApi.getAll();
+      const data = await countriesApi.getAll({ is_active: 'all' });
       setCountries(data);
     } catch (error) {
       console.error('Error fetching countries:', error);
@@ -54,6 +54,20 @@ export default function AdminCountriesPage() {
       } catch (error) {
         toast.error('Failed to delete country');
       }
+    }
+  };
+
+  const handleToggleActive = async (country: Country) => {
+    try {
+      const updatedMeta = {
+        ...country.meta,
+        is_active: !country.meta?.is_active,
+      };
+      await countriesApi.update(country._id, { meta: updatedMeta });
+      toast.success(`Country ${updatedMeta.is_active ? 'activated' : 'deactivated'} successfully`);
+      fetchCountries();
+    } catch (error) {
+      toast.error('Failed to update country status');
     }
   };
 
@@ -146,15 +160,19 @@ export default function AdminCountriesPage() {
                 </div>
                 {/* Status Badge */}
                 <div className="absolute top-3 right-3">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleToggleActive(country);
+                    }}
+                    className={`px-2 py-1 text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity ${
                       country.meta?.is_active
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                     }`}
                   >
                     {country.meta?.is_active ? 'Active' : 'Inactive'}
-                  </span>
+                  </button>
                 </div>
               </div>
 

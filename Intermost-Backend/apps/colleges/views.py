@@ -51,13 +51,15 @@ class CollegeListCreateView(APIView):
         collection = get_collection('colleges')
         
         # Query parameters
-        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        is_active_param = request.query_params.get('is_active', 'true').lower()
         is_featured = request.query_params.get('is_featured', None)
         country_slug = request.query_params.get('country', None)
         is_nmc_approved = request.query_params.get('nmc_approved', None)
         
         # Build query
-        query = {'meta.is_active': is_active}
+        query = {}
+        if is_active_param != 'all':
+            query['meta.is_active'] = is_active_param == 'true'
         
         if is_featured is not None:
             query['meta.is_featured'] = is_featured.lower() == 'true'
@@ -109,13 +111,23 @@ class CollegeListCreateView(APIView):
                 'error': 'College name is required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
-        if not data.get('country_slug'):
+        country_id = data.get('country_id')
+        country_slug = data.get('country_slug')
+        
+        if not country_id and not country_slug:
             return Response({
-                'error': 'Country slug is required'
+                'error': 'Country ID or slug is required'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Verify country exists
-        country = countries_collection.find_one({'slug': data['country_slug']})
+        if country_id:
+            try:
+                country = countries_collection.find_one({'_id': ObjectId(country_id)})
+            except InvalidId:
+                return Response({'error': 'Invalid Country ID'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            country = countries_collection.find_one({'slug': country_slug})
+            
         if not country:
             return Response({
                 'error': 'Country not found'
@@ -138,6 +150,7 @@ class CollegeListCreateView(APIView):
         # Set country reference
         college['country_id'] = country['_id']
         college['country_name'] = country['name']
+        college['country_slug'] = country.get('slug', '')
         
         # Set timestamps
         now = datetime.utcnow()
@@ -208,6 +221,13 @@ class CollegeDetailView(APIView):
         
         # Remove _id from data if present
         data.pop('_id', None)
+        
+        # Convert country_id to ObjectId if present
+        if 'country_id' in data and isinstance(data['country_id'], str):
+            try:
+                data['country_id'] = ObjectId(data['country_id'])
+            except InvalidId:
+                pass
         
         # Update in MongoDB
         collection.update_one(

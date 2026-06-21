@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import SubscriptionModal from '@/components/ui/SubscriptionModal';
@@ -14,14 +14,13 @@ import {
   Send
 } from 'lucide-react';
 
-const quickLinks = [
+import { countriesApi } from '@/lib/services';
+
+const baseQuickLinks = [
   { name: 'About Us', href: '/about' },
-  { name: 'MBBS in Russia', href: '/countries/russia' },
-  { name: 'MBBS in Georgia', href: '/countries/georgia' },
-  { name: 'MBBS in Uzbekistan', href: '/countries/uzbekistan' },
-  { name: 'MBBS in Nepal', href: '/countries/nepal' },
-  { name: 'MBBS in Kazakhstan', href: '/countries/kazakhstan' },
-  { name: 'MBBS in Tajikistan', href: '/countries/tajikistan' },
+];
+
+const endQuickLinks = [
   { name: 'Compare Countries', href: '/compare' },
   { name: 'Apply Now', href: '/apply' },
 ];
@@ -35,6 +34,23 @@ const legalLinks = [
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [quickLinks, setQuickLinks] = useState([...baseQuickLinks, ...endQuickLinks]);
+
+  useEffect(() => {
+    const fetchLinks = async () => {
+      try {
+        const data = await countriesApi.getAll({ active: true });
+        const countryLinks = data.map((c) => ({
+          name: `MBBS in ${c.name}`,
+          href: `/countries/${c.slug}`,
+        }));
+        setQuickLinks([...baseQuickLinks, ...countryLinks, ...endQuickLinks]);
+      } catch (error) {
+        console.error('Failed to load countries for footer', error);
+      }
+    };
+    fetchLinks();
+  }, []);
 
   const handleSubscribeSubmit = (e: React.FormEvent) => {
     e.preventDefault();

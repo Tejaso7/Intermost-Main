@@ -5,6 +5,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ChevronDown, Sparkles, CheckCircle, RefreshCw, AlertTriangle, GraduationCap } from 'lucide-react';
+import { coreApi } from '@/lib/services';
+import { SiteSettings } from '@/lib/api';
 import { scrollToElement } from '@/lib/utils';
 
 interface MatchResult {
@@ -26,6 +28,27 @@ export default function Hero() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [calculationStep, setCalculationStep] = useState(0);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
+  
+  const [siteStats, setSiteStats] = useState({
+    students_placed: 5500,
+    partner_universities: 35,
+    years_experience: 21,
+    visa_success_rate: 99
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.stats) {
+          setSiteStats(settings.stats);
+        }
+      } catch (error) {
+        console.debug('Failed to fetch stats for hero, using defaults', error);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const steps = [
     'Analyzing target destination qualifications...',
@@ -223,10 +246,10 @@ export default function Hero() {
               className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl"
             >
               {[
-                { value: '5500+', label: 'Students Placed' },
-                { value: '35+', label: 'Partner Colleges' },
-                { value: '21+', label: 'Years Experience' },
-                { value: '99%', label: 'Visa Success' },
+                { value: `${siteStats.students_placed}+`, label: 'Students Placed' },
+                { value: `${siteStats.partner_universities}+`, label: 'Partner Colleges' },
+                { value: `${siteStats.years_experience}+`, label: 'Years Experience' },
+                { value: `${siteStats.visa_success_rate}%`, label: 'Visa Success' },
               ].map((stat, i) => (
                 <div key={i} className="p-3.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
                   <p className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-300 to-secondary-300">

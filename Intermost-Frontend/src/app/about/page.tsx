@@ -8,21 +8,23 @@ import {
   Building, 
   CheckCircle,
   Phone,
-  Mail,
   MapPin,
-  ExternalLink
+  ExternalLink,
+  Mail
 } from 'lucide-react';
+import { coreApi, teamApi } from '@/lib/services';
 
 export const metadata: Metadata = {
   title: 'About Us - Intermost Ventures | Your Trusted MBBS Consultant',
   description: 'Learn about Intermost Ventures - Your gateway for medical education abroad with strategic offices in UAE, India, Georgia, Ukraine and Uzbekistan.',
 };
 
-const stats = [
-  { value: '5500+', label: 'Students Placed' },
-  { value: '35+', label: 'Partner Universities' },
-  { value: '7+', label: 'Countries' },
-  { value: '99%', label: 'Visa Success Rate' },
+// Initial fallback stats
+let stats = [
+  { value: '5500+', label: 'Students Placed', key: 'students_placed' },
+  { value: '35+', label: 'Partner Universities', key: 'partner_universities' },
+  { value: '21+', label: 'Years Experience', key: 'years_experience' },
+  { value: '99%', label: 'Visa Success Rate', key: 'visa_success_rate' },
 ];
 
 const values = [
@@ -139,7 +141,36 @@ const offices = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  let teamMembersList: any[] = teamMembers;
+  let officesList: any[] = offices;
+
+  try {
+    const settings = await coreApi.getSettings();
+    if (settings?.stats) {
+      stats = [
+        { value: `${settings.stats.students_placed}+`, label: 'Students Placed', key: 'students_placed' },
+        { value: `${settings.stats.partner_universities}+`, label: 'Partner Universities', key: 'partner_universities' },
+        { value: `${settings.stats.years_experience}+`, label: 'Years Experience', key: 'years_experience' },
+        { value: `${settings.stats.visa_success_rate}%`, label: 'Visa Success Rate', key: 'visa_success_rate' },
+      ];
+    }
+
+    const [fetchedTeam, fetchedOffices] = await Promise.all([
+      teamApi.getAll(),
+      teamApi.getOffices(),
+    ]);
+
+    if (fetchedTeam && fetchedTeam.length > 0) {
+      teamMembersList = fetchedTeam.filter((m: any) => m.is_active !== false);
+    }
+    if (fetchedOffices && fetchedOffices.length > 0) {
+      officesList = fetchedOffices.filter((o: any) => o.is_active !== false);
+    }
+  } catch (error) {
+    console.debug('Failed to fetch data for AboutPage', error);
+  }
+
   return (
     <div className="min-h-screen pt-20">
       {/* Hero Section */}
@@ -160,7 +191,7 @@ export default function AboutPage() {
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-white rounded-2xl shadow-xl p-8">
             {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
+              <div key={stat.key} className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-primary-600">
                   {stat.value}
                 </div>
@@ -307,19 +338,23 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {teamMembers.map((member) => (
+            {teamMembersList.map((member: any) => (
               <div
-                key={member.name}
+                key={member._id || member.name}
                 className="bg-gray-50 rounded-xl p-6 text-center hover:shadow-lg transition-all duration-300 group"
               >
-                <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors">
-                  <Users className="w-10 h-10 text-primary-600" />
+                <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors overflow-hidden relative">
+                  {member.photo ? (
+                    <Image src={member.photo} alt={member.name} fill className="object-cover" />
+                  ) : (
+                    <Users className="w-10 h-10 text-primary-600" />
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-1">
                   {member.name}
                 </h3>
-                <p className="text-primary-600 text-sm font-medium mb-2">{member.role}</p>
-                <p className="text-gray-600 text-sm mb-3">{member.description}</p>
+                <p className="text-primary-600 text-sm font-medium mb-2">{member.designation || (member as any).role}</p>
+                <p className="text-gray-600 text-sm mb-3">{member.bio || member.specialization || (member as any).description}</p>
                 {member.phone && (
                   <a 
                     href={`tel:${member.phone.replace(/\s/g, '')}`}
@@ -346,10 +381,10 @@ export default function AboutPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {offices.map((office) => (
-              <div key={office.title} className="bg-gray-50 rounded-xl p-6">
-                <h3 className="font-semibold text-gray-900 mb-1">{office.title}</h3>
-                <p className="text-primary-600 text-sm font-medium mb-3">{office.company}</p>
+            {officesList.map((office: any) => (
+              <div key={office._id || office.title || office.name} className="bg-gray-50 rounded-xl p-6">
+                <h3 className="font-semibold text-gray-900 mb-1">{office.title || office.name}</h3>
+                <p className="text-primary-600 text-sm font-medium mb-3">{office.company || office.company_name}</p>
                 <div className="space-y-3 text-gray-600 text-sm">
                   <p className="flex items-start">
                     <MapPin className="w-4 h-4 mr-2 mt-1 text-primary-600 flex-shrink-0" />
