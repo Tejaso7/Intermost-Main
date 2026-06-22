@@ -4,9 +4,10 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Play, MapPin, Calendar, ArrowRight, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { newsApi } from '@/lib/services';
 import type { News } from '@/lib/api';
+import NewsList from '@/components/news/NewsList';
 
 const fallbackNews: News[] = [
   {
@@ -69,24 +70,43 @@ export default function NewsPage() {
 
   const gridNews = news.filter((n) => n.media_type !== 'marquee');
 
+  // Calculate categories based on badge_text
+  const categoryCounts: Record<string, number> = {};
+  gridNews.forEach(item => {
+    const cat = item.badge_text || 'General';
+    categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  });
+
+  const categories = [
+    { name: 'All', count: gridNews.length },
+    ...Object.entries(categoryCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+  ];
+
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="py-20 bg-gradient-to-br from-primary-600 to-primary-800">
-        <div className="container-custom">
+      <section className="relative py-24 lg:py-32 bg-gradient-to-br from-primary-600 to-primary-800 flex flex-col items-center justify-center min-h-[40vh]">
+        <div className="absolute inset-0 bg-[url('/images/pattern-bg.png')] opacity-10 bg-cover bg-center mix-blend-overlay"></div>
+        <div className="container-custom relative z-10">
           <div className="text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">News & Updates</h1>
-            <p className="text-white/90 text-lg max-w-2xl mx-auto">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6 animate-slide-up">News & Updates</h1>
+            <p className="text-white/90 text-lg md:text-xl max-w-2xl mx-auto animate-slide-up" style={{ animationDelay: '0.1s' }}>
               Stay informed about our latest events, student achievements, and admission updates
             </p>
           </div>
         </div>
       </section>
 
-      {/* News Grid */}
-      <section className="py-16 bg-gray-50">
-        <div className="container-custom">
-          {loading ? (
+      {/* News Grid via Client Component */}
+      {!loading && gridNews.length > 0 && (
+        <NewsList newsItems={gridNews} categories={categories} />
+      )}
+
+      {loading && (
+        <section className="py-16 bg-gray-50">
+          <div className="container-custom">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-white rounded-2xl shadow-lg overflow-hidden animate-pulse">
@@ -99,85 +119,19 @@ export default function NewsPage() {
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {gridNews.map((item, index) => (
-                <motion.div
-                  key={item._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="bg-white rounded-2xl shadow-lg overflow-hidden group hover:shadow-xl transition-shadow"
-                >
-                  {/* Media */}
-                  <div className="relative h-48 overflow-hidden">
-                    {item.media_type === 'video' ? (
-                      <>
-                        <video
-                          src={item.media_url}
-                          poster={item.media_url}
-                          className="w-full h-full object-cover"
-                          muted
-                        />
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                          <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                            <Play className="w-6 h-6 text-primary-600 ml-1" />
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <Image
-                        src={item.media_url || '/images/placeholder.jpg'}
-                        alt={item.title}
-                        fill
-                        className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                    )}
+          </div>
+        </section>
+      )}
 
-                    {item.badge_text && (
-                      <span className="absolute top-4 left-4 px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full">
-                        {item.badge_text}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-5">
-                    <h3 className="font-semibold text-lg text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
-                      {item.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mt-2 line-clamp-3">
-                      {item.description}
-                    </p>
-
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                      {item.location && (
-                        <span className="flex items-center text-sm text-gray-500">
-                          <MapPin className="w-4 h-4 mr-1" />
-                          {item.location}
-                        </span>
-                      )}
-                      <span className="flex items-center text-sm text-gray-400">
-                        <Calendar className="w-4 h-4 mr-1" />
-                        {new Date(item.created_at).toLocaleDateString('en-IN', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {gridNews.length === 0 && !loading && (
+      {!loading && gridNews.length === 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container-custom">
             <div className="text-center py-20">
               <p className="text-gray-500 text-lg">No news articles available at the moment.</p>
             </div>
-          )}
+          </div>
+        </section>
+      )}
 
           {/* Back to Home */}
           <div className="text-center mt-12">
@@ -186,8 +140,6 @@ export default function NewsPage() {
               Back to Home
             </Link>
           </div>
-        </div>
-      </section>
     </main>
   );
 }

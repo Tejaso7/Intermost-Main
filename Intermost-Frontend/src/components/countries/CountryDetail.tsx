@@ -363,11 +363,11 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
                         <h3 className="font-semibold text-gray-900 line-clamp-2">
                           {college.name}
                         </h3>
-                        {college.overview?.location || college.contact?.city ? (
-                          <p className="text-sm text-gray-500 flex items-center mt-1">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {college.overview?.location || college.contact?.city}
-                          </p>
+                        {college.contact?.city ? (
+                          <div className="flex items-center text-sm text-gray-500 mb-3">
+                            <MapPin className="w-4 h-4 mr-1 text-primary-500" />
+                            {college.contact?.city}
+                          </div>
                         ) : null}
                       </div>
                     </div>

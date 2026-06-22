@@ -46,7 +46,7 @@ function collegeToForm(college: College): CollegeForm {
     name: college.name || '',
     slug: college.slug || '',
     country_id: college.country_id || '',
-    location: college.contact?.city || college.overview?.location || '',
+    location: college.contact?.city || '',
     established: college.overview?.established_year || 1950,
     world_rank: college.rankings?.world_rank?.toString() || '',
     description: college.overview?.short_description || '',
@@ -73,7 +73,6 @@ function formToCollege(form: CollegeForm): Partial<College> {
       short_description: form.description,
       established_year: form.established,
       university_type: 'Government',
-      location: form.location,
     },
     contact: {
       city: form.location,

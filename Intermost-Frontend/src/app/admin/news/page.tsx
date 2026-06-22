@@ -18,17 +18,24 @@ import { newsApi } from '@/lib/services';
 import { News } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 export default function NewsPage() {
   const [news, setNews] = useState<News[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   const fetchData = async () => {
     try {
-      const newsData = await newsApi.getAll();
+      const newsData = await newsApi.getAll({ is_active: 'all' });
       setNews(Array.isArray(newsData) ? newsData : []);
     } catch (error) {
       console.error('Error fetching news:', error);
@@ -52,15 +59,21 @@ export default function NewsPage() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this news item?')) return;
-    
+  const handleDelete = (id: string, title: string) => {
+    setDeleteDialog({ isOpen: true, id, title });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
-      await newsApi.delete(id);
+      await newsApi.delete(deleteDialog.id);
       toast.success('News deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
       fetchData();
     } catch (error) {
       toast.error('Failed to delete news');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -167,7 +180,7 @@ export default function NewsPage() {
                   <Edit2 className="w-4 h-4" />
                 </Link>
                 <button
-                  onClick={() => handleDelete(item._id)}
+                  onClick={() => handleDelete(item._id, item.title)}
                   className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -225,6 +238,15 @@ export default function NewsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete News Article"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

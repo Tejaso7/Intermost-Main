@@ -18,6 +18,7 @@ import { collegesApi, countriesApi } from '@/lib/services';
 import { College, Country } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 export default function CollegesPage() {
   const [colleges, setColleges] = useState<College[]>([]);
@@ -25,9 +26,13 @@ export default function CollegesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCollege, setEditingCollege] = useState<College | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 10;
 
   const fetchData = async () => {
@@ -51,7 +56,7 @@ export default function CollegesPage() {
   }, []);
 
   const filteredColleges = colleges.filter((college) => {
-    const location = college.overview?.location || college.contact?.city || '';
+    const location = college.contact?.city || '';
     const matchesSearch = college.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCountry = !selectedCountry || college.country_id === selectedCountry;
@@ -64,15 +69,21 @@ export default function CollegesPage() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this college?')) return;
-    
+  const handleDelete = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, id, title: name });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
-      await collegesApi.delete(id);
+      await collegesApi.delete(deleteDialog.id);
       toast.success('College deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
       fetchData();
     } catch (error) {
       toast.error('Failed to delete college');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -174,7 +185,7 @@ export default function CollegesPage() {
                     </div>
                   </td>
                   <td className="py-4 px-6 text-gray-700 capitalize">{college.country_name || college.country_id}</td>
-                  <td className="py-4 px-6 text-gray-700">{college.overview?.location || college.contact?.city || '-'}</td>
+                  <td className="py-4 px-6 text-gray-700">{college.contact?.city || '-'}</td>
                   <td className="py-4 px-6 text-gray-700">{college.overview?.established_year || '-'}</td>
                   <td className="py-4 px-6">
                     <div className="flex items-center space-x-2">
@@ -214,7 +225,7 @@ export default function CollegesPage() {
                         <Edit2 className="w-4 h-4" />
                       </Link>
                       <button
-                        onClick={() => handleDelete(college._id)}
+                        onClick={() => handleDelete(college._id, college.name)}
                         className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                         title="Delete"
                       >
@@ -276,6 +287,15 @@ export default function CollegesPage() {
           </div>
         )}
       </motion.div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete College"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

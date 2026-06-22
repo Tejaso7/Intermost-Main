@@ -46,10 +46,12 @@ class BlogListCreateView(APIView):
     def get(self, request):
         collection = get_collection('blogs')
         
-        is_published = request.query_params.get('published', 'true').lower() == 'true'
+        published_param = request.query_params.get('published', 'true').lower()
         category = request.query_params.get('category', None)
         
-        query = {'is_published': is_published}
+        query = {}
+        if published_param != 'all':
+            query['is_published'] = published_param == 'true'
         if category:
             query['category'] = category
         

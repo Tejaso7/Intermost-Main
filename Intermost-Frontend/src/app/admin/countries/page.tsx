@@ -16,6 +16,7 @@ import {
 import { countriesApi } from '@/lib/services';
 import type { Country } from '@/lib/api';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 // Helper to ensure image paths start with /
 const getImageSrc = (path: string | undefined, fallback: string = '/images/placeholder.svg'): string => {
@@ -28,6 +29,12 @@ export default function AdminCountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchCountries();
@@ -45,15 +52,21 @@ export default function AdminCountriesPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete ${name}?`)) {
-      try {
-        await countriesApi.delete(id);
-        toast.success('Country deleted successfully');
-        fetchCountries();
-      } catch (error) {
-        toast.error('Failed to delete country');
-      }
+  const handleDelete = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, id, title: name });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await countriesApi.delete(deleteDialog.id);
+      toast.success('Country deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
+      fetchCountries();
+    } catch (error) {
+      toast.error('Failed to delete country');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -228,6 +241,15 @@ export default function AdminCountriesPage() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Country"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

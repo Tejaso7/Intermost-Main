@@ -12,20 +12,15 @@ import {
   ExternalLink,
   Mail
 } from 'lucide-react';
-import { coreApi, teamApi } from '@/lib/services';
+import { teamApi } from '@/lib/services';
+import AboutStats from '@/components/about/AboutStats';
 
 export const metadata: Metadata = {
   title: 'About Us - Intermost Ventures | Your Trusted MBBS Consultant',
   description: 'Learn about Intermost Ventures - Your gateway for medical education abroad with strategic offices in UAE, India, Georgia, Ukraine and Uzbekistan.',
 };
 
-// Initial fallback stats
-let stats = [
-  { value: '5500+', label: 'Students Placed', key: 'students_placed' },
-  { value: '35+', label: 'Partner Universities', key: 'partner_universities' },
-  { value: '21+', label: 'Years Experience', key: 'years_experience' },
-  { value: '99%', label: 'Visa Success Rate', key: 'visa_success_rate' },
-];
+// Removed fallback stats variable
 
 const values = [
   {
@@ -146,16 +141,6 @@ export default async function AboutPage() {
   let officesList: any[] = offices;
 
   try {
-    const settings = await coreApi.getSettings();
-    if (settings?.stats) {
-      stats = [
-        { value: `${settings.stats.students_placed}+`, label: 'Students Placed', key: 'students_placed' },
-        { value: `${settings.stats.partner_universities}+`, label: 'Partner Universities', key: 'partner_universities' },
-        { value: `${settings.stats.years_experience}+`, label: 'Years Experience', key: 'years_experience' },
-        { value: `${settings.stats.visa_success_rate}%`, label: 'Visa Success Rate', key: 'visa_success_rate' },
-      ];
-    }
-
     const [fetchedTeam, fetchedOffices] = await Promise.all([
       teamApi.getAll(),
       teamApi.getOffices(),
@@ -187,20 +172,7 @@ export default async function AboutPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white -mt-10 relative z-10">
-        <div className="container-custom">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 bg-white rounded-2xl shadow-xl p-8">
-            {stats.map((stat) => (
-              <div key={stat.key} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary-600">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600 mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <AboutStats />
 
       {/* Story Section */}
       <section className="py-16 bg-gray-50">

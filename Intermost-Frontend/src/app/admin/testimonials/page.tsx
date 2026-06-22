@@ -17,6 +17,7 @@ import { testimonialsApi, countriesApi } from '@/lib/services';
 import { Testimonial } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 interface Country {
   _id: string;
@@ -31,6 +32,12 @@ export default function TestimonialsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
   const itemsPerPage = 9;
 
   const fetchData = async () => {
@@ -66,15 +73,21 @@ export default function TestimonialsPage() {
     currentPage * itemsPerPage
   );
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this testimonial?')) return;
-    
+  const handleDelete = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, id, title: name });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
-      await testimonialsApi.delete(id);
+      await testimonialsApi.delete(deleteDialog.id);
       toast.success('Testimonial deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
       fetchData();
     } catch (error) {
       toast.error('Failed to delete testimonial');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -219,7 +232,7 @@ export default function TestimonialsPage() {
                   <Edit2 className="w-4 h-4" />
                 </Link>
                 <button
-                  onClick={() => handleDelete(testimonial._id)}
+                  onClick={() => handleDelete(testimonial._id, testimonial.name)}
                   className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -277,6 +290,15 @@ export default function TestimonialsPage() {
           </button>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Testimonial"
+        message={`Are you sure you want to delete the testimonial from "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

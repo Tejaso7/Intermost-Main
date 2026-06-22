@@ -33,11 +33,15 @@ class NewsListCreateView(APIView):
     def get(self, request):
         collection = get_collection('news')
         
-        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        is_active_param = request.query_params.get('is_active', 'true').lower()
         limit = int(request.query_params.get('limit', 10))
         
+        query = {}
+        if is_active_param != 'all':
+            query['is_active'] = is_active_param == 'true'
+            
         news_items = list(
-            collection.find({'is_active': is_active})
+            collection.find(query)
             .sort('date', -1)
             .limit(limit)
         )
