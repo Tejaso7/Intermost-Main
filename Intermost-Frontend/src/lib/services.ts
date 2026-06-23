@@ -13,7 +13,7 @@ import api, {
 
 // Countries API
 export const countriesApi = {
-  getAll: async (params?: { active?: boolean; featured?: boolean }) => {
+  getAll: async (params?: { is_active?: boolean | 'all'; featured?: boolean; active?: boolean }) => {
     const response = await api.get<{ count: number; results: Country[] }>('/countries/', { params });
     return response.data.results || [];
   },
@@ -45,7 +45,7 @@ export const countriesApi = {
 
 // Colleges API
 export const collegesApi = {
-  getAll: async (params?: { country?: string; featured?: boolean }) => {
+  getAll: async (params?: { country?: string; featured?: boolean; is_active?: boolean | 'all' }) => {
     const response = await api.get<{ results: College[] }>('/colleges/', { params });
     return response.data.results || [];
   },
@@ -104,7 +104,7 @@ export const testimonialsApi = {
 
 // Blogs API
 export const blogsApi = {
-  getAll: async (params?: { category?: string; featured?: boolean; page?: number }) => {
+  getAll: async (params?: { category?: string; featured?: boolean; page?: number; published?: string | boolean }) => {
     const response = await api.get<PaginatedResponse<Blog>>('/blogs/', { params });
     return response.data.results || [];
   },
@@ -136,7 +136,7 @@ export const blogsApi = {
 
 // News API
 export const newsApi = {
-  getAll: async (params?: { active?: boolean; limit?: number }) => {
+  getAll: async (params?: { is_active?: string | boolean; limit?: number }) => {
     const response = await api.get<{ count: number; results: News[] }>('/news/', { params });
     return response.data.results || [];
   },
@@ -267,6 +267,25 @@ export const teamApi = {
   getOffices: async () => {
     const response = await api.get<{ count: number; results: Office[] }>('/team/offices/');
     return response.data.results || [];
+  },
+
+  getOfficeById: async (id: string) => {
+    const response = await api.get<Office>(`/team/offices/${id}/`);
+    return response.data;
+  },
+
+  createOffice: async (data: Partial<Office>) => {
+    const response = await api.post<{ message: string; data: Office }>('/team/offices/', data);
+    return response.data.data;
+  },
+
+  updateOffice: async (id: string, data: Partial<Office>) => {
+    const response = await api.put<{ message: string; data: Office }>(`/team/offices/${id}/`, data);
+    return response.data.data;
+  },
+
+  deleteOffice: async (id: string) => {
+    await api.delete(`/team/offices/${id}/`);
   },
 };
 

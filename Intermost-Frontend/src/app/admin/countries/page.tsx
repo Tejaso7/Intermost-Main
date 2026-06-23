@@ -16,6 +16,7 @@ import {
 import { countriesApi } from '@/lib/services';
 import type { Country } from '@/lib/api';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 // Helper to ensure image paths start with /
 const getImageSrc = (path: string | undefined, fallback: string = '/images/placeholder.svg'): string => {
@@ -28,6 +29,12 @@ export default function AdminCountriesPage() {
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetchCountries();
@@ -35,7 +42,7 @@ export default function AdminCountriesPage() {
 
   const fetchCountries = async () => {
     try {
-      const data = await countriesApi.getAll();
+      const data = await countriesApi.getAll({ is_active: 'all' });
       setCountries(data);
     } catch (error) {
       console.error('Error fetching countries:', error);
@@ -45,15 +52,35 @@ export default function AdminCountriesPage() {
     }
   };
 
-  const handleDelete = async (id: string, name: string) => {
-    if (confirm(`Are you sure you want to delete ${name}?`)) {
-      try {
-        await countriesApi.delete(id);
-        toast.success('Country deleted successfully');
-        fetchCountries();
-      } catch (error) {
-        toast.error('Failed to delete country');
-      }
+  const handleDelete = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, id, title: name });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await countriesApi.delete(deleteDialog.id);
+      toast.success('Country deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
+      fetchCountries();
+    } catch (error) {
+      toast.error('Failed to delete country');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleToggleActive = async (country: Country) => {
+    try {
+      const updatedMeta = {
+        ...country.meta,
+        is_active: !country.meta?.is_active,
+      };
+      await countriesApi.update(country._id, { meta: updatedMeta });
+      toast.success(`Country ${updatedMeta.is_active ? 'activated' : 'deactivated'} successfully`);
+      fetchCountries();
+    } catch (error) {
+      toast.error('Failed to update country status');
     }
   };
 
@@ -146,15 +173,19 @@ export default function AdminCountriesPage() {
                 </div>
                 {/* Status Badge */}
                 <div className="absolute top-3 right-3">
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleToggleActive(country);
+                    }}
+                    className={`px-2 py-1 text-xs font-medium rounded-full cursor-pointer hover:opacity-80 transition-opacity ${
                       country.meta?.is_active
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
                     }`}
                   >
                     {country.meta?.is_active ? 'Active' : 'Inactive'}
-                  </span>
+                  </button>
                 </div>
               </div>
 
@@ -210,6 +241,15 @@ export default function AdminCountriesPage() {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Country"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

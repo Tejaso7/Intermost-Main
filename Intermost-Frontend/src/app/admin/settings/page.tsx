@@ -38,6 +38,12 @@ interface SiteSettings {
   meta_keywords: string;
   google_analytics_id: string;
   facebook_pixel_id: string;
+  stats: {
+    students_placed: number | '';
+    partner_universities: number | '';
+    years_experience: number | '';
+    visa_success_rate: number | '';
+  };
 }
 
 export default function SettingsPage() {
@@ -65,6 +71,12 @@ export default function SettingsPage() {
     meta_keywords: 'MBBS abroad, study medicine abroad, medical universities',
     google_analytics_id: '',
     facebook_pixel_id: '',
+    stats: {
+      students_placed: 5500,
+      partner_universities: 35,
+      years_experience: 21,
+      visa_success_rate: 99,
+    },
   });
 
   useEffect(() => {
@@ -95,15 +107,46 @@ export default function SettingsPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setSettings(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('stats.')) {
+      const statField = name.split('.')[1];
+      let parsedValue: number | '' = '';
+      if (value !== '') {
+        const parsed = parseInt(value, 10);
+        parsedValue = isNaN(parsed) ? 0 : Math.max(0, parsed);
+        
+        if (statField === 'visa_success_rate') {
+          parsedValue = Math.min(100, parsedValue);
+        }
+      }
+      setSettings(prev => ({
+        ...prev,
+        stats: {
+          ...prev.stats,
+          [statField]: parsedValue
+        }
+      }));
+    } else {
+      setSettings(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
+    // Ensure empty stats fallback to 0 before saving
+    const payloadToSave = {
+      ...settings,
+      stats: {
+        students_placed: settings.stats?.students_placed || 0,
+        partner_universities: settings.stats?.partner_universities || 0,
+        years_experience: settings.stats?.years_experience || 0,
+        visa_success_rate: settings.stats?.visa_success_rate || 0,
+      }
+    };
+
     try {
-      await coreApi.updateSettings(settings);
+      await coreApi.updateSettings(payloadToSave);
       toast.success('Settings saved successfully');
     } catch (error) {
       console.error('Error saving settings:', error);
@@ -427,6 +470,78 @@ export default function SettingsPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="XXXXXXXXXXXXXXX"
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* KPI Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:col-span-2"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <Globe className="w-5 h-5 mr-2 text-primary-600" />
+                KPI Statistics
+              </h2>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Students Placed <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    name="stats.students_placed"
+                    value={settings.stats?.students_placed ?? ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Partner Colleges <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    name="stats.partner_universities"
+                    value={settings.stats?.partner_universities ?? ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Years Experience <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    name="stats.years_experience"
+                    value={settings.stats?.years_experience ?? ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Visa Success (%) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    required
+                    name="stats.visa_success_rate"
+                    value={settings.stats?.visa_success_rate ?? ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />
                 </div>
               </div>

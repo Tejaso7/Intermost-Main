@@ -174,3 +174,53 @@ class OfficeListView(APIView):
             'message': 'Office added successfully',
             'data': office
         }, status=status.HTTP_201_CREATED)
+
+class OfficeDetailView(APIView):
+    """Retrieve, update, delete office."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, office_id):
+        collection = get_collection('offices')
+        
+        try:
+            office = collection.find_one({'_id': ObjectId(office_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if not office:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serialize_doc(office))
+    
+    def put(self, request, office_id):
+        collection = get_collection('offices')
+        data = request.data
+        data['updated_at'] = datetime.utcnow()
+        data.pop('_id', None)
+        
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(office_id)},
+                {'$set': data}
+            )
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if result.matched_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        updated = collection.find_one({'_id': ObjectId(office_id)})
+        return Response({'message': 'Updated', 'data': serialize_doc(updated)})
+    
+    def delete(self, request, office_id):
+        collection = get_collection('offices')
+        
+        try:
+            result = collection.delete_one({'_id': ObjectId(office_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if result.deleted_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response({'message': 'Deleted'}, status=status.HTTP_204_NO_CONTENT)

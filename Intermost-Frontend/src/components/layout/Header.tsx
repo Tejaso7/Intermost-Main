@@ -7,20 +7,14 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Phone, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { countriesApi } from '@/lib/services';
 
 const navigation = [
   { name: 'Home', href: '/' },
   {
     name: 'Countries',
     href: '/countries',
-    submenu: [
-      { name: 'Russia', href: '/countries/russia', flag: '/flags/russia.png' },
-      { name: 'Georgia', href: '/countries/georgia', flag: '/flags/georgia.png' },
-      { name: 'Uzbekistan', href: '/countries/uzbekistan', flag: '/flags/uzbekistan.png' },
-      { name: 'Nepal', href: '/countries/nepal', flag: '/flags/nepal.png' },
-      { name: 'Kazakhstan', href: '/countries/kazakhstan', flag: '/flags/kazakhstan.png' },
-      { name: 'Tajikistan', href: '/countries/tajikistan', flag: '/flags/tajikistan.png' },
-    ],
+    submenu: [], // This will be populated dynamically
   },
   { name: 'Compare', href: '/compare' },
   { name: 'About Us', href: '/about' },
@@ -33,6 +27,31 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
+  const [navItems, setNavItems] = useState(navigation);
+
+  useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const data = await countriesApi.getAll({ active: true });
+        const countrySubmenu = data.map((c) => ({
+          name: c.name,
+          href: `/countries/${c.slug}`,
+          flag: c.flag_url || `/flags/${c.slug}.png`,
+        }));
+
+        setNavItems((prev) =>
+          prev.map((item) =>
+            item.name === 'Countries'
+              ? { ...item, submenu: countrySubmenu }
+              : item
+          )
+        );
+      } catch (error) {
+        console.error('Failed to load countries for navigation', error);
+      }
+    };
+    fetchCountries();
+  }, []);
 
   // Only use transparent header on homepage
   const isHomePage = pathname === '/';
@@ -71,7 +90,7 @@ export default function Header() {
               />
             </div>
             <div className={cn(
-              'hidden sm:block transition-colors duration-300',
+              'block transition-colors duration-300',
               useSolidHeader ? 'text-gray-900' : 'text-white'
             )}>
               <span className="font-bold text-base lg:text-lg leading-tight">INTERMOST</span>
@@ -81,7 +100,7 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center space-x-8">
-            {navigation.map((item) => (
+            {navItems.map((item) => (
               <div
                 key={item.name}
                 className="relative"
@@ -189,7 +208,7 @@ export default function Header() {
               className="lg:hidden mt-4 bg-white rounded-xl shadow-xl overflow-hidden"
             >
               <div className="py-4 px-4 space-y-2">
-                {navigation.map((item) => (
+                {navItems.map((item) => (
                   <div key={item.name}>
                     <Link
                       href={item.href}

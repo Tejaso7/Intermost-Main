@@ -18,17 +18,24 @@ import { formatDate } from '@/lib/utils';
 import { blogsApi } from '@/lib/services';
 import { Blog } from '@/lib/api';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 export default function AdminBlogsPage() {
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const data = await blogsApi.getAll();
+        const data = await blogsApi.getAll({ published: 'all' });
         setBlogs(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error('Error fetching blogs:', error);
@@ -40,15 +47,22 @@ export default function AdminBlogsPage() {
     fetchBlogs();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this blog post?')) return;
+  const handleDelete = (id: string, title: string) => {
+    setDeleteDialog({ isOpen: true, id, title });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
-      await blogsApi.delete(id);
-      setBlogs(blogs.filter(b => b._id !== id));
+      await blogsApi.delete(deleteDialog.id);
+      setBlogs(blogs.filter(b => b._id !== deleteDialog.id));
       toast.success('Blog deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
     } catch (error) {
       console.error('Error deleting blog:', error);
       toast.error('Failed to delete blog');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -216,9 +230,10 @@ export default function AdminBlogsPage() {
                       >
                         <Edit2 className="w-4 h-4" />
                       </Link>
-                      <button 
-                        onClick={() => handleDelete(blog._id)}
-                        className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                      <button
+                        onClick={() => handleDelete(blog._id, blog.title)}
+                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -251,6 +266,15 @@ export default function AdminBlogsPage() {
           </button>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Blog Post"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

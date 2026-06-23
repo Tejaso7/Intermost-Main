@@ -1,9 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import CountUp from 'react-countup';
 import { Users, Building, Calendar, Award } from 'lucide-react';
+import { coreApi } from '@/lib/services';
 
 const stats = [
   {
@@ -39,6 +40,57 @@ const stats = [
 export default function StatsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const [siteStats, setSiteStats] = useState({
+    students_placed: 5500,
+    partner_universities: 35,
+    years_experience: 21,
+    visa_success_rate: 99
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.stats) {
+          setSiteStats(settings.stats);
+        }
+      } catch (error) {
+        console.debug('Failed to fetch stats for StatsSection, using defaults', error);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const dynamicStats = [
+    {
+      icon: Users,
+      value: siteStats.students_placed,
+      suffix: '+',
+      label: 'Students Placed',
+      description: 'Successfully admitted worldwide',
+    },
+    {
+      icon: Building,
+      value: siteStats.partner_universities,
+      suffix: '+',
+      label: 'Partner Universities',
+      description: 'NMC & WHO approved',
+    },
+    {
+      icon: Calendar,
+      value: siteStats.years_experience,
+      suffix: '+',
+      label: 'Years Experience',
+      description: 'Trusted since 2003',
+    },
+    {
+      icon: Award,
+      value: siteStats.visa_success_rate,
+      suffix: '%',
+      label: 'Visa Success Rate',
+      description: 'Industry-leading success',
+    },
+  ];
 
   return (
     <section ref={ref} className="py-16 sm:py-20 md:py-24 bg-white relative overflow-hidden">
@@ -70,7 +122,7 @@ export default function StatsSection() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
-          {stats.map((stat, index) => (
+          {dynamicStats.map((stat, index) => (
             <motion.div
               key={stat.label}
               initial={{ opacity: 0, y: 20, scale: 0.95 }}

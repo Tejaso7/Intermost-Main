@@ -11,14 +11,10 @@ import {
   DollarSign, 
   GraduationCap, 
   CheckCircle2, 
-  XCircle, 
   ShieldAlert, 
-  BookOpen, 
-  Compass, 
   Award,
   Zap,
-  Sparkles,
-  ChevronDown
+  Sparkles
 } from 'lucide-react';
 import { countriesApi } from '@/lib/services';
 import { getCountryFlag } from '@/lib/utils';
@@ -127,74 +123,6 @@ const fallbackCountriesData = [
       'Modern infrastructure and clinical labs',
       'Large community of Indian students already studying'
     ]
-  },
-  {
-    _id: 'nepal-id',
-    name: 'Nepal',
-    slug: 'nepal',
-    code: 'NP',
-    flag_url: 'https://flagcdn.com/w80/np.png',
-    pricing: {
-      tuition_fee: '₹45,00,000 - 55,00,000 (Total Package)',
-      hostel_fee: 'Included in package or ₹8,000/Month',
-      living_cost: '₹10,000 / Month',
-      total_course_fee: '₹50 - 60 Lakhs',
-      currency: 'INR'
-    },
-    eligibility: {
-      academic: '12th Standard with PCB (minimum 50% in PCB)',
-      minimum_marks: '50% aggregate in 12th PCB',
-      neet_required: true,
-      age_requirement: 'Minimum 17 years of age',
-      other_requirements: ['Passport or Voter Card', 'Nepal Medical Council Entrance (MECEE) is required if NEET qualified score is low']
-    },
-    course_details: {
-      duration: '5.5 Years (including internship)',
-      medium: 'English & Hindi',
-      degree_awarded: 'MBBS',
-      recognition: ['NMC', 'WHO', 'Nepal Medical Council', 'FAIMER', 'ECFMG']
-    },
-    advantages: [
-      'No passport or visa required for Indian students',
-      'Same syllabus, books, and study pattern as India',
-      'Indian doctors teaching in several top colleges',
-      'Excellent clinical exposure due to identical patient demographics',
-      'Hindi/Nepali spoken widely, no local language barrier'
-    ]
-  },
-  {
-    _id: 'kazakhstan-id',
-    name: 'Kazakhstan',
-    slug: 'kazakhstan',
-    code: 'KZ',
-    flag_url: 'https://flagcdn.com/w80/kz.png',
-    pricing: {
-      tuition_fee: '₹3,00,000 / Year',
-      hostel_fee: '₹45,000 / Year',
-      living_cost: '₹9,000 / Month',
-      total_course_fee: '₹18 - 25 Lakhs',
-      currency: 'INR'
-    },
-    eligibility: {
-      academic: '12th PCB with 50% marks',
-      minimum_marks: '50% for General, 40% for Reserved',
-      neet_required: true,
-      age_requirement: 'Must be 17 years by Dec 31st',
-      other_requirements: ['Valid Passport', 'Apostilled educational certificates']
-    },
-    course_details: {
-      duration: '5 Years',
-      medium: 'English Medium',
-      degree_awarded: 'MD (Equivalent to MBBS)',
-      recognition: ['NMC', 'WHO', 'Ministry of Education & Science, Kazakhstan', 'FAIMER', 'ECFMG']
-    },
-    advantages: [
-      'Shorter course duration (5 Years) saving tuition & hostel expenses',
-      'Fully English-taught programs recognized globally',
-      'Modern learning centers and highly qualified professors',
-      'Favorable student-to-teacher ratio in labs',
-      'Affordable direct flights from major Indian cities'
-    ]
   }
 ];
 
@@ -205,9 +133,6 @@ export default function CountryComparisonPage() {
   const [col3Country, setCol3Country] = useState<string>(''); // Optional third country
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Dropdown open states
-  const [openDropdown, setOpenDropdown] = useState<'col1' | 'col2' | 'col3' | null>(null);
-
   useEffect(() => {
     const loadCountries = async () => {
       try {
@@ -217,7 +142,7 @@ export default function CountryComparisonPage() {
           const mapped = data.map((c: any) => ({
             _id: c._id || c.id,
             name: c.name,
-            slug: c.slug,
+            slug: c.slug || c.name.toLowerCase().replace(/\s+/g, '-'),
             code: c.code || 'UN',
             flag_url: c.flag_url || getCountryFlag(c.code || 'in'),
             pricing: {
@@ -247,6 +172,12 @@ export default function CountryComparisonPage() {
           // Set initial selectors to first two fetched countries if available
           if (mapped[0]) setCol1Country(mapped[0].slug);
           if (mapped[1]) setCol2Country(mapped[1].slug);
+        } else if (data && data.length === 1) {
+          // Edge case: only 1 country in DB
+          setCountries([
+            ...data.map((c: any) => ({...c, slug: c.slug || c.name.toLowerCase()})),
+            ...fallbackCountriesData.slice(0, 2)
+          ]);
         }
       } catch (err) {
         console.debug('Failed to fetch dynamic country data, using premium fallbacks');
@@ -266,6 +197,11 @@ export default function CountryComparisonPage() {
   const c3 = col3Country ? getCountryBySlug(col3Country) : null;
 
   const handleSelectCountry = (column: 'col1' | 'col2' | 'col3', slug: string) => {
+    if (!slug) {
+      if (column === 'col3') setCol3Country('');
+      return;
+    }
+    
     if (column === 'col1') {
       if (slug === col2Country || slug === col3Country) {
         toast.error('Country already selected in another column');
@@ -285,16 +221,15 @@ export default function CountryComparisonPage() {
       }
       setCol3Country(slug);
     }
-    setOpenDropdown(null);
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 pt-24 pb-20 overflow-hidden relative">
-      {/* Premium Decorative Glowing Orbs */}
+    <div className="min-h-screen bg-slate-50 text-slate-900 pt-24 pb-20 overflow-hidden relative">
+      {/* Decorative Light Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-40 w-96 h-96 bg-primary-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/3 -right-40 w-96 h-96 bg-secondary-600/15 rounded-full blur-3xl" />
-        <div className="absolute top-10 right-1/4 w-80 h-80 bg-violet-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/4 -left-40 w-96 h-96 bg-primary-200/40 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/3 -right-40 w-96 h-96 bg-secondary-200/40 rounded-full blur-3xl" />
+        <div className="absolute top-10 right-1/4 w-80 h-80 bg-violet-200/40 rounded-full blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">
@@ -303,7 +238,7 @@ export default function CountryComparisonPage() {
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-400 text-xs font-semibold uppercase tracking-wider mb-4"
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-100 border border-primary-200 text-primary-700 text-xs font-semibold uppercase tracking-wider mb-4"
           >
             <Sparkles className="w-3.5 h-3.5" />
             Decision Helper
@@ -312,7 +247,7 @@ export default function CountryComparisonPage() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-primary-400 bg-clip-text text-transparent mb-6"
+            className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-slate-900 via-slate-800 to-primary-600 bg-clip-text text-transparent mb-6"
           >
             Compare MBBS Destinations
           </motion.h1>
@@ -320,158 +255,66 @@ export default function CountryComparisonPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-slate-400 text-lg leading-relaxed"
+            className="text-slate-600 text-lg leading-relaxed"
           >
             Analyze global medical courses side-by-side. Compare total fees, eligibility, course duration, and global university recognition lists instantly.
           </motion.p>
         </div>
 
-        {/* Dropdown selectors row */}
-        <div className="bg-slate-900/60 backdrop-blur-md border border-slate-800 rounded-2xl p-4 md:p-6 mb-8 shadow-xl">
+        {/* Dropdown selectors row using native select for maximum reliability */}
+        <div className="bg-white/80 backdrop-blur-md border border-slate-200 rounded-2xl p-4 md:p-6 mb-8 shadow-xl">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
             {/* Column 1 Selector */}
             <div className="relative">
-              <label className="block text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">Column 1 Country</label>
-              <button
-                onClick={() => setOpenDropdown(openDropdown === 'col1' ? null : 'col1')}
-                className="w-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 px-4 py-3 rounded-xl flex items-center justify-between transition-all"
+              <label className="block text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Column 1 Country</label>
+              <select
+                value={col1Country}
+                onChange={(e) => handleSelectCountry('col1', e.target.value)}
+                className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 px-4 py-3 rounded-xl transition-all appearance-none font-semibold text-slate-800"
               >
-                {c1 ? (
-                  <div className="flex items-center gap-3">
-                    <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                      <img src={c1.flag_url} alt={c1.name} className="object-cover w-full h-full" />
-                    </span>
-                    <span className="font-semibold text-slate-200">MBBS in {c1.name}</span>
-                  </div>
-                ) : (
-                  <span className="text-slate-500">Select Country</span>
-                )}
-                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openDropdown === 'col1' ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {openDropdown === 'col1' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute z-20 left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto"
-                  >
-                    {countries.map(c => (
-                      <button
-                        key={c.slug}
-                        onClick={() => handleSelectCountry('col1', c.slug)}
-                        className={`w-full text-left px-4 py-3 hover:bg-primary-600/20 hover:text-primary-300 flex items-center gap-3 transition-colors ${col1Country === c.slug ? 'bg-primary-950/40 text-primary-400' : 'text-slate-300'}`}
-                      >
-                        <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                          <img src={c.flag_url} alt={c.name} className="object-cover w-full h-full" />
-                        </span>
-                        <span>MBBS in {c.name}</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                {countries.map(c => (
+                  <option key={c.slug} value={c.slug}>MBBS in {c.name}</option>
+                ))}
+              </select>
             </div>
 
             {/* Column 2 Selector */}
             <div className="relative">
-              <label className="block text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">Column 2 Country</label>
-              <button
-                onClick={() => setOpenDropdown(openDropdown === 'col2' ? null : 'col2')}
-                className="w-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 px-4 py-3 rounded-xl flex items-center justify-between transition-all"
+              <label className="block text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Column 2 Country</label>
+              <select
+                value={col2Country}
+                onChange={(e) => handleSelectCountry('col2', e.target.value)}
+                className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 px-4 py-3 rounded-xl transition-all appearance-none font-semibold text-slate-800"
               >
-                {c2 ? (
-                  <div className="flex items-center gap-3">
-                    <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                      <img src={c2.flag_url} alt={c2.name} className="object-cover w-full h-full" />
-                    </span>
-                    <span className="font-semibold text-slate-200">MBBS in {c2.name}</span>
-                  </div>
-                ) : (
-                  <span className="text-slate-500">Select Country</span>
-                )}
-                <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openDropdown === 'col2' ? 'rotate-180' : ''}`} />
-              </button>
-              <AnimatePresence>
-                {openDropdown === 'col2' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute z-20 left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto"
-                  >
-                    {countries.map(c => (
-                      <button
-                        key={c.slug}
-                        onClick={() => handleSelectCountry('col2', c.slug)}
-                        className={`w-full text-left px-4 py-3 hover:bg-primary-600/20 hover:text-primary-300 flex items-center gap-3 transition-colors ${col2Country === c.slug ? 'bg-primary-950/40 text-primary-400' : 'text-slate-300'}`}
-                      >
-                        <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                          <img src={c.flag_url} alt={c.name} className="object-cover w-full h-full" />
-                        </span>
-                        <span>MBBS in {c.name}</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                {countries.map(c => (
+                  <option key={c.slug} value={c.slug}>MBBS in {c.name}</option>
+                ))}
+              </select>
             </div>
 
             {/* Column 3 Selector (Optional) */}
             <div className="relative">
-              <label className="block text-xs text-slate-400 font-semibold uppercase tracking-wider mb-2">Column 3 Country (Optional)</label>
+              <label className="block text-xs text-slate-500 font-semibold uppercase tracking-wider mb-2">Column 3 Country (Optional)</label>
               <div className="flex gap-2">
-                <button
-                  onClick={() => setOpenDropdown(openDropdown === 'col3' ? null : 'col3')}
-                  className="w-full bg-slate-950/80 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 px-4 py-3 rounded-xl flex items-center justify-between transition-all"
+                <select
+                  value={col3Country}
+                  onChange={(e) => handleSelectCountry('col3', e.target.value)}
+                  className="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-slate-300 px-4 py-3 rounded-xl transition-all appearance-none font-semibold text-slate-800"
                 >
-                  {c3 ? (
-                    <div className="flex items-center gap-3">
-                      <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                        <img src={c3.flag_url} alt={c3.name} className="object-cover w-full h-full" />
-                      </span>
-                      <span className="font-semibold text-slate-200">MBBS in {c3.name}</span>
-                    </div>
-                  ) : (
-                    <span className="text-slate-500">Add Country to Compare</span>
-                  )}
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${openDropdown === 'col3' ? 'rotate-180' : ''}`} />
-                </button>
+                  <option value="">Select 3rd Country</option>
+                  {countries.map(c => (
+                    <option key={c.slug} value={c.slug}>MBBS in {c.name}</option>
+                  ))}
+                </select>
                 {c3 && (
                   <button
-                    onClick={() => {
-                      setCol3Country('');
-                      setOpenDropdown(null);
-                    }}
-                    className="px-3 bg-red-950/40 border border-red-900/40 text-red-400 rounded-xl hover:bg-red-900/60 transition-colors"
+                    onClick={() => setCol3Country('')}
+                    className="px-4 bg-red-50 border border-red-100 text-red-600 rounded-xl hover:bg-red-100 transition-colors font-medium text-sm"
                   >
                     Clear
                   </button>
                 )}
               </div>
-              <AnimatePresence>
-                {openDropdown === 'col3' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute z-20 left-0 right-0 mt-2 bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-2xl max-h-60 overflow-y-auto"
-                  >
-                    {countries.map(c => (
-                      <button
-                        key={c.slug}
-                        onClick={() => handleSelectCountry('col3', c.slug)}
-                        className={`w-full text-left px-4 py-3 hover:bg-primary-600/20 hover:text-primary-300 flex items-center gap-3 transition-colors ${col3Country === c.slug ? 'bg-primary-950/40 text-primary-400' : 'text-slate-300'}`}
-                      >
-                        <span className="relative w-6 h-4 rounded-sm overflow-hidden flex-shrink-0">
-                          <img src={c.flag_url} alt={c.name} className="object-cover w-full h-full" />
-                        </span>
-                        <span>MBBS in {c.name}</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -489,86 +332,80 @@ export default function CountryComparisonPage() {
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl flex flex-col hover:border-slate-700 transition-all group"
+                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl flex flex-col hover:border-slate-300 transition-all group"
               >
-                {/* Brand glowing line */}
                 <div className="w-full h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full mb-6" />
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0">
+                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 border border-slate-100">
                     <img src={c1.flag_url} alt={c1.name} className="object-cover w-full h-full" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white group-hover:text-primary-400 transition-colors">MBBS in {c1.name}</h3>
-                    <span className="text-xs text-slate-400 font-semibold tracking-wider">Premium Destination</span>
+                    <h3 className="text-2xl font-bold text-slate-900 group-hover:text-primary-600 transition-colors">MBBS in {c1.name}</h3>
+                    <span className="text-xs text-slate-500 font-semibold tracking-wider">Premium Destination</span>
                   </div>
                 </div>
 
                 <div className="space-y-6 flex-grow">
-                  {/* Category: Pricing */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-primary-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-primary-600 font-semibold mb-3">
                       <DollarSign className="w-4 h-4" />
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Total Course Fee:</span> <span className="font-bold text-white">{c1.pricing.total_course_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Tuition Fee:</span> <span className="text-slate-200">{c1.pricing.tuition_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Hostel Fee:</span> <span className="text-slate-200">{c1.pricing.hostel_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Avg. Living Cost:</span> <span className="text-slate-200">{c1.pricing.living_cost}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c1.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c1.pricing.tuition_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c1.pricing.hostel_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c1.pricing.living_cost}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Course Details */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-indigo-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-indigo-600 font-semibold mb-3">
                       <Clock className="w-4 h-4" />
                       <span>COURSE STRUCTURE</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Course Duration:</span> <span className="font-semibold text-slate-200">{c1.course_details.duration}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Medium of Study:</span> <span className="font-semibold text-slate-200">{c1.course_details.medium}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Degree Conferred:</span> <span className="font-semibold text-slate-200 text-right">{c1.course_details.degree_awarded}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Course Duration:</span> <span className="font-semibold text-slate-800">{c1.course_details.duration}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Medium of Study:</span> <span className="font-semibold text-slate-800">{c1.course_details.medium}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Degree Conferred:</span> <span className="font-semibold text-slate-800 text-right">{c1.course_details.degree_awarded}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Eligibility */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-violet-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-violet-600 font-semibold mb-3">
                       <GraduationCap className="w-4 h-4" />
                       <span>ELIGIBILITY REQUIREMENTS</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between items-center"><span className="text-slate-400">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-400"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Min. PCB Marks:</span> <span className="font-semibold text-slate-200">{c1.eligibility.minimum_marks}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Age Requirement:</span> <span className="font-semibold text-slate-200 text-right">{c1.eligibility.age_requirement}</span></li>
+                      <li className="flex justify-between items-center"><span className="text-slate-500">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-600"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Min. PCB Marks:</span> <span className="font-semibold text-slate-800">{c1.eligibility.minimum_marks}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Age Requirement:</span> <span className="font-semibold text-slate-800 text-right">{c1.eligibility.age_requirement}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Recognition */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-emerald-600 font-semibold mb-3">
                       <Award className="w-4 h-4" />
                       <span>GLOBAL RECOGNITION</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {c1.course_details.recognition.map((rec: string) => (
-                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/40 text-emerald-400 text-xs font-semibold">
+                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
                           {rec.split(' ')[0]}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Advantages list */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-orange-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-orange-600 font-semibold mb-3">
                       <Zap className="w-4 h-4" />
                       <span>PROS & HIGHLIGHTS</span>
                     </div>
                     <ul className="space-y-2">
                       {c1.advantages.slice(0, 3).map((adv: string, idx: number) => (
-                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-300">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" />
+                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-600">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 mt-0.5" />
                           <span>{adv}</span>
                         </li>
                       ))}
@@ -576,10 +413,10 @@ export default function CountryComparisonPage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-slate-800/80">
+                <div className="mt-8 pt-4 border-t border-slate-100">
                   <Link 
                     href={`/apply?country=${c1.name}`}
-                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-indigo-500/25 transition-all"
+                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-indigo-500/25 transition-all"
                   >
                     <span>Apply for {c1.name}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -593,86 +430,80 @@ export default function CountryComparisonPage() {
               <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl flex flex-col hover:border-slate-700 transition-all group"
+                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl flex flex-col hover:border-slate-300 transition-all group"
               >
-                {/* Brand glowing line */}
                 <div className="w-full h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6" />
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0">
+                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 border border-slate-100">
                     <img src={c2.flag_url} alt={c2.name} className="object-cover w-full h-full" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white group-hover:text-purple-400 transition-colors">MBBS in {c2.name}</h3>
-                    <span className="text-xs text-slate-400 font-semibold tracking-wider">Premium Destination</span>
+                    <h3 className="text-2xl font-bold text-slate-900 group-hover:text-purple-600 transition-colors">MBBS in {c2.name}</h3>
+                    <span className="text-xs text-slate-500 font-semibold tracking-wider">Premium Destination</span>
                   </div>
                 </div>
 
                 <div className="space-y-6 flex-grow">
-                  {/* Category: Pricing */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-primary-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-primary-600 font-semibold mb-3">
                       <DollarSign className="w-4 h-4" />
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Total Course Fee:</span> <span className="font-bold text-white">{c2.pricing.total_course_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Tuition Fee:</span> <span className="text-slate-200">{c2.pricing.tuition_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Hostel Fee:</span> <span className="text-slate-200">{c2.pricing.hostel_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Avg. Living Cost:</span> <span className="text-slate-200">{c2.pricing.living_cost}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c2.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c2.pricing.tuition_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c2.pricing.hostel_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c2.pricing.living_cost}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Course Details */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-indigo-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-indigo-600 font-semibold mb-3">
                       <Clock className="w-4 h-4" />
                       <span>COURSE STRUCTURE</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Course Duration:</span> <span className="font-semibold text-slate-200">{c2.course_details.duration}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Medium of Study:</span> <span className="font-semibold text-slate-200">{c2.course_details.medium}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Degree Conferred:</span> <span className="font-semibold text-slate-200 text-right">{c2.course_details.degree_awarded}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Course Duration:</span> <span className="font-semibold text-slate-800">{c2.course_details.duration}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Medium of Study:</span> <span className="font-semibold text-slate-800">{c2.course_details.medium}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Degree Conferred:</span> <span className="font-semibold text-slate-800 text-right">{c2.course_details.degree_awarded}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Eligibility */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-violet-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-violet-600 font-semibold mb-3">
                       <GraduationCap className="w-4 h-4" />
                       <span>ELIGIBILITY REQUIREMENTS</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between items-center"><span className="text-slate-400">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-400"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Min. PCB Marks:</span> <span className="font-semibold text-slate-200">{c2.eligibility.minimum_marks}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Age Requirement:</span> <span className="font-semibold text-slate-200 text-right">{c2.eligibility.age_requirement}</span></li>
+                      <li className="flex justify-between items-center"><span className="text-slate-500">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-600"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Min. PCB Marks:</span> <span className="font-semibold text-slate-800">{c2.eligibility.minimum_marks}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Age Requirement:</span> <span className="font-semibold text-slate-800 text-right">{c2.eligibility.age_requirement}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Recognition */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-emerald-600 font-semibold mb-3">
                       <Award className="w-4 h-4" />
                       <span>GLOBAL RECOGNITION</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {c2.course_details.recognition.map((rec: string) => (
-                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/40 text-emerald-400 text-xs font-semibold">
+                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
                           {rec.split(' ')[0]}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Advantages list */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-orange-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-orange-600 font-semibold mb-3">
                       <Zap className="w-4 h-4" />
                       <span>PROS & HIGHLIGHTS</span>
                     </div>
                     <ul className="space-y-2">
                       {c2.advantages.slice(0, 3).map((adv: string, idx: number) => (
-                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-300">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" />
+                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-600">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 mt-0.5" />
                           <span>{adv}</span>
                         </li>
                       ))}
@@ -680,10 +511,10 @@ export default function CountryComparisonPage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-slate-800/80">
+                <div className="mt-8 pt-4 border-t border-slate-100">
                   <Link 
                     href={`/apply?country=${c2.name}`}
-                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-pink-500/25 transition-all"
+                    className="w-full py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-pink-500/25 transition-all"
                   >
                     <span>Apply for {c2.name}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -697,86 +528,80 @@ export default function CountryComparisonPage() {
               <motion.div 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-slate-900/40 border border-slate-800 rounded-3xl p-6 backdrop-blur-md shadow-2xl flex flex-col hover:border-slate-700 transition-all group"
+                className="bg-white border border-slate-200 rounded-3xl p-6 shadow-xl flex flex-col hover:border-slate-300 transition-all group"
               >
-                {/* Brand glowing line */}
                 <div className="w-full h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full mb-6" />
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0">
+                  <div className="relative w-12 h-8 rounded shadow-sm overflow-hidden flex-shrink-0 border border-slate-100">
                     <img src={c3.flag_url} alt={c3.name} className="object-cover w-full h-full" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white group-hover:text-emerald-400 transition-colors">MBBS in {c3.name}</h3>
-                    <span className="text-xs text-slate-400 font-semibold tracking-wider">Premium Destination</span>
+                    <h3 className="text-2xl font-bold text-slate-900 group-hover:text-emerald-600 transition-colors">MBBS in {c3.name}</h3>
+                    <span className="text-xs text-slate-500 font-semibold tracking-wider">Premium Destination</span>
                   </div>
                 </div>
 
                 <div className="space-y-6 flex-grow">
-                  {/* Category: Pricing */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-primary-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-primary-600 font-semibold mb-3">
                       <DollarSign className="w-4 h-4" />
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Total Course Fee:</span> <span className="font-bold text-white">{c3.pricing.total_course_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Tuition Fee:</span> <span className="text-slate-200">{c3.pricing.tuition_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Hostel Fee:</span> <span className="text-slate-200">{c3.pricing.hostel_fee}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Avg. Living Cost:</span> <span className="text-slate-200">{c3.pricing.living_cost}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c3.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c3.pricing.tuition_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c3.pricing.hostel_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c3.pricing.living_cost}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Course Details */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-indigo-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-indigo-600 font-semibold mb-3">
                       <Clock className="w-4 h-4" />
                       <span>COURSE STRUCTURE</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-400">Course Duration:</span> <span className="font-semibold text-slate-200">{c3.course_details.duration}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Medium of Study:</span> <span className="font-semibold text-slate-200">{c3.course_details.medium}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Degree Conferred:</span> <span className="font-semibold text-slate-200 text-right">{c3.course_details.degree_awarded}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Course Duration:</span> <span className="font-semibold text-slate-800">{c3.course_details.duration}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Medium of Study:</span> <span className="font-semibold text-slate-800">{c3.course_details.medium}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Degree Conferred:</span> <span className="font-semibold text-slate-800 text-right">{c3.course_details.degree_awarded}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Eligibility */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-violet-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-violet-600 font-semibold mb-3">
                       <GraduationCap className="w-4 h-4" />
                       <span>ELIGIBILITY REQUIREMENTS</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between items-center"><span className="text-slate-400">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-400"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Min. PCB Marks:</span> <span className="font-semibold text-slate-200">{c3.eligibility.minimum_marks}</span></li>
-                      <li className="flex justify-between"><span className="text-slate-400">Age Requirement:</span> <span className="font-semibold text-slate-200 text-right">{c3.eligibility.age_requirement}</span></li>
+                      <li className="flex justify-between items-center"><span className="text-slate-500">NEET Required:</span> <span className="font-semibold flex items-center gap-1 text-green-600"><CheckCircle2 className="w-4 h-4" /> Yes</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Min. PCB Marks:</span> <span className="font-semibold text-slate-800">{c3.eligibility.minimum_marks}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Age Requirement:</span> <span className="font-semibold text-slate-800 text-right">{c3.eligibility.age_requirement}</span></li>
                     </ul>
                   </div>
 
-                  {/* Category: Recognition */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-emerald-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-emerald-600 font-semibold mb-3">
                       <Award className="w-4 h-4" />
                       <span>GLOBAL RECOGNITION</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {c3.course_details.recognition.map((rec: string) => (
-                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-950/40 border border-emerald-900/40 text-emerald-400 text-xs font-semibold">
+                        <span key={rec} className="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
                           {rec.split(' ')[0]}
                         </span>
                       ))}
                     </div>
                   </div>
 
-                  {/* Advantages list */}
-                  <div className="border-t border-slate-800/80 pt-4">
-                    <div className="flex items-center gap-2 text-orange-400 font-semibold mb-3">
+                  <div className="border-t border-slate-100 pt-4">
+                    <div className="flex items-center gap-2 text-orange-600 font-semibold mb-3">
                       <Zap className="w-4 h-4" />
                       <span>PROS & HIGHLIGHTS</span>
                     </div>
                     <ul className="space-y-2">
                       {c3.advantages.slice(0, 3).map((adv: string, idx: number) => (
-                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-300">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-400 flex-shrink-0 mt-0.5" />
+                        <li key={idx} className="flex gap-2 items-start text-xs text-slate-600">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-orange-500 flex-shrink-0 mt-0.5" />
                           <span>{adv}</span>
                         </li>
                       ))}
@@ -784,10 +609,10 @@ export default function CountryComparisonPage() {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-slate-800/80">
+                <div className="mt-8 pt-4 border-t border-slate-100">
                   <Link 
                     href={`/apply?country=${c3.name}`}
-                    className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25 transition-all"
+                    className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:shadow-emerald-500/25 transition-all"
                   >
                     <span>Apply for {c3.name}</span>
                     <ArrowRight className="w-4 h-4" />
@@ -795,10 +620,10 @@ export default function CountryComparisonPage() {
                 </div>
               </motion.div>
             ) : (
-              <div className="hidden md:flex bg-slate-900/10 border-2 border-dashed border-slate-800/60 rounded-3xl p-6 items-center justify-center flex-col text-slate-500 h-full min-h-[400px]">
-                <Globe className="w-12 h-12 text-slate-600 mb-4 animate-pulse" />
-                <p className="font-medium">Choose a third country</p>
-                <p className="text-xs text-slate-600 mt-1">Select from the dropdown above to compare three side-by-side</p>
+              <div className="hidden md:flex bg-slate-50 border-2 border-dashed border-slate-300 rounded-3xl p-6 items-center justify-center flex-col text-slate-500 h-full min-h-[400px]">
+                <Globe className="w-12 h-12 text-slate-400 mb-4 animate-pulse" />
+                <p className="font-medium text-slate-600">Choose a third country</p>
+                <p className="text-xs text-slate-500 mt-1">Select from the dropdown above to compare three side-by-side</p>
               </div>
             )}
 
@@ -810,11 +635,11 @@ export default function CountryComparisonPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="mt-16 bg-slate-900/30 border border-slate-800/80 rounded-2xl p-6 text-slate-400 text-xs md:text-sm flex gap-4 items-start"
+          className="mt-16 bg-blue-50/50 border border-blue-100 rounded-2xl p-6 text-slate-600 text-xs md:text-sm flex gap-4 items-start"
         >
-          <ShieldAlert className="w-5 h-5 text-primary-500 flex-shrink-0 mt-0.5 animate-pulse" />
+          <ShieldAlert className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5 animate-pulse" />
           <div>
-            <p className="font-semibold text-slate-300 mb-1">Important Guidance for MBBS Students</p>
+            <p className="font-semibold text-slate-800 mb-1">Important Guidance for MBBS Students</p>
             <p className="leading-relaxed">
               All fees and figures mentioned above are approximate and subject to change based on university regulations, foreign exchange rates, and personal living expenses. Ensure you check and verify each university's specific requirements, official language mediums, and recognition under the National Medical Commission (NMC) guidelines before proceeding with any overseas admission.
             </p>

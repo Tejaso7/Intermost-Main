@@ -21,6 +21,7 @@ import {
   Newspaper,
   BarChart3,
   Database,
+  MapPin,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { storage } from '@/lib/utils';
@@ -36,6 +37,7 @@ const navItems = [
   { name: 'Testimonials', href: '/admin/testimonials', icon: Users },
   { name: 'Leads', href: '/admin/leads', icon: MessageSquare },
   { name: 'Team', href: '/admin/team', icon: Users },
+  { name: 'Offices', href: '/admin/offices', icon: MapPin },
   { name: 'Knowledge Base', href: '/admin/knowledge-base', icon: Database },
   { name: 'Settings', href: '/admin/settings', icon: Settings },
 ];

@@ -33,34 +33,7 @@ const getCountryImage = (country: Country): string => {
   return `/images/countries/${country.slug}.jpg`;
 };
 
-// Fallback colleges by country
-const fallbackCollegesByCountry: Record<string, Partial<College>[]> = {
-  russia: [
-    { _id: '1', name: 'Bashkir State Medical University', slug: 'bashkir-state-medical-university', country_name: 'Russia', overview: { description: 'One of the oldest medical institutions in Russia with global recognition.', established: 1932, location: 'Ufa' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$4,000-6,000', hostel_per_year: '$600-1,200', total_course_fee: '₹25-35 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-    { _id: '2', name: 'Ryazan State Medical University', slug: 'ryazan-state-medical-university', country_name: 'Russia', overview: { description: 'Offers high-quality medical education with strong clinical exposure.', established: 1950, location: 'Ryazan' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$4,000-6,000', hostel_per_year: '$600-1,200', total_course_fee: '₹25-35 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: false, display_order: 2, created_at: '', updated_at: '' } },
-    { _id: '3', name: 'Yaroslavi State Medical University', slug: 'yaroslavi-state-medical-university', country_name: 'Russia', overview: { description: 'One of the oldest medical institutions in Russia with global recognition.', established: 1944, location: 'Yaroslavl' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$4,000-6,000', hostel_per_year: '$600-1,200', total_course_fee: '₹25-35 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: false, display_order: 3, created_at: '', updated_at: '' } },
-  ],
-  georgia: [
-    { _id: '1', name: 'Caucasus University', slug: 'caucasus-university', country_name: 'Georgia', overview: { description: 'Private university in Tbilisi offering NMC-approved MBBS with modern facilities.', established: 1998, location: 'Tbilisi' }, recognition: ['NMC', 'FAIMER', 'WFME', 'WHO'], fees: { tuition_per_year: '$5,500', hostel_per_year: '$2,500-3,000', total_course_fee: '₹40-50 Lakhs' }, facilities: ['Modern Labs', 'International Faculty', 'Clinical Training'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-    { _id: '2', name: 'East European University', slug: 'east-european-university', country_name: 'Georgia', overview: { description: 'Focus on practical medical training with international partnerships.', established: 2012, location: 'Tbilisi' }, recognition: ['NMC', 'FAIMER', 'WFME', 'WHO'], fees: { tuition_per_year: '$5,500', hostel_per_year: '$2,500-3,000', total_course_fee: '₹40-50 Lakhs' }, facilities: ['Modern Labs', 'USMLE Prep', 'Clinical Training'], meta: { is_active: true, is_featured: false, display_order: 2, created_at: '', updated_at: '' } },
-    { _id: '3', name: 'Alte University', slug: 'alte-university', country_name: 'Georgia', overview: { description: 'Affordable English-medium MBBS program with strong clinical exposure.', established: 2014, location: 'Tbilisi' }, recognition: ['NMC', 'FAIMER', 'WFME', 'WHO'], fees: { tuition_per_year: '$5,500', hostel_per_year: '$2,500-3,000', total_course_fee: '₹40-50 Lakhs' }, facilities: ['Modern Labs', 'Clinical Training', 'Library'], meta: { is_active: true, is_featured: false, display_order: 3, created_at: '', updated_at: '' } },
-  ],
-  uzbekistan: [
-    { _id: '1', name: 'Samarkand State Medical University', slug: 'samarkand-state-medical-university', country_name: 'Uzbekistan', overview: { description: 'One of the oldest and most reputed medical universities in Uzbekistan.', established: 1930, location: 'Samarkand' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$3,500', hostel_per_year: '$500-800', total_course_fee: '₹20-28 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-    { _id: '2', name: 'Tashkent Medical Academy', slug: 'tashkent-medical-academy', country_name: 'Uzbekistan', overview: { description: 'Premier medical institution in capital city with excellent facilities.', established: 1919, location: 'Tashkent' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$3,500', hostel_per_year: '$500-800', total_course_fee: '₹20-28 Lakhs' }, facilities: ['Modern Labs', 'Research Center', 'Clinical Training'], meta: { is_active: true, is_featured: false, display_order: 2, created_at: '', updated_at: '' } },
-  ],
-  kazakhstan: [
-    { _id: '1', name: 'Kazakh National Medical University', slug: 'kazakh-national-medical-university', country_name: 'Kazakhstan', overview: { description: 'Leading medical university in Kazakhstan with international recognition.', established: 1930, location: 'Almaty' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$3,700-6,383', hostel_per_year: '$600-1,200', total_course_fee: '₹22-35 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-    { _id: '2', name: 'Semey Medical University', slug: 'semey-medical-university', country_name: 'Kazakhstan', overview: { description: 'Quality medical education at affordable costs.', established: 1953, location: 'Semey' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$3,500', hostel_per_year: '$600-1,200', total_course_fee: '₹22-30 Lakhs' }, facilities: ['Modern Labs', 'Clinical Training', 'Research'], meta: { is_active: true, is_featured: false, display_order: 2, created_at: '', updated_at: '' } },
-  ],
-  tajikistan: [
-    { _id: '1', name: 'Avicenna Tajik State Medical University', slug: 'avicenna-tajik-state-medical-university', country_name: 'Tajikistan', overview: { description: 'The leading medical university in Tajikistan named after the famous physician Avicenna.', established: 1939, location: 'Dushanbe' }, recognition: ['NMC', 'WHO'], fees: { tuition_per_year: '$3,000', hostel_per_year: '$1,200-1,500', total_course_fee: '₹18-25 Lakhs' }, facilities: ['Modern Labs', 'Hospital Training', 'Library'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-  ],
-  nepal: [
-    { _id: '1', name: 'Kathmandu University School of Medical Sciences', slug: 'kusms', country_name: 'Nepal', overview: { description: 'Premier medical school in Nepal with excellent clinical exposure.', established: 1993, location: 'Dhulikhel' }, recognition: ['NMC'], fees: { tuition_per_year: '₹10-12 Lakhs', hostel_per_year: '₹1-2 Lakhs', total_course_fee: '₹50-65 Lakhs' }, facilities: ['Teaching Hospital', 'Modern Labs', 'Library'], meta: { is_active: true, is_featured: true, display_order: 1, created_at: '', updated_at: '' } },
-    { _id: '2', name: 'Manipal College of Medical Sciences', slug: 'mcoms-nepal', country_name: 'Nepal', overview: { description: 'Affiliated with Manipal University with high standards of medical education.', established: 1994, location: 'Pokhara' }, recognition: ['NMC'], fees: { tuition_per_year: '₹10-12 Lakhs', hostel_per_year: '₹1-2 Lakhs', total_course_fee: '₹50-65 Lakhs' }, facilities: ['Teaching Hospital', 'Modern Labs', 'Clinical Training'], meta: { is_active: true, is_featured: false, display_order: 2, created_at: '', updated_at: '' } },
-  ],
-};
+// Remove hardcoded fallbacks as data is now dynamic
 
 interface CountryDetailProps {
   country: Country;
@@ -68,10 +41,7 @@ interface CountryDetailProps {
 }
 
 export default function CountryDetail({ country, colleges: propColleges }: CountryDetailProps) {
-  // Use fallback colleges if none provided
-  const colleges = propColleges.length > 0 
-    ? propColleges 
-    : (fallbackCollegesByCountry[country.slug] || []) as College[];
+  const colleges = propColleges || [];
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [showVideo, setShowVideo] = useState(false);
 
@@ -393,30 +363,30 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
                         <h3 className="font-semibold text-gray-900 line-clamp-2">
                           {college.name}
                         </h3>
-                        {college.overview?.location && (
-                          <p className="text-sm text-gray-500 flex items-center mt-1">
-                            <MapPin className="w-4 h-4 mr-1" />
-                            {college.overview.location}
-                          </p>
-                        )}
+                        {college.contact?.city ? (
+                          <div className="flex items-center text-sm text-gray-500 mb-3">
+                            <MapPin className="w-4 h-4 mr-1 text-primary-500" />
+                            {college.contact?.city}
+                          </div>
+                        ) : null}
                       </div>
                     </div>
                     
                     <div className="flex flex-wrap gap-2 mb-4">
                       {college.recognition?.slice(0, 3).map((rec) => (
                         <span
-                          key={rec}
+                          key={rec.name}
                           className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded"
                         >
-                          {rec}
+                          {rec.name}
                         </span>
                       ))}
                     </div>
 
-                    {college.fees?.total_course_fee && (
+                    {college.fees?.total_package && (
                       <p className="text-sm text-gray-600">
                         <span className="font-semibold text-primary-600">
-                          {college.fees.total_course_fee}
+                          {college.fees.total_package}
                         </span>{' '}
                         Total Fee
                       </p>

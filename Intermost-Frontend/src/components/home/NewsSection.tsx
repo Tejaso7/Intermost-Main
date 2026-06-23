@@ -48,6 +48,13 @@ const fallbackNews: News[] = [
 export default function NewsSection() {
   const [news, setNews] = useState<News[]>(fallbackNews);
   const [loading, setLoading] = useState(true);
+  const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+
+  const getYoutubeId = (url: string) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+    return match ? match[1] : null;
+  };
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -132,22 +139,55 @@ export default function NewsSection() {
               {/* Media */}
               <div className="relative h-40 sm:h-48 overflow-hidden">
                 {item.media_type === 'video' ? (
-                  <>
-                    <video
-                      src={item.media_url}
-                      poster={item.media_url}
-                      className="w-full h-full object-cover"
-                      muted
-                    />
-                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                      <motion.div 
-                        className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform"
-                        whileHover={{ scale: 1.2 }}
-                      >
-                        <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
-                      </motion.div>
+                  playingVideoId === item._id ? (
+                    getYoutubeId(item.media_url || '') ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYoutubeId(item.media_url || '')}?autoplay=1`}
+                        className="w-full h-full object-cover"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <video
+                        src={item.media_url}
+                        className="w-full h-full object-cover bg-black"
+                        controls
+                        autoPlay
+                      />
+                    )
+                  ) : (
+                    <div 
+                      className="relative w-full h-full cursor-pointer group"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setPlayingVideoId(item._id);
+                      }}
+                    >
+                      {getYoutubeId(item.media_url || '') ? (
+                        <Image
+                          src={`https://img.youtube.com/vi/${getYoutubeId(item.media_url || '')}/hqdefault.jpg`}
+                          alt={item.title}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <video
+                          src={item.media_url}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          muted
+                          playsInline
+                        />
+                      )}
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+                        <motion.div 
+                          className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"
+                          whileHover={{ scale: 1.1 }}
+                        >
+                          <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
+                        </motion.div>
+                      </div>
                     </div>
-                  </>
+                  )
                 ) : (
                   <Image
                     src={item.media_url || '/images/placeholder.jpg'}

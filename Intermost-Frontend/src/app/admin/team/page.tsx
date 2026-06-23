@@ -16,11 +16,18 @@ import { teamApi } from '@/lib/services';
 import { TeamMember } from '@/lib/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import ConfirmDialog from '@/components/admin/ConfirmDialog';
 
 export default function TeamPage() {
   const [team, setTeam] = useState<TeamMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [deleteDialog, setDeleteDialog] = useState<{ isOpen: boolean; id: string; title: string }>({
+    isOpen: false,
+    id: '',
+    title: ''
+  });
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -45,15 +52,21 @@ export default function TeamPage() {
     member.region?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this team member?')) return;
-    
+  const handleDelete = (id: string, name: string) => {
+    setDeleteDialog({ isOpen: true, id, title: name });
+  };
+
+  const confirmDelete = async () => {
+    setIsDeleting(true);
     try {
-      await teamApi.delete(id);
+      await teamApi.delete(deleteDialog.id);
       toast.success('Team member deleted successfully');
+      setDeleteDialog({ isOpen: false, id: '', title: '' });
       fetchData();
     } catch (error) {
       toast.error('Failed to delete team member');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -158,7 +171,7 @@ export default function TeamPage() {
                   <Edit2 className="w-4 h-4" />
                 </Link>
                 <button
-                  onClick={() => handleDelete(member._id)}
+                  onClick={() => handleDelete(member._id, member.name)}
                   className="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -183,6 +196,15 @@ export default function TeamPage() {
           </Link>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={deleteDialog.isOpen}
+        title="Delete Team Member"
+        message={`Are you sure you want to delete "${deleteDialog.title}"? This action cannot be undone.`}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleteDialog({ isOpen: false, id: '', title: '' })}
+        isLoading={isDeleting}
+      />
     </div>
   );
 }

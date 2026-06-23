@@ -2,9 +2,10 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { chatAPI, ChatMessage } from '@/lib/api';
+import { chatAPI, ChatMessage, Country } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles } from 'lucide-react';
+import { countriesApi } from '@/lib/services';
 
 type ChatStep = 'chat' | 'lead_capture' | 'lead_complete';
 
@@ -22,6 +23,7 @@ export default function StudentChatWidget() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeCountries, setActiveCountries] = useState<string[]>([]);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [step, setStep] = useState<ChatStep>('chat');
   const [leadForm, setLeadForm] = useState<LeadFormState>({
@@ -35,7 +37,7 @@ export default function StudentChatWidget() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Generate session ID on mount
+  // Generate session ID on mount and fetch countries
   useEffect(() => {
     const storedSessionId = localStorage.getItem('student_chat_session');
     if (storedSessionId) {
@@ -45,6 +47,17 @@ export default function StudentChatWidget() {
       setSessionId(newSessionId);
       localStorage.setItem('student_chat_session', newSessionId);
     }
+    
+    // Fetch active countries for the dropdown
+    const fetchCountries = async () => {
+      try {
+        const data = await countriesApi.getAll({ active: true });
+        setActiveCountries(data.map((c: Country) => c.name));
+      } catch (e) {
+        console.error('Failed to load countries', e);
+      }
+    };
+    fetchCountries();
   }, []);
 
   // Scroll to bottom on new messages
@@ -179,9 +192,6 @@ export default function StudentChatWidget() {
     { label: 'Uzbekistan Duration 🇺🇿', query: 'What is the duration and medium of instruction in Uzbekistan?' }
   ];
 
-  const countries = [
-    'Russia', 'Kazakhstan', 'Uzbekistan', 'Georgia', 'Nepal', 'Tajikistan'
-  ];
 
   // Don't render on admin pages
   if (pathname?.startsWith('/admin') || pathname?.startsWith('/django-admin')) {
@@ -401,7 +411,7 @@ export default function StudentChatWidget() {
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all appearance-none bg-white"
                     >
                       <option value="">Preferred Study Destination</option>
-                      {countries.map((country) => (
+                      {activeCountries.map((country) => (
                         <option key={country} value={country}>{country}</option>
                       ))}
                     </select>
