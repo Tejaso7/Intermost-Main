@@ -9,7 +9,19 @@ import { Menu, X, Phone, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { countriesApi } from '@/lib/services';
 
-const navigation = [
+interface NavSubmenuItem {
+  name: string;
+  href: string;
+  flag: string;
+}
+
+interface NavItem {
+  name: string;
+  href: string;
+  submenu?: NavSubmenuItem[];
+}
+
+const navigation: NavItem[] = [
   { name: 'Home', href: '/' },
   {
     name: 'Countries',

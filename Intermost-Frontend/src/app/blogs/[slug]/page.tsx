@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
       title: blog.title,
       description: blog.excerpt,
-      images: [blog.featured_image],
+      images: blog.featured_image ? [blog.featured_image] : [],
     },
   };
 }
@@ -62,7 +62,7 @@ export default async function BlogDetailPage({ params }: Props) {
       <section className="relative py-32 bg-gray-900">
         <div className="absolute inset-0">
           <Image
-            src={blog.featured_image}
+            src={blog.featured_image || '/images/placeholder.jpg'}
             alt={blog.title}
             fill
             className="object-cover opacity-40"
@@ -192,7 +192,7 @@ export default async function BlogDetailPage({ params }: Props) {
                       >
                         <div className="relative w-20 h-16 rounded-lg overflow-hidden flex-shrink-0">
                           <Image
-                            src={post.featured_image}
+                            src={post.featured_image || '/images/placeholder.jpg'}
                             alt={post.title}
                             fill
                             className="object-cover group-hover:scale-105 transition-transform"
@@ -242,7 +242,7 @@ export default async function BlogDetailPage({ params }: Props) {
                 <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow">
                   <div className="relative h-48">
                     <Image
-                      src={post.featured_image}
+                      src={post.featured_image || '/images/placeholder.jpg'}
                       alt={post.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-300"

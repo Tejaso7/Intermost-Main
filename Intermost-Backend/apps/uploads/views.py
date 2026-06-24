@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.conf import settings
+from django.core.files.storage import default_storage
 import logging
 
 logger = logging.getLogger(__name__)
@@ -85,17 +86,18 @@ class FileUploadView(APIView):
             
             # Generate unique filename
             filename = generate_filename(file.name)
-            filepath = upload_folder / filename
             
-            # Save file
+            # Save file using default_storage (Cloudinary or Local Media)
             try:
-                with open(filepath, 'wb+') as destination:
-                    for chunk in file.chunks():
-                        destination.write(chunk)
+                save_path = f"uploads/{category}/{filename}"
+                saved_file_path = default_storage.save(save_path, file)
                 
-                # Calculate relative URL path
-                relative_path = str(filepath.relative_to(FRONTEND_PUBLIC_PATH))
-                url_path = '/' + relative_path.replace('\\', '/')
+                # Retrieve URL
+                url_path = default_storage.url(saved_file_path)
+                
+                # Ensure local URL starts with a slash
+                if not (url_path.startswith('http://') or url_path.startswith('https://')) and not url_path.startswith('/'):
+                    url_path = '/' + url_path
                 
                 uploaded_files.append({
                     'original_name': file.name,
@@ -105,7 +107,7 @@ class FileUploadView(APIView):
                     'category': category
                 })
                 
-                logger.info(f"File uploaded: {filename} to {category}")
+                logger.info(f"File uploaded: {filename} to {category} via storage")
                 
             except Exception as e:
                 logger.error(f"Error uploading file {file.name}: {str(e)}")

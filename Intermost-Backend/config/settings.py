@@ -98,6 +98,7 @@ DATABASES = {
 # MongoDB Connection String
 MONGODB_URI = env('MONGODB_URI', default='mongodb://localhost:27017/')
 MONGODB_NAME = env('MONGODB_NAME', default='intermost_db')
+BACKEND_URL = env('BACKEND_URL', default='http://localhost:8000')
 
 # Google Gemini API Key for Chatbot
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
@@ -130,6 +131,10 @@ EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_USE_TLS = env.bool('EMAIL_USE_TLS', default=True)
 DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default=env('EMAIL_HOST_USER', default=''))
+
+# Media Files Configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Media files - Cloudinary
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

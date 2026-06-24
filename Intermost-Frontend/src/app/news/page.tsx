@@ -54,7 +54,7 @@ export default function NewsPage() {
   useEffect(() => {
     const fetchNews = async () => {
       try {
-        const data = await newsApi.getAll({ active: true });
+        const data = await newsApi.getAll({ is_active: true });
         if (data && data.length > 0) {
           setNews(data);
         }

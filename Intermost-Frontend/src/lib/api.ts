@@ -263,18 +263,20 @@ export interface Blog {
   content: string;
   featured_image?: string;
   category: string;
-  tags: string[];
+  tags?: string[];
   author: string;
+  read_time?: string;
+  is_published: boolean;
+  is_featured: boolean;
+  views: number;
   seo?: {
     title?: string;
     description?: string;
     keywords?: string[];
   };
-  is_published: boolean;
-  is_featured: boolean;
-  views: number;
   created_at: string;
   updated_at: string;
+  published_at?: string;
 }
 
 // News Types
@@ -547,27 +549,3 @@ export const ragAPI = {
   },
 };
 
-// Blog Types
-export interface Blog {
-  _id: string;
-  title: string;
-  slug: string;
-  excerpt: string;
-  content: string;
-  featured_image: string;
-  category: string;
-  tags?: string[];
-  author: string;
-  read_time: string;
-  is_published: boolean;
-  is_featured: boolean;
-  views: number;
-  seo?: {
-    title?: string;
-    description?: string;
-    keywords?: string[];
-  };
-  created_at: string;
-  updated_at: string;
-  published_at?: string;
-}
