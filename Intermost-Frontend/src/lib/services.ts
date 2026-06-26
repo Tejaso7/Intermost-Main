@@ -484,4 +484,37 @@ export const messagesApi = {
     });
     return response.data;
   },
+
+  getConfig: async () => {
+    const response = await api.get<{
+      gateway?: string;
+      meta_phone_number_id?: string;
+      meta_access_token?: string;
+      twilio_account_sid?: string;
+      twilio_auth_token?: string;
+      twilio_sender_phone?: string;
+    }>('/whatsapp/config/');
+    return response.data;
+  },
+
+  saveConfig: async (config: {
+    gateway: string;
+    meta_phone_number_id?: string;
+    meta_access_token?: string;
+    twilio_account_sid?: string;
+    twilio_auth_token?: string;
+    twilio_sender_phone?: string;
+  }) => {
+    const response = await api.post<{ message: string }>('/whatsapp/config/', config);
+    return response.data;
+  },
+
+  sendWhatsAppCampaign: async (inquiryIds: string[], message: string, selectAll: boolean = false) => {
+    const response = await api.post<{ message: string; status: string; sent_count: number; failed_count: number; errors?: string[] }>('/whatsapp/campaign/', {
+      inquiry_ids: inquiryIds,
+      message,
+      select_all: selectAll
+    });
+    return response.data;
+  },
 };

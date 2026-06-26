@@ -1,5 +1,6 @@
 import logging
 import re
+import requests
 from datetime import datetime
 from rest_framework import status
 from rest_framework.views import APIView
@@ -138,6 +139,74 @@ class ContactsListView(APIView):
         })
 
 
+def send_whatsapp_api_message(config, phone, message_text):
+    gateway = config.get('gateway', 'simulation')
+    if gateway == 'simulation':
+        logger.info(f"Simulating sending WhatsApp message to {phone}: {message_text}")
+        return True, "Simulation"
+        
+    clean_phone = re.sub(r'\D', '', phone)
+    
+    if gateway == 'meta':
+        phone_id = config.get('meta_phone_number_id')
+        token = config.get('meta_access_token')
+        if not phone_id or not token:
+            return False, "Meta config missing"
+        url = f"https://graph.facebook.com/v18.0/{phone_id}/messages"
+        headers = {
+            "Authorization": f"Bearer {token}",
+            "Content-Type": "application/json"
+        }
+        payload = {
+            "messaging_product": "whatsapp",
+            "recipient_type": "individual",
+            "to": clean_phone,
+            "type": "text",
+            "text": {
+                "preview_url": False,
+                "body": message_text
+            }
+        }
+        try:
+            res = requests.post(url, json=payload, headers=headers, timeout=10)
+            if res.status_code in [200, 201]:
+                return True, "Meta sent"
+            else:
+                logger.error(f"Meta WhatsApp API error: {res.text}")
+                return False, f"Meta API error: {res.status_code}"
+        except Exception as e:
+            logger.error(f"Meta request exception: {str(e)}")
+            return False, str(e)
+            
+    elif gateway == 'twilio':
+        sid = config.get('twilio_account_sid')
+        token = config.get('twilio_auth_token')
+        sender = config.get('twilio_sender_phone', '')
+        if not sid or not token or not sender:
+            return False, "Twilio config missing"
+        url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
+        auth = (sid, token)
+        twilio_phone = phone if phone.startswith('+') else f"+{clean_phone}"
+        twilio_sender = sender if sender.startswith('+') else f"+{re.sub(r'\D', '', sender)}"
+        data = {
+            "From": f"whatsapp:{twilio_sender}",
+            "To": f"whatsapp:{twilio_phone}",
+            "Body": message_text
+        }
+        try:
+            res = requests.post(url, data=data, auth=auth, timeout=10)
+            if res.status_code in [200, 201]:
+                return True, "Twilio sent"
+            else:
+                logger.error(f"Twilio WhatsApp error: {res.text}")
+                return False, f"Twilio API error: {res.status_code}"
+        except Exception as e:
+            logger.error(f"Twilio request exception: {str(e)}")
+            return False, str(e)
+            
+    return False, "Unknown gateway"
+
+
 class SendMessageView(APIView):
     """
     Send a WhatsApp message to specific contacts
@@ -154,11 +223,9 @@ class SendMessageView(APIView):
             return Response({'error': 'message is required'}, status=status.HTTP_400_BAD_REQUEST)
             
         collection = get_collection('contacts')
-        
         target_phones = []
         
         if select_all:
-            # Send to all matching search
             query = {}
             if search_query:
                 query = {
@@ -188,12 +255,137 @@ class SendMessageView(APIView):
         if not target_phones:
             return Response({'error': 'No valid contacts found'}, status=status.HTTP_404_NOT_FOUND)
             
-        # TODO: Implement actual WhatsApp API call here (e.g., using requests to Meta Graph API, Twilio, etc.)
+        # Load WhatsApp Config
+        config_col = get_collection('whatsapp_config')
+        config = config_col.find_one({'_id': 'global'}) or {'gateway': 'simulation'}
+        
+        success_count = 0
+        failed_count = 0
+        errors = []
+        
         for phone in target_phones:
-            logger.info(f"Simulating sending WhatsApp message to {phone}: {message_text}")
-            
+            success, reason = send_whatsapp_api_message(config, phone, message_text)
+            if success:
+                success_count += 1
+            else:
+                failed_count += 1
+                errors.append(f"{phone}: {reason}")
+                
         return Response({
-            'message': f'Message sent successfully to {len(target_phones)} contacts',
-            'status': 'sent',
-            'sent_count': len(target_phones)
+            'message': f'WhatsApp dispatch complete. Sent: {success_count}, Failed: {failed_count}',
+            'status': 'complete',
+            'sent_count': success_count,
+            'failed_count': failed_count,
+            'errors': errors
+        })
+
+
+class WhatsAppConfigView(APIView):
+    """
+    GET and POST API config for WhatsApp.
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        config_col = get_collection('whatsapp_config')
+        config = config_col.find_one({'_id': 'global'}) or {}
+        if config:
+            config.pop('_id', None)
+        return Response(config)
+
+    def post(self, request):
+        config_col = get_collection('whatsapp_config')
+        config_data = request.data
+        
+        # Save config
+        config_col.update_one(
+            {'_id': 'global'},
+            {'$set': {
+                'gateway': config_data.get('gateway', 'simulation'),
+                'meta_phone_number_id': config_data.get('meta_phone_number_id', '').strip(),
+                'meta_access_token': config_data.get('meta_access_token', '').strip(),
+                'twilio_account_sid': config_data.get('twilio_account_sid', '').strip(),
+                'twilio_auth_token': config_data.get('twilio_auth_token', '').strip(),
+                'twilio_sender_phone': config_data.get('twilio_sender_phone', '').strip(),
+                'updated_at': datetime.utcnow()
+            }},
+            upsert=True
+        )
+        return Response({'message': 'WhatsApp configuration updated successfully'})
+
+
+class WhatsAppCampaignView(APIView):
+    """
+    Send WhatsApp campaign to leads in the inquiries collection.
+    """
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        inquiry_ids = request.data.get('inquiry_ids', [])
+        message_text = request.data.get('message', '').strip()
+        select_all = request.data.get('select_all', False)
+        
+        if not message_text:
+            return Response({'error': 'message content is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        inquiries_col = get_collection('inquiries')
+        target_leads = []
+        
+        if select_all:
+            cursor = inquiries_col.find({})
+            for doc in cursor:
+                target_leads.append(doc)
+        else:
+            if not inquiry_ids or not isinstance(inquiry_ids, list):
+                return Response({'error': 'inquiry_ids list is required when select_all is false'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            object_ids = []
+            for iid in inquiry_ids:
+                try:
+                    object_ids.append(ObjectId(iid))
+                except Exception:
+                    pass
+                    
+            cursor = inquiries_col.find({'_id': {'$in': object_ids}})
+            for doc in cursor:
+                target_leads.append(doc)
+                
+        if not target_leads:
+            return Response({'error': 'No valid leads found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        # Load WhatsApp Config
+        config_col = get_collection('whatsapp_config')
+        config = config_col.find_one({'_id': 'global'}) or {'gateway': 'simulation'}
+        
+        success_count = 0
+        failed_count = 0
+        errors = []
+        
+        for lead in target_leads:
+            phone = lead.get('phone', '')
+            cc = lead.get('country_code', '')
+            if not phone:
+                failed_count += 1
+                errors.append(f"Lead {lead.get('name', 'Unknown')}: missing phone number")
+                continue
+                
+            full_phone = phone
+            if cc and not phone.startswith('+') and not phone.startswith(cc.replace('+', '')):
+                full_phone = f"{cc}{phone}"
+                
+            personal_msg = message_text.replace('{{name}}', lead.get('name', 'Student'))
+            
+            success, reason = send_whatsapp_api_message(config, full_phone, personal_msg)
+            if success:
+                success_count += 1
+            else:
+                failed_count += 1
+                errors.append(f"{lead.get('name')}: {reason}")
+                
+        return Response({
+            'message': f'WhatsApp campaign completed. Sent: {success_count}, Failed: {failed_count}',
+            'status': 'complete',
+            'sent_count': success_count,
+            'failed_count': failed_count,
+            'errors': errors
         })

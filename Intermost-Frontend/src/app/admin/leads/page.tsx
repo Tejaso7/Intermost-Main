@@ -29,7 +29,7 @@ import {
   Square,
   Loader2
 } from 'lucide-react';
-import { inquiriesApi } from '@/lib/services';
+import { inquiriesApi, messagesApi } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
 import { formatDate, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -53,7 +53,7 @@ const statusIcons = {
 
 export default function LeadsPage() {
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp'>('explore');
 
   // Leads list states
   const [leads, setLeads] = useState<Inquiry[]>([]);
@@ -99,6 +99,38 @@ export default function LeadsPage() {
   const [sendingCampaign, setSendingCampaign] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [sendingTest, setSendingTest] = useState(false);
+
+  // WhatsApp Campaign States
+  const [whatsappCampaignMessage, setWhatsappCampaignMessage] = useState('Hello {{name}},\n\nWe have exciting updates regarding MBBS admissions abroad.\n\nBest regards,\nIntermost Admissions Team');
+  const [sendingWhatsappCampaign, setSendingWhatsappCampaign] = useState(false);
+
+  const handleSendWhatsappCampaign = async () => {
+    if (selectedLeadIds.length === 0) {
+      toast.error("Please select at least one lead from the Explore tab first!");
+      return;
+    }
+    if (!whatsappCampaignMessage.trim()) {
+      toast.error("WhatsApp message is required");
+      return;
+    }
+
+    setSendingWhatsappCampaign(true);
+    try {
+      const result = await messagesApi.sendWhatsAppCampaign(
+        selectedLeadIds,
+        whatsappCampaignMessage.trim(),
+        false
+      );
+
+      toast.success(`WhatsApp campaign finished! Sent: ${result.sent_count}, Failed: ${result.failed_count}`);
+      setSelectedLeadIds([]);
+      setActiveTab('explore');
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to send WhatsApp campaign");
+    } finally {
+      setSendingWhatsappCampaign(false);
+    }
+  };
 
   useEffect(() => {
     fetchLeads();
@@ -336,7 +368,7 @@ export default function LeadsPage() {
 
         {/* Tab Buttons */}
         <div className="flex bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700">
-          {(['explore', 'import', 'campaign'] as const).map((tab) => (
+          {(['explore', 'import', 'campaign', 'whatsapp'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -347,7 +379,13 @@ export default function LeadsPage() {
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               )}
             >
-              {tab === 'explore' ? 'Explore Leads' : tab === 'import' ? 'Excel Import' : 'Email Campaign'}
+              {tab === 'explore' 
+                ? 'Explore Leads' 
+                : tab === 'import' 
+                  ? 'Excel Import' 
+                  : tab === 'campaign' 
+                    ? 'Email Campaign' 
+                    : 'WhatsApp Campaign'}
             </button>
           ))}
         </div>
@@ -409,12 +447,22 @@ export default function LeadsPage() {
                 <button
                   onClick={() => {
                     setActiveTab('campaign');
-                    toast.success("Ready to send campaign to selected leads!");
+                    toast.success("Ready to send email campaign to selected leads!");
                   }}
-                  className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 transition-colors flex items-center gap-1.5 font-medium shadow-sm"
                 >
-                  <Send className="w-3.5 h-3.5" />
+                  <Mail className="w-3.5 h-3.5" />
                   Email Campaign
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('whatsapp');
+                    toast.success("Ready to send WhatsApp campaign to selected leads!");
+                  }}
+                  className="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors flex items-center gap-1.5 font-medium shadow-sm"
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  WhatsApp Campaign
                 </button>
                 <button
                   onClick={() => setSelectedLeadIds([])}
@@ -971,6 +1019,213 @@ export default function LeadsPage() {
                     className="prose dark:prose-invert max-w-none text-xs leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: campaignBody.replace(/\{\{name\}\}/g, 'John Doe') }}
                   />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WhatsApp Campaign Tab */}
+      {activeTab === 'whatsapp' && (
+        <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6 animate-fade-in">
+          <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <MessageSquare className="w-6 h-6 text-emerald-500" />
+              Dispatch Bulk WhatsApp Campaign
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Select leads on the left and design your WhatsApp message on the right. Ensure they have phone numbers with correct country codes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Leads Selector */}
+            <div className="lg:col-span-1 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-850 flex flex-col h-[650px] overflow-hidden shadow-sm">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-855 flex flex-col gap-3 flex-shrink-0">
+                <h3 className="font-bold text-gray-900 dark:text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-emerald-500" />
+                  Recipients ({selectedLeadIds.length} selected)
+                </h3>
+                
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 text-gray-900 dark:text-white outline-none"
+                  />
+                </div>
+                
+                {/* Select All Checkbox */}
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <button 
+                    onClick={toggleSelectAll}
+                    className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 hover:text-emerald-600 transition-colors"
+                  >
+                    {leads.length > 0 && leads.every(l => selectedLeadIds.includes(l._id)) ? (
+                      <CheckSquare className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <Square className="w-4 h-4" />
+                    )}
+                    Select All on Page
+                  </button>
+                  <span className="font-semibold bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-750 dark:text-gray-300">
+                    {totalCount} total
+                  </span>
+                </div>
+              </div>
+              
+              {/* Scrollable list of leads */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-2 py-8 text-gray-455">
+                    <Loader2 className="w-6 h-6 animate-spin text-emerald-500" />
+                    <span className="text-xs">Loading leads...</span>
+                  </div>
+                ) : filteredLeads.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full py-8 text-gray-450">
+                    <Users className="w-8 h-8 mb-1.5 text-gray-300 dark:text-gray-700" />
+                    <span className="text-xs">No leads found</span>
+                  </div>
+                ) : (
+                  filteredLeads.map((lead) => {
+                    const isSelected = selectedLeadIds.includes(lead._id);
+                    return (
+                      <div
+                        key={lead._id}
+                        onClick={() => toggleSelectLead(lead._id)}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                          isSelected 
+                            ? "bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900" 
+                            : "bg-white border-gray-150 hover:bg-gray-50/50 dark:bg-gray-850 dark:border-gray-800 dark:hover:bg-gray-800/40"
+                        )}
+                      >
+                        <div className="flex-shrink-0">
+                          {isSelected ? (
+                            <CheckSquare className="w-4.5 h-4.5 text-emerald-600 dark:text-emerald-400" />
+                          ) : (
+                            <Square className="w-4.5 h-4.5 text-gray-400" />
+                          )}
+                        </div>
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0",
+                          isSelected ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-300" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        )}>
+                          {lead.name ? lead.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
+                            {lead.name}
+                          </p>
+                          <p className="text-[10px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                            <Phone className="w-3 h-3 flex-shrink-0" />
+                            {lead.country_code} {lead.phone}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+              
+              {/* Pagination inside Left Column */}
+              {totalPages > 1 && (
+                <div className="p-3 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 flex items-center justify-between flex-shrink-0">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-[10px] text-gray-500 font-semibold">Page {page} of {totalPages}</span>
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Editor & Preview split */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 h-[650px] overflow-hidden">
+              {/* Editor Pane */}
+              <div className="flex flex-col bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden p-5 shadow-sm h-full overflow-y-auto">
+                <div className="space-y-4 flex-1">
+                  {/* Body Content */}
+                  <div className="space-y-2 flex flex-col">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                        WhatsApp Message Body
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage((prev) => prev + '{{name}}')}
+                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-[10px] font-semibold flex items-center gap-1"
+                        title="Insert student's full name dynamically"
+                      >
+                        <Sparkles className="w-3 h-3 text-emerald-500" />
+                        Insert {"{{name}}"}
+                      </button>
+                    </div>
+                    <textarea
+                      rows={14}
+                      value={whatsappCampaignMessage}
+                      onChange={(e) => setWhatsappCampaignMessage(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-250 dark:border-gray-750 bg-white dark:bg-gray-900 rounded-xl text-xs focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-gray-900 dark:text-white outline-none resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Dispatch Action Button */}
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end flex-shrink-0">
+                  <button
+                    onClick={handleSendWhatsappCampaign}
+                    disabled={sendingWhatsappCampaign || selectedLeadIds.length === 0}
+                    className="w-full md:w-auto px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 disabled:opacity-50 animate-pulse-slow"
+                  >
+                    {sendingWhatsappCampaign ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send WhatsApp Campaign ({selectedLeadIds.length} Recipient{selectedLeadIds.length !== 1 ? 's' : ''})
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview Panel */}
+              <div className="flex flex-col border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden bg-[#e5ddd5] dark:bg-gray-900/60 h-full relative" style={{ backgroundImage: 'url("https://user-images.githubusercontent.com/15075759/28719144-86dc0f70-73b1-11e7-911d-60d70fcded21.png")', backgroundSize: 'contain' }}>
+                <div className="bg-[#075e54] text-white px-4 py-3 flex items-center gap-3 shrink-0">
+                  <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-sm shrink-0">
+                    WA
+                  </div>
+                  <div>
+                    <span className="text-xs font-bold block leading-none">WhatsApp Preview</span>
+                    <span className="text-[10px] opacity-80 mt-0.5 block leading-none">Recipient: John Doe</span>
+                  </div>
+                </div>
+                <div className="p-4 flex-1 overflow-y-auto flex flex-col justify-end">
+                  {/* Chat bubble */}
+                  <div className="max-w-[85%] bg-[#d9fdd3] dark:bg-emerald-950 text-gray-900 dark:text-gray-155 p-3 rounded-2xl rounded-tr-none shadow-sm ml-auto relative">
+                    <p className="text-xs whitespace-pre-wrap leading-relaxed pr-6 text-left">
+                      {whatsappCampaignMessage ? whatsappCampaignMessage.replace(/\{\{name\}\}/g, 'John Doe') : <span className="text-gray-400 italic">Type a message to preview...</span>}
+                    </p>
+                    <div className="absolute bottom-1.5 right-2 flex items-center gap-0.5">
+                      <span className="text-[9px] text-gray-500 leading-none">12:00 PM</span>
+                      <svg className="w-3.5 h-3.5 text-blue-500" viewBox="0 0 16 15" fill="none"><path d="M15 3L6.875 11.5L3 7.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M11 3L5.875 8.25" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

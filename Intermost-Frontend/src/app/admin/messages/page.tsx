@@ -15,6 +15,8 @@ import {
   Loader2,
   CheckSquare,
   Square,
+  Settings,
+  X
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import toast from 'react-hot-toast';
@@ -31,6 +33,18 @@ export default function MessagesPage() {
   const [selectAllGlobal, setSelectAllGlobal] = useState(false);
   
   const [message, setMessage] = useState('');
+
+  // Config States
+  const [isConfigModalOpen, setIsConfigModalOpen] = useState(false);
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [config, setConfig] = useState({
+    gateway: 'simulation',
+    meta_phone_number_id: '',
+    meta_access_token: '',
+    twilio_account_sid: '',
+    twilio_auth_token: '',
+    twilio_sender_phone: '',
+  });
   
   const highlightText = (text: string, query: string) => {
     if (!query || !text) return text;
@@ -71,6 +85,25 @@ export default function MessagesPage() {
 
   useEffect(() => {
     fetchContacts(searchQuery, page);
+    
+    const fetchConfig = async () => {
+      try {
+        const data = await messagesApi.getConfig();
+        if (data) {
+          setConfig({
+            gateway: data.gateway || 'simulation',
+            meta_phone_number_id: data.meta_phone_number_id || '',
+            meta_access_token: data.meta_access_token || '',
+            twilio_account_sid: data.twilio_account_sid || '',
+            twilio_auth_token: data.twilio_auth_token || '',
+            twilio_sender_phone: data.twilio_sender_phone || ''
+          });
+        }
+      } catch (error) {
+        console.debug('No saved config found');
+      }
+    };
+    fetchConfig();
   }, []);
 
   // Debounced Search
@@ -83,6 +116,19 @@ export default function MessagesPage() {
     }, 500);
     return () => clearTimeout(timer);
   }, [searchQuery]);
+
+  const handleSaveConfig = async () => {
+    setIsSavingConfig(true);
+    try {
+      await messagesApi.saveConfig(config);
+      toast.success('WhatsApp configuration saved successfully!');
+      setIsConfigModalOpen(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to save configuration');
+    } finally {
+      setIsSavingConfig(false);
+    }
+  };
 
   const toggleContactSelection = (id: string) => {
     const newSet = new Set(selectedContactIds);
@@ -189,23 +235,34 @@ export default function MessagesPage() {
           <p className="text-sm text-gray-500 mt-1">Import contacts from Excel and send WhatsApp messages.</p>
         </div>
         
-        {/* Import Action */}
-        <div>
-          <input 
-            type="file" 
-            accept=".xlsx, .xls, .csv" 
-            className="hidden" 
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-          />
+        <div className="flex items-center gap-3">
+          {/* Config Settings Trigger */}
           <button
-            onClick={() => fileInputRef.current?.click()}
-            disabled={isImporting}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-70"
+            onClick={() => setIsConfigModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-lg transition-colors font-medium text-sm shadow-sm"
           >
-            {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
-            {isImporting ? 'Importing...' : 'Import Excel'}
+            <Settings className="w-4 h-4 text-gray-500" />
+            WhatsApp Config
           </button>
+
+          {/* Import Action */}
+          <div>
+            <input 
+              type="file" 
+              accept=".xlsx, .xls, .csv" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleFileUpload}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isImporting}
+              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-70 font-medium text-sm shadow-sm"
+            >
+              {isImporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+              {isImporting ? 'Importing...' : 'Import Excel'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -419,6 +476,143 @@ export default function MessagesPage() {
         </div>
         
       </div>
+
+      {/* Config Modal */}
+      {isConfigModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full border border-gray-150 shadow-2xl overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6 pb-3 border-b border-gray-100">
+                <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-primary-500" />
+                  WhatsApp Gateway Setup
+                </h2>
+                <button
+                  onClick={() => setIsConfigModalOpen(false)}
+                  className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-400 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                {/* Gateway Selector */}
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                    Select Gateway API
+                  </label>
+                  <select
+                    value={config.gateway}
+                    onChange={(e) => setConfig({ ...config, gateway: e.target.value })}
+                    className="w-full bg-gray-50 border border-gray-200 text-sm px-3.5 py-2 rounded-xl outline-none text-gray-900 focus:ring-2 focus:ring-primary-500"
+                  >
+                    <option value="simulation">Console Simulator (Demo Mode)</option>
+                    <option value="meta">Meta Cloud API (Official)</option>
+                    <option value="twilio">Twilio Programmable WhatsApp</option>
+                  </select>
+                </div>
+
+                {config.gateway === 'simulation' && (
+                  <div className="p-3 bg-blue-50 text-blue-800 rounded-xl border border-blue-100 text-xs">
+                    <p className="font-semibold mb-1">Demo Mode Active</p>
+                    <p>In Simulation mode, outbound messages are not dispatched to real APIs. Instead, they are printed to the Django terminal log for testing purposes.</p>
+                  </div>
+                )}
+
+                {config.gateway === 'meta' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Phone Number ID
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. 10984920392019"
+                        value={config.meta_phone_number_id}
+                        onChange={(e) => setConfig({ ...config, meta_phone_number_id: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Access Token (Permanent)
+                      </label>
+                      <textarea
+                        rows={3}
+                        placeholder="EAABw..."
+                        value={config.meta_access_token}
+                        onChange={(e) => setConfig({ ...config, meta_access_token: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 resize-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {config.gateway === 'twilio' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Account SID
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="AC..."
+                        value={config.twilio_account_sid}
+                        onChange={(e) => setConfig({ ...config, twilio_account_sid: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Auth Token
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Twilio Auth Token"
+                        value={config.twilio_auth_token}
+                        onChange={(e) => setConfig({ ...config, twilio_auth_token: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Twilio WhatsApp Sender Phone
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="e.g. +14155238886"
+                        value={config.twilio_sender_phone}
+                        onChange={(e) => setConfig({ ...config, twilio_sender_phone: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div className="mt-8 pt-4 border-t border-gray-100 flex justify-end gap-3">
+                <button
+                  onClick={() => setIsConfigModalOpen(false)}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveConfig}
+                  disabled={isSavingConfig}
+                  className="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-sm font-semibold flex items-center justify-center gap-1.5 shadow-sm transition-colors disabled:opacity-75"
+                >
+                  {isSavingConfig ? (
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
+                  ) : (
+                    'Save Configuration'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
