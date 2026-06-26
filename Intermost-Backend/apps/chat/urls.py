@@ -18,4 +18,9 @@ urlpatterns = [
     path('documents/', views.RAGDocumentListView.as_view(), name='rag-documents'),
     path('documents/<str:document_id>/', views.RAGDocumentDetailView.as_view(), name='rag-document-detail'),
     path('documents/stats/', views.RAGStatsView.as_view(), name='rag-stats'),
+    
+    # Runtime RAG (Brochure QA)
+    path('runtime-rag/upload/', views.RuntimeRAGUploadView.as_view(), name='runtime-rag-upload'),
+    path('runtime-rag/ask/', views.RuntimeRAGAskView.as_view(), name='runtime-rag-ask'),
+    path('runtime-rag/close/', views.RuntimeRAGCloseView.as_view(), name='runtime-rag-close'),
 ]

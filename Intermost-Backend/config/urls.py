@@ -40,6 +40,7 @@ urlpatterns = [
     path('api/v1/analytics/', include('apps.analytics.urls')),
     path('api/v1/uploads/', include('apps.uploads.urls')),
     path('api/v1/chat/', include('apps.chat.urls')),
+    path('api/v1/whatsapp/', include('apps.whatsapp.urls')),
     
     # API Documentation
     path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),

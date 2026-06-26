@@ -756,3 +756,84 @@ class RAGStatsView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+# ============= Runtime RAG (Brochure QA) Views =============
+
+class RuntimeRAGUploadView(APIView):
+    """Handles PDF brochure upload and generates temporary embeddings."""
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        try:
+            from .runtime_rag import BrochureSessionManager
+            
+            session_id = request.data.get('session_id')
+            file_obj = request.FILES.get('file')
+            
+            if not session_id or not file_obj:
+                return Response(
+                    {'error': 'session_id and file are required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            if not file_obj.name.lower().endswith('.pdf'):
+                return Response(
+                    {'error': 'Only PDF files are supported.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            result = BrochureSessionManager.create_session(session_id, file_obj)
+            return Response(result)
+            
+        except ValueError as ve:
+            return Response({'error': str(ve)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            logger.error(f"Error in RuntimeRAGUploadView: {e}")
+            return Response({'error': 'Failed to process document.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class RuntimeRAGAskView(APIView):
+    """Handles questions for the uploaded brochure."""
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        try:
+            from .runtime_rag import BrochureChat
+            
+            session_id = request.data.get('session_id')
+            query = request.data.get('query')
+            
+            if not session_id or not query:
+                return Response(
+                    {'error': 'session_id and query are required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            answer = BrochureChat.ask_question(session_id, query)
+            return Response({'answer': answer})
+            
+        except FileNotFoundError as fe:
+            return Response({'error': str(fe)}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            logger.error(f"Error in RuntimeRAGAskView: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class RuntimeRAGCloseView(APIView):
+    """Cleans up the temporary embeddings when session is closed."""
+    permission_classes = [AllowAny]
+    
+    def delete(self, request):
+        try:
+            from .runtime_rag import BrochureSessionManager
+            
+            session_id = request.data.get('session_id')
+            if not session_id:
+                return Response(
+                    {'error': 'session_id is required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            success = BrochureSessionManager.destroy_session(session_id)
+            return Response({'success': success})
+            
+        except Exception as e:
+            logger.error(f"Error in RuntimeRAGCloseView: {e}")
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

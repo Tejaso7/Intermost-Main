@@ -102,6 +102,9 @@ MONGODB_NAME = env('MONGODB_NAME', default='intermost_db')
 # Google Gemini API Key for Chatbot
 GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 
+# Groq API Key for Brochure Chatbot
+GROQ_API_KEY = env('GROQ_API_KEY', default='')
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

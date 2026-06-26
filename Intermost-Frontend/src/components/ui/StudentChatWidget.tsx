@@ -2,9 +2,9 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
-import { chatAPI, ChatMessage, Country } from '@/lib/api';
+import { chatAPI, runtimeRagAPI, ChatMessage, Country } from '@/lib/api';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles } from 'lucide-react';
+import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles, Paperclip, FileText, Loader2 } from 'lucide-react';
 import { countriesApi } from '@/lib/services';
 
 type ChatStep = 'chat' | 'lead_capture' | 'lead_complete';
@@ -34,6 +34,12 @@ export default function StudentChatWidget() {
     course_interest: 'MBBS',
   });
   const [showLeadPrompt, setShowLeadPrompt] = useState(false);
+  
+  // Brochure Mode States
+  const [isBrochureMode, setIsBrochureMode] = useState(false);
+  const [brochureName, setBrochureName] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -110,18 +116,30 @@ export default function StudentChatWidget() {
     setIsLoading(true);
 
     try {
-      const response = await chatAPI.sendStudentMessage(message, sessionId || undefined);
+      let assistantResponseText = '';
+      let newSessionId = sessionId;
       
-      if (response.session_id && response.session_id !== sessionId) {
-        setSessionId(response.session_id);
-        localStorage.setItem('student_chat_session', response.session_id);
+      if (isBrochureMode && sessionId) {
+        // Query the RAG backend
+        const response = await runtimeRagAPI.askQuestion(message, sessionId);
+        assistantResponseText = response.answer;
+      } else {
+        // Normal chat
+        const response = await chatAPI.sendStudentMessage(message, sessionId || undefined);
+        assistantResponseText = response.message;
+        
+        if (response.session_id && response.session_id !== sessionId) {
+          setSessionId(response.session_id);
+          newSessionId = response.session_id;
+          localStorage.setItem('student_chat_session', response.session_id);
+        }
       }
 
       const assistantMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: response.message,
-        timestamp: response.timestamp,
+        content: assistantResponseText,
+        timestamp: new Date().toISOString(),
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
@@ -129,7 +147,7 @@ export default function StudentChatWidget() {
       const errorMessage: ChatMessage = {
         id: crypto.randomUUID(),
         role: 'assistant',
-        content: 'I apologize for the inconvenience. Please try again or contact us directly at +91-9717717165.',
+        content: error.response?.data?.error || 'I apologize for the inconvenience. Please try again or contact us directly at +91-9717717165.',
         timestamp: new Date().toISOString(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -139,6 +157,57 @@ export default function StudentChatWidget() {
   };
 
   const sendMessage = () => sendQuery(inputValue);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile || !sessionId) return;
+    
+    if (selectedFile.type !== 'application/pdf') {
+      alert('Please upload a valid PDF file.');
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      await runtimeRagAPI.uploadBrochure(selectedFile, sessionId);
+      setIsBrochureMode(true);
+      setBrochureName(selectedFile.name);
+      
+      const assistantMessage: ChatMessage = {
+        id: crypto.randomUUID(),
+        role: 'assistant',
+        content: `I've successfully read through "${selectedFile.name}". Ask me any questions about it!`,
+        timestamp: new Date().toISOString()
+      };
+      setMessages(prev => [...prev, assistantMessage]);
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to process document.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const exitBrochureMode = async () => {
+    if (sessionId) {
+      try {
+        await runtimeRagAPI.closeSession(sessionId);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    setIsBrochureMode(false);
+    setBrochureName(null);
+    const newSessionId = crypto.randomUUID();
+    setSessionId(newSessionId);
+    localStorage.setItem('student_chat_session', newSessionId);
+    setMessages([{
+      id: 'greeting_reset',
+      role: 'assistant',
+      content: 'Brochure context cleared. How else can I assist you?',
+      timestamp: new Date().toISOString()
+    }]);
+  };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -240,6 +309,19 @@ export default function StudentChatWidget() {
             {/* Content */}
             {step === 'chat' ? (
               <>
+                {/* Brochure Banner */}
+                {isBrochureMode && (
+                  <div className="bg-indigo-50 border-b border-indigo-100 px-4 py-2 flex items-center justify-between">
+                    <div className="flex items-center gap-2 text-indigo-700 text-xs font-medium">
+                      <FileText className="w-4 h-4" />
+                      <span className="truncate max-w-[200px]">Asking about: {brochureName}</span>
+                    </div>
+                    <button onClick={exitBrochureMode} className="text-indigo-500 hover:text-indigo-700 hover:bg-indigo-100 p-1 rounded-md transition">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                )}
+                
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50/50 to-white scrollbar-modern">
                   <AnimatePresence initial={false}>
@@ -336,13 +418,23 @@ export default function StudentChatWidget() {
                 {/* Input */}
                 <div className="p-4 bg-white border-t border-gray-100">
                   <div className="flex items-center gap-2">
+                    <label className="flex-shrink-0 relative cursor-pointer text-gray-400 hover:text-primary-600 transition-colors p-2 hover:bg-gray-50 rounded-xl" title="Upload Brochure (PDF)">
+                      <input 
+                        type="file" 
+                        accept=".pdf" 
+                        className="hidden" 
+                        onChange={handleFileUpload}
+                        disabled={isUploading || isLoading}
+                      />
+                      {isUploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Paperclip className="w-5 h-5" />}
+                    </label>
                     <input
                       ref={inputRef}
                       type="text"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyPress={handleKeyPress}
-                      placeholder="Ask about MBBS abroad..."
+                      placeholder={isBrochureMode ? "Ask about brochure..." : "Ask about MBBS abroad..."}
                       className="flex-1 px-4 py-3 border border-gray-200 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary-100 focus:border-primary-500 text-sm transition-all duration-200"
                       disabled={isLoading}
                     />
