@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+const uuidv4 = () => typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
 import { runtimeRagAPI } from '@/lib/api';
 import { Send, UploadCloud, X, Loader2, Bot, User, FileText } from 'lucide-react';
 
@@ -161,7 +161,7 @@ export default function BrochureChatPage() {
                       onChange={handleFileUpload}
                       disabled={isUploading}
                     />
-                    <div className={\`w-full py-3 px-4 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all \${isUploading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]'}\`}>
+                    <div className={`w-full py-3 px-4 rounded-xl text-white font-medium flex items-center justify-center gap-2 transition-all ${isUploading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98]'}`}>
                       {isUploading ? (
                         <><Loader2 className="w-5 h-5 animate-spin" /> Processing PDF...</>
                       ) : (
@@ -175,18 +175,18 @@ export default function BrochureChatPage() {
               // Chat State
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
                 {messages.map((msg) => (
-                  <div key={msg.id} className={\`flex gap-4 \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}>
+                  <div key={msg.id} className={`flex gap-4 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     {msg.role === 'assistant' && (
                       <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
                         <Bot className="w-5 h-5 text-indigo-600" />
                       </div>
                     )}
                     
-                    <div className={\`max-w-[75%] rounded-2xl px-5 py-3 \${
+                    <div className={`max-w-[75%] rounded-2xl px-5 py-3 ${
                       msg.role === 'user' 
                         ? 'bg-indigo-600 text-white rounded-tr-none' 
                         : 'bg-white border border-gray-100 shadow-sm text-gray-800 rounded-tl-none'
-                    }\`}>
+                    }`}>
                       <p className="whitespace-pre-wrap">{msg.content}</p>
                     </div>
 
