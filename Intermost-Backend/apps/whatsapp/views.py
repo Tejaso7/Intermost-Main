@@ -187,7 +187,11 @@ def send_whatsapp_api_message(config, phone, message_text):
         url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json"
         auth = (sid, token)
         twilio_phone = phone if phone.startswith('+') else f"+{clean_phone}"
-        twilio_sender = sender if sender.startswith('+') else f"+{re.sub(r'\D', '', sender)}"
+        if sender.startswith('+'):
+            twilio_sender = sender
+        else:
+            clean_sender = re.sub(r'\D', '', sender)
+            twilio_sender = f"+{clean_sender}"
         data = {
             "From": f"whatsapp:{twilio_sender}",
             "To": f"whatsapp:{twilio_phone}",
