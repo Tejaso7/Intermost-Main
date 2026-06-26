@@ -24,7 +24,10 @@ import {
   Info,
   Sparkles,
   Check,
-  AlertCircle
+  AlertCircle,
+  CheckSquare,
+  Square,
+  Loader2
 } from 'lucide-react';
 import { inquiriesApi } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
@@ -738,114 +741,237 @@ export default function LeadsPage() {
 
       {/* Campaign Tab */}
       {activeTab === 'campaign' && (
-        <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm space-y-6 animate-fade-in">
+        <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6 animate-fade-in">
           <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
             <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
               <Send className="w-6 h-6 text-primary-500" />
               Dispatch Bulk Email Campaign
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
-              Create an HTML campaign targeting the leads you selected.
+              Select leads on the left and design your email campaign on the right.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Editor Panel */}
-            <div className="space-y-4">
-              {/* Target Indicator */}
-              <div className="p-4 bg-primary-50 dark:bg-primary-950/20 border border-primary-100 dark:border-primary-900/30 text-primary-800 dark:text-primary-400 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  <span className="font-semibold text-sm">
-                    Campaign Target: {selectedLeadIds.length} leads
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Left Column: Leads Selector */}
+            <div className="lg:col-span-1 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-850 flex flex-col h-[650px] overflow-hidden shadow-sm">
+              <div className="p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 flex flex-col gap-3 flex-shrink-0">
+                <h3 className="font-bold text-gray-900 dark:text-white text-xs uppercase tracking-wider flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-primary-500" />
+                  Recipients ({selectedLeadIds.length} selected)
+                </h3>
+                
+                {/* Search Bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white outline-none"
+                  />
+                </div>
+                
+                {/* Select All Checkbox */}
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <button 
+                    onClick={toggleSelectAll}
+                    className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors"
+                  >
+                    {leads.length > 0 && leads.every(l => selectedLeadIds.includes(l._id)) ? (
+                      <CheckSquare className="w-4 h-4 text-primary-600" />
+                    ) : (
+                      <Square className="w-4 h-4" />
+                    )}
+                    Select All on Page
+                  </button>
+                  <span className="font-semibold bg-gray-200 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-750 dark:text-gray-300">
+                    {totalCount} total
                   </span>
                 </div>
-                {selectedLeadIds.length === 0 && (
-                  <button
-                    onClick={() => setActiveTab('explore')}
-                    className="text-xs bg-white dark:bg-gray-900 px-3 py-1.5 rounded-lg border border-primary-200 dark:border-primary-800 hover:bg-primary-50 font-bold transition-all text-primary-600 dark:text-primary-400"
-                  >
-                    Select Leads First
-                  </button>
+              </div>
+              
+              {/* Scrollable list of leads */}
+              <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {loading ? (
+                  <div className="flex flex-col items-center justify-center h-full gap-2 py-8 text-gray-455">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+                    <span className="text-xs">Loading leads...</span>
+                  </div>
+                ) : filteredLeads.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full py-8 text-gray-450">
+                    <Users className="w-8 h-8 mb-1.5 text-gray-300 dark:text-gray-700" />
+                    <span className="text-xs">No leads found</span>
+                  </div>
+                ) : (
+                  filteredLeads.map((lead) => {
+                    const isSelected = selectedLeadIds.includes(lead._id);
+                    return (
+                      <div
+                        key={lead._id}
+                        onClick={() => toggleSelectLead(lead._id)}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                          isSelected 
+                            ? "bg-primary-50/50 border-primary-200 dark:bg-primary-950/20 dark:border-primary-900" 
+                            : "bg-white border-gray-150 hover:bg-gray-50/50 dark:bg-gray-850 dark:border-gray-800 dark:hover:bg-gray-800/40"
+                        )}
+                      >
+                        <div className="flex-shrink-0">
+                          {isSelected ? (
+                            <CheckSquare className="w-4.5 h-4.5 text-primary-600 dark:text-primary-400" />
+                          ) : (
+                            <Square className="w-4.5 h-4.5 text-gray-400" />
+                          )}
+                        </div>
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0",
+                          isSelected ? "bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300" : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                        )}>
+                          {lead.name ? lead.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
+                            {lead.name}
+                          </p>
+                          <p className="text-[10px] text-gray-500 truncate flex items-center gap-1 mt-0.5">
+                            <Mail className="w-3 h-3 flex-shrink-0" />
+                            {lead.email}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
                 )}
               </div>
-
-              {/* Subject Input */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Email Subject
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Admission Updates for MBBS in Georgia"
-                  value={campaignSubject}
-                  onChange={(e) => setCampaignSubject(e.target.value)}
-                  className="w-full px-4 py-2.5 border border-gray-250 dark:border-gray-750 bg-white dark:bg-gray-900 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none"
-                />
-              </div>
-
-              {/* Body Content */}
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                    HTML Message Body
-                  </label>
-                  <div className="flex gap-1">
-                    <button
-                      type="button"
-                      onClick={() => insertTemplateTag('{{name}}')}
-                      className="px-2.5 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-xs font-semibold flex items-center gap-1"
-                      title="Insert student's full name dynamically"
-                    >
-                      <Sparkles className="w-3 h-3 text-primary-500" />
-                      Insert {"{{name}}"}
-                    </button>
-                  </div>
+              
+              {/* Pagination inside Left Column */}
+              {totalPages > 1 && (
+                <div className="p-3 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-850 flex items-center justify-between flex-shrink-0">
+                  <button
+                    disabled={page === 1}
+                    onClick={() => setPage(page - 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-[10px] text-gray-500 font-semibold">Page {page} of {totalPages}</span>
+                  <button
+                    disabled={page === totalPages}
+                    onClick={() => setPage(page + 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    Next
+                  </button>
                 </div>
-                <textarea
-                  rows={10}
-                  value={campaignBody}
-                  onChange={(e) => setCampaignBody(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-250 dark:border-gray-750 bg-white dark:bg-gray-900 rounded-xl font-mono text-xs focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none"
-                />
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 dark:border-gray-800">
-                <button
-                  onClick={handleSendCampaign}
-                  disabled={sendingCampaign || selectedLeadIds.length === 0}
-                  className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center justify-center gap-1.5 shadow-lg shadow-primary-500/20 disabled:opacity-50"
-                >
-                  {sendingCampaign ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  ) : (
-                    <>
-                      <Send className="w-4 h-4" />
-                      Send Campaign
-                    </>
-                  )}
-                </button>
-              </div>
+              )}
             </div>
 
-            {/* Preview Panel */}
-            <div className="flex flex-col border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden bg-gray-50 dark:bg-gray-900/30">
-              <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-850 flex items-center gap-2">
-                <Eye className="w-4 h-4 text-gray-500" />
-                <span className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                  Live Render Preview
-                </span>
-              </div>
-              <div className="p-4 flex-1 bg-white dark:bg-gray-900 overflow-y-auto min-h-[300px]">
-                <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 pb-2 border-b border-gray-100 dark:border-gray-800">
-                  <p><strong>From:</strong> Intermost Study Abroad &lt;admissions@intermost.in&gt;</p>
-                  <p className="mt-1"><strong>Subject:</strong> {campaignSubject || <span className="text-gray-400 italic">(Subject template is empty)</span>}</p>
+            {/* Right Column: Editor & Preview split */}
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 h-[650px] overflow-hidden">
+              {/* Editor Pane */}
+              <div className="flex flex-col bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden p-5 shadow-sm h-full overflow-y-auto">
+                <div className="space-y-4 flex-1">
+                  {/* Subject Input */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                      Email Subject
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Admission Updates for MBBS in Georgia"
+                      value={campaignSubject}
+                      onChange={(e) => setCampaignSubject(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-750 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm text-gray-900 dark:text-white outline-none"
+                    />
+                  </div>
+
+                  {/* Body Content */}
+                  <div className="space-y-2 flex flex-col">
+                    <div className="flex justify-between items-center">
+                      <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                        HTML Message Body
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => insertTemplateTag('{{name}}')}
+                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded text-[10px] font-semibold flex items-center gap-1"
+                        title="Insert student's full name dynamically"
+                      >
+                        <Sparkles className="w-3 h-3 text-primary-500" />
+                        Insert {"{{name}}"}
+                      </button>
+                    </div>
+                    <textarea
+                      rows={12}
+                      value={campaignBody}
+                      onChange={(e) => setCampaignBody(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-250 dark:border-gray-750 bg-white dark:bg-gray-900 rounded-xl font-mono text-xs focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none resize-none"
+                    />
+                  </div>
+
+                  {/* Test Email Section */}
+                  <div className="pt-4 border-t border-gray-100 dark:border-gray-800 space-y-2">
+                    <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                      Send Test Email
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="email"
+                        placeholder="test@example.com"
+                        value={testEmailAddress}
+                        onChange={(e) => setTestEmailAddress(e.target.value)}
+                        className="flex-1 px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-750 rounded-lg text-xs text-gray-900 dark:text-white outline-none focus:ring-1 focus:ring-primary-500"
+                      />
+                      <button
+                        onClick={handleSendTestEmail}
+                        disabled={sendingTest || !testEmailAddress.trim()}
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-lg transition-colors disabled:opacity-50"
+                      >
+                        {sendingTest ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Send Test'}
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div
-                  className="prose dark:prose-invert max-w-none text-sm leading-relaxed"
-                  dangerouslySetInnerHTML={{ __html: campaignBody.replace(/\{\{name\}\}/g, 'John Doe') }}
-                />
+
+                {/* Dispatch Action Button */}
+                <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end flex-shrink-0">
+                  <button
+                    onClick={handleSendCampaign}
+                    disabled={sendingCampaign || selectedLeadIds.length === 0}
+                    className="w-full md:w-auto px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center justify-center gap-1.5 shadow-lg shadow-primary-500/20 disabled:opacity-50"
+                  >
+                    {sendingCampaign ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-white" />
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Send Campaign ({selectedLeadIds.length} Recipient{selectedLeadIds.length !== 1 ? 's' : ''})
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Preview Panel */}
+              <div className="flex flex-col border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden bg-gray-50 dark:bg-gray-900/30 h-full">
+                <div className="bg-gray-100 dark:bg-gray-900 px-4 py-3 border-b border-gray-200 dark:border-gray-850 flex items-center gap-2 flex-shrink-0">
+                  <Eye className="w-4 h-4 text-gray-500" />
+                  <span className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
+                    Live Render Preview
+                  </span>
+                </div>
+                <div className="p-4 flex-1 bg-white dark:bg-gray-900 overflow-y-auto">
+                  <div className="text-xs text-gray-500 dark:text-gray-400 mb-4 pb-2 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+                    <p><strong>From:</strong> Intermost Study Abroad &lt;admissions@intermost.in&gt;</p>
+                    <p className="mt-1"><strong>Subject:</strong> {campaignSubject || <span className="text-gray-400 italic">(Subject template is empty)</span>}</p>
+                  </div>
+                  <div
+                    className="prose dark:prose-invert max-w-none text-xs leading-relaxed"
+                    dangerouslySetInnerHTML={{ __html: campaignBody.replace(/\{\{name\}\}/g, 'John Doe') }}
+                  />
+                </div>
               </div>
             </div>
           </div>
