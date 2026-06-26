@@ -452,3 +452,36 @@ export const uploadsApi = {
     return response.data;
   },
 };
+
+// Messages & WhatsApp API
+export interface WhatsAppContact {
+  _id?: string;
+  id?: string;
+  name: string;
+  phone: string;
+  created_at?: string;
+}
+
+export const messagesApi = {
+  getContacts: async (page: number = 1, search?: string) => {
+    const params: any = { page };
+    if (search) params.search = search;
+    const response = await api.get<{ count: number; page: number; total_pages: number; limit: number; results: WhatsAppContact[] }>('/whatsapp/contacts/', { params });
+    return response.data;
+  },
+
+  importContacts: async (contacts: Array<{ name: string; phone: string }>) => {
+    const response = await api.post<{ message: string; imported: number }>('/whatsapp/contacts/import/', { contacts });
+    return response.data;
+  },
+
+  sendMessage: async (contactIds: string[], message: string, selectAll: boolean = false, search: string = '') => {
+    const response = await api.post<{ message: string; status: string; sent_count: number }>('/whatsapp/send/', { 
+      contact_ids: contactIds, 
+      message,
+      select_all: selectAll,
+      search
+    });
+    return response.data;
+  },
+};

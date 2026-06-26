@@ -549,3 +549,25 @@ export const ragAPI = {
   },
 };
 
+// Runtime RAG API Functions
+export const runtimeRagAPI = {
+  uploadBrochure: async (file: File, sessionId: string): Promise<{ success: boolean; chunks_count: number }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('session_id', sessionId);
+    const response = await api.post('/chat/runtime-rag/upload/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  askQuestion: async (query: string, sessionId: string): Promise<{ answer: string }> => {
+    const response = await api.post('/chat/runtime-rag/ask/', { query, session_id: sessionId });
+    return response.data;
+  },
+
+  closeSession: async (sessionId: string): Promise<{ success: boolean }> => {
+    const response = await api.delete('/chat/runtime-rag/close/', { data: { session_id: sessionId } });
+    return response.data;
+  },
+};
