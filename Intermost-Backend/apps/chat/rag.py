@@ -187,12 +187,14 @@ class RAGDocumentStore:
     def list_documents(
         self,
         category: Optional[str] = None,
-        is_active: bool = True,
+        is_active: Optional[bool] = None,
         skip: int = 0,
         limit: int = 50
     ) -> List[Dict]:
         """List all documents."""
-        query = {'is_active': is_active}
+        query = {}
+        if is_active is not None:
+            query['is_active'] = is_active
         if category:
             query['category'] = category
         

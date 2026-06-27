@@ -493,6 +493,8 @@ export const messagesApi = {
       twilio_account_sid?: string;
       twilio_auth_token?: string;
       twilio_sender_phone?: string;
+      custom_endpoint?: string;
+      custom_token?: string;
     }>('/whatsapp/config/');
     return response.data;
   },
@@ -504,6 +506,8 @@ export const messagesApi = {
     twilio_account_sid?: string;
     twilio_auth_token?: string;
     twilio_sender_phone?: string;
+    custom_endpoint?: string;
+    custom_token?: string;
   }) => {
     const response = await api.post<{ message: string }>('/whatsapp/config/', config);
     return response.data;

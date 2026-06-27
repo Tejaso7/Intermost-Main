@@ -207,6 +207,34 @@ def send_whatsapp_api_message(config, phone, message_text):
         except Exception as e:
             logger.error(f"Twilio request exception: {str(e)}")
             return False, str(e)
+
+    elif gateway == 'custom':
+        custom_url = config.get('custom_endpoint', '').strip()
+        custom_token = config.get('custom_token', '').strip()
+        if not custom_url:
+            return False, "Custom endpoint missing"
+        
+        headers = {
+            "Content-Type": "application/json"
+        }
+        if custom_token:
+            headers["Authorization"] = f"Bearer {custom_token}"
+            
+        clean_phone = re.sub(r'\D', '', phone)
+        payload = {
+            "to": clean_phone,
+            "message": message_text
+        }
+        try:
+            res = requests.post(custom_url, json=payload, headers=headers, timeout=10)
+            if res.status_code in [200, 201, 202, 204]:
+                return True, "Custom sent"
+            else:
+                logger.error(f"Custom WhatsApp API error: {res.text}")
+                return False, f"Custom API error: {res.status_code}"
+        except Exception as e:
+            logger.error(f"Custom request exception: {str(e)}")
+            return False, str(e)
             
     return False, "Unknown gateway"
 
@@ -311,6 +339,8 @@ class WhatsAppConfigView(APIView):
                 'twilio_account_sid': config_data.get('twilio_account_sid', '').strip(),
                 'twilio_auth_token': config_data.get('twilio_auth_token', '').strip(),
                 'twilio_sender_phone': config_data.get('twilio_sender_phone', '').strip(),
+                'custom_endpoint': config_data.get('custom_endpoint', '').strip(),
+                'custom_token': config_data.get('custom_token', '').strip(),
                 'updated_at': datetime.utcnow()
             }},
             upsert=True

@@ -1342,16 +1342,40 @@ export default function LeadsPage() {
                 )}
               </div>
 
-              <div className="mt-8 pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-3">
+              <div className="mt-8 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-wrap justify-end gap-3">
                 <button
                   onClick={() => setSelectedLead(null)}
-                  className="px-5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                 >
                   Close Detail
                 </button>
+                <button
+                  onClick={() => {
+                    setSelectedLeadIds([selectedLead._id]);
+                    setActiveTab('campaign');
+                    setSelectedLead(null);
+                    toast.success(`Drafting email to ${selectedLead.name}`);
+                  }}
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <Mail className="w-4 h-4" />
+                  Send Email
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedLeadIds([selectedLead._id]);
+                    setActiveTab('whatsapp');
+                    setSelectedLead(null);
+                    toast.success(`Drafting WhatsApp message for ${selectedLead.name}`);
+                  }}
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  Send WhatsApp
+                </button>
                 <a
                   href={`tel:${selectedLead.country_code}${selectedLead.phone}`}
-                  className="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-primary-500/10 transition-colors"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-primary-500/10 transition-colors"
                 >
                   <Phone className="w-4 h-4" />
                   Call Now

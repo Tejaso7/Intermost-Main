@@ -44,6 +44,8 @@ export default function MessagesPage() {
     twilio_account_sid: '',
     twilio_auth_token: '',
     twilio_sender_phone: '',
+    custom_endpoint: '',
+    custom_token: '',
   });
   
   const highlightText = (text: string, query: string) => {
@@ -96,7 +98,9 @@ export default function MessagesPage() {
             meta_access_token: data.meta_access_token || '',
             twilio_account_sid: data.twilio_account_sid || '',
             twilio_auth_token: data.twilio_auth_token || '',
-            twilio_sender_phone: data.twilio_sender_phone || ''
+            twilio_sender_phone: data.twilio_sender_phone || '',
+            custom_endpoint: data.custom_endpoint || '',
+            custom_token: data.custom_token || ''
           });
         }
       } catch (error) {
@@ -509,6 +513,7 @@ export default function MessagesPage() {
                     <option value="simulation">Console Simulator (Demo Mode)</option>
                     <option value="meta">Meta Cloud API (Official)</option>
                     <option value="twilio">Twilio Programmable WhatsApp</option>
+                    <option value="custom">Custom Webhook / API Gateway</option>
                   </select>
                 </div>
 
@@ -585,6 +590,39 @@ export default function MessagesPage() {
                         onChange={(e) => setConfig({ ...config, twilio_sender_phone: e.target.value })}
                         className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
                       />
+                    </div>
+                  </div>
+                )}
+
+                {config.gateway === 'custom' && (
+                  <div className="space-y-3 pt-2">
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Custom API Endpoint URL
+                      </label>
+                      <input
+                        type="url"
+                        placeholder="https://api.example.com/whatsapp/send"
+                        value={config.custom_endpoint}
+                        onChange={(e) => setConfig({ ...config, custom_endpoint: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Custom Auth Token / API Key
+                      </label>
+                      <input
+                        type="password"
+                        placeholder="Bearer token or API Key"
+                        value={config.custom_token}
+                        onChange={(e) => setConfig({ ...config, custom_token: e.target.value })}
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900"
+                      />
+                    </div>
+                    <div className="p-3 bg-blue-50 text-blue-800 rounded-xl border border-blue-100 text-xs">
+                      <p className="font-semibold mb-1">Payload Format Info</p>
+                      <p>The gateway will POST a JSON payload: <code>{"{\"to\": \"<phone_number>\", \"message\": \"<message_content>\"}"}</code>. If an Auth Token is provided, it will be included in the request headers as <code>{"Authorization: Bearer <token>"}</code>.</p>
                     </div>
                   </div>
                 )}
