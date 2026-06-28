@@ -558,3 +558,89 @@ export const shortsApi = {
     await api.delete(`/shorts/${id}/`);
   },
 };
+
+export interface LeadDripRecord {
+  _id?: string;
+  lead_id: string;
+  name: string;
+  phone: string;
+  email: string;
+  country: string;
+  status: 'active' | 'paused' | 'completed';
+  current_step: number;
+  next_run: string;
+  created_at: string;
+  updated_at: string;
+  logs: Array<{
+    step: number;
+    sent_at: string;
+    whatsapp: boolean;
+    email: boolean;
+  }>;
+}
+
+export const dripsApi = {
+  getAll: async (params?: { status?: string; search?: string; page?: number }) => {
+    const response = await api.get<{
+      count: number;
+      page: number;
+      total_pages: number;
+      is_enabled: boolean;
+      results: LeadDripRecord[];
+    }>('/inquiries/drips/', { params });
+    return response.data;
+  },
+
+  toggleGlobal: async (isEnabled: boolean) => {
+    const response = await api.post<{ message: string }>('/inquiries/drips/', {
+      action: 'toggle_global',
+      is_enabled: isEnabled,
+    });
+    return response.data;
+  },
+
+  pauseDrip: async (dripId: string) => {
+    const response = await api.post<{ message: string }>('/inquiries/drips/', {
+      action: 'pause',
+      drip_id: dripId,
+    });
+    return response.data;
+  },
+
+  resumeDrip: async (dripId: string) => {
+    const response = await api.post<{ message: string }>('/inquiries/drips/', {
+      action: 'resume',
+      drip_id: dripId,
+    });
+    return response.data;
+  },
+
+  restartDrip: async (dripId: string) => {
+    const response = await api.post<{ message: string }>('/inquiries/drips/', {
+      action: 'restart',
+      drip_id: dripId,
+    });
+    return response.data;
+  },
+};
+
+export const studentService = {
+  chat: async (message: string, sessionId: string) => {
+    const response = await api.post<{ response: string; message?: string }>('/chat/student/', {
+      message,
+      session_id: sessionId,
+    });
+    return response.data;
+  },
+
+  submitLead: async (data: {
+    phone: string;
+    session_id: string;
+    name?: string;
+    email?: string;
+    source?: string;
+  }) => {
+    const response = await api.post<{ message: string }>('/chat/student/lead/', data);
+    return response.data;
+  },
+};

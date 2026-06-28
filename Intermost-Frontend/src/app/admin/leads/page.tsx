@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -32,7 +32,7 @@ import {
   MessageCircle,
   Save
 } from 'lucide-react';
-import { inquiriesApi, messagesApi, type WhatsAppContact } from '@/lib/services';
+import { inquiriesApi, messagesApi, dripsApi, type WhatsAppContact, type LeadDripRecord } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
 import { formatDate, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -56,13 +56,13 @@ const statusIcons = {
 
 export default function LeadsPage() {
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips'>('explore');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
-      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config'].includes(tab)) {
+      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config', 'drips'].includes(tab)) {
         setActiveTab(tab as any);
       }
     }
@@ -81,6 +81,18 @@ export default function LeadsPage() {
   const [isSendingContactsMessage, setIsSendingContactsMessage] = useState(false);
   const [isImportingContacts, setIsImportingContacts] = useState(false);
   const contactsFileInputRef = useRef<HTMLInputElement>(null);
+
+  // Drip Nurturing Tab States
+  const [drips, setDrips] = useState<LeadDripRecord[]>([]);
+  const [dripsSearchQuery, setDripsSearchQuery] = useState('');
+  const [dripsStatusFilter, setDripsStatusFilter] = useState<string>('all');
+  const [dripsPage, setDripsPage] = useState(1);
+  const [dripsTotalPages, setDripsTotalPages] = useState(1);
+  const [dripsTotalCount, setDripsTotalCount] = useState(0);
+  const [dripsIsEnabled, setDripsIsEnabled] = useState(true);
+  const [isLoadingDrips, setIsLoadingDrips] = useState(false);
+  const [isTogglingDrips, setIsTogglingDrips] = useState(false);
+  const [expandedDripId, setExpandedDripId] = useState<string | null>(null);
 
   // WhatsApp settings configuration states
   const [isSavingConfig, setIsSavingConfig] = useState(false);
@@ -181,8 +193,10 @@ export default function LeadsPage() {
       fetchContacts(contactsSearchQuery, contactsPage);
     } else if (activeTab === 'config') {
       fetchConfig();
+    } else if (activeTab === 'drips') {
+      fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
     }
-  }, [activeTab, page, statusFilter, contactsPage]);
+  }, [activeTab, page, statusFilter, contactsPage, dripsPage]);
 
   // Debounced search for Contacts Database tab
   useEffect(() => {
@@ -196,6 +210,36 @@ export default function LeadsPage() {
       return () => clearTimeout(timer);
     }
   }, [contactsSearchQuery]);
+
+  // Debounced search for Drip Nurturing tab
+  useEffect(() => {
+    if (activeTab === 'drips') {
+      const timer = setTimeout(() => {
+        setDripsPage(1);
+        fetchDrips(dripsSearchQuery, dripsStatusFilter, 1);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [dripsSearchQuery, dripsStatusFilter]);
+
+  const fetchDrips = async (searchParam?: string, statusParam?: string, pageParam: number = 1) => {
+    setIsLoadingDrips(true);
+    try {
+      const params: any = { page: pageParam };
+      if (searchParam) params.search = searchParam;
+      if (statusParam && statusParam !== 'all') params.status = statusParam;
+      
+      const response = await dripsApi.getAll(params);
+      setDrips(response.results || []);
+      setDripsTotalPages(response.total_pages || 1);
+      setDripsTotalCount(response.count || 0);
+      setDripsIsEnabled(response.is_enabled);
+    } catch (err: any) {
+      toast.error("Failed to load nurturing drips");
+    } finally {
+      setIsLoadingDrips(false);
+    }
+  };
 
   const fetchContacts = async (searchParam?: string, pageParam: number = 1) => {
     setIsLoadingContacts(true);
@@ -561,7 +605,7 @@ export default function LeadsPage() {
 
         {/* Tab Buttons */}
         <div className="flex flex-wrap bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700 gap-1">
-          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config'] as const).map((tab) => (
+          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'drips', 'config'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -582,7 +626,9 @@ export default function LeadsPage() {
                       ? 'Target via WhatsApp'
                       : tab === 'contacts'
                         ? 'Contact Database'
-                        : 'WhatsApp Config'}
+                        : tab === 'drips'
+                          ? 'Drip Nurturing'
+                          : 'WhatsApp Config'}
             </button>
           ))}
         </div>
@@ -1808,6 +1854,295 @@ export default function LeadsPage() {
                 Save Configuration
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'drips' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Global Drip Settings Card */}
+          <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Clock className="w-6 h-6 text-primary-500" />
+                Automated 3-Day Drip Campaigns
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                Newly registered website leads automatically receive a greeting message on Day 1, country prospectus on Day 2, and student reviews on Day 3.
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                Global Campaign Status:
+              </span>
+              <button
+                onClick={async () => {
+                  setIsTogglingDrips(true);
+                  try {
+                    await dripsApi.toggleGlobal(!dripsIsEnabled);
+                    setDripsIsEnabled(!dripsIsEnabled);
+                    toast.success(`Drip campaigns ${!dripsIsEnabled ? 'enabled' : 'disabled'} successfully!`);
+                  } catch (e) {
+                    toast.error("Failed to update status");
+                  } finally {
+                    setIsTogglingDrips(false);
+                  }
+                }}
+                disabled={isTogglingDrips}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-sm font-bold shadow-sm transition-all duration-200",
+                  dripsIsEnabled 
+                    ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                    : "bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 text-gray-800 dark:text-gray-200"
+                )}
+              >
+                {dripsIsEnabled ? "Active (Sending)" : "Paused"}
+              </button>
+            </div>
+          </div>
+
+          {/* Drips Table & Filter Panel */}
+          <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            {/* Filter Header */}
+            <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3.5 top-3 w-4 h-4 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search by lead name, phone, or email..."
+                  value={dripsSearchQuery}
+                  onChange={(e) => setDripsSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 text-sm rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Status:</span>
+                <select
+                  value={dripsStatusFilter}
+                  onChange={(e) => setDripsStatusFilter(e.target.value)}
+                  className="px-3.5 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-sm font-semibold text-gray-700 dark:text-gray-300 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="all">All States</option>
+                  <option value="active">Active Funnel</option>
+                  <option value="paused">Paused</option>
+                  <option value="completed">Completed</option>
+                </select>
+              </div>
+            </div>
+
+            {/* List */}
+            {isLoadingDrips ? (
+              <div className="p-20 flex flex-col items-center justify-center gap-3">
+                <Loader2 className="w-10 h-10 text-primary-500 animate-spin" />
+                <p className="text-gray-400 text-sm">Fetching drip nurturing records...</p>
+              </div>
+            ) : drips.length === 0 ? (
+              <div className="p-20 text-center">
+                <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400 font-medium">No leads currently enrolled in this nurturing stage.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50/50 dark:bg-gray-900/30 border-b border-gray-100 dark:border-gray-800 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      <th className="px-6 py-4">Student</th>
+                      <th className="px-6 py-4">Mobile & Email</th>
+                      <th className="px-6 py-4">Preferred Country</th>
+                      <th className="px-6 py-4">Day/Step</th>
+                      <th className="px-6 py-4">Next Send Scheduled</th>
+                      <th className="px-6 py-4">Funnel State</th>
+                      <th className="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800/50 text-sm text-gray-850 dark:text-gray-200">
+                    {drips.map((drip) => {
+                      const isExpanded = expandedDripId === drip._id;
+                      return (
+                        <React.Fragment key={drip._id}>
+                          <tr className="hover:bg-gray-50/30 dark:hover:bg-gray-900/20 transition-colors">
+                            <td className="px-6 py-4.5 font-bold text-gray-900 dark:text-white">
+                              {drip.name}
+                            </td>
+                            <td className="px-6 py-4.5">
+                              <div className="flex flex-col">
+                                <span className="font-semibold text-gray-700 dark:text-gray-300">{drip.phone}</span>
+                                <span className="text-xs text-gray-400">{drip.email}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4.5">
+                              <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 capitalize">
+                                {drip.country}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4.5">
+                              <span className="font-bold text-primary-600 dark:text-primary-400">
+                                Day {drip.current_step}
+                              </span>
+                              <span className="text-xs text-gray-400 block">
+                                {drip.current_step === 1 
+                                  ? 'Greeting Message' 
+                                  : drip.current_step === 2 
+                                    ? 'Country Prospectus' 
+                                    : 'Alumni Testimonials'}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4.5 font-medium text-gray-600 dark:text-gray-400">
+                              {drip.status === 'completed' 
+                                ? '—' 
+                                : formatDate(drip.next_run)}
+                            </td>
+                            <td className="px-6 py-4.5">
+                              <span className={cn(
+                                "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-block",
+                                drip.status === 'active'
+                                  ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400'
+                                  : drip.status === 'paused'
+                                    ? 'bg-yellow-100 text-yellow-750 dark:bg-yellow-950/40 dark:text-yellow-400'
+                                    : 'bg-blue-100 text-blue-750 dark:bg-blue-950/40 dark:text-blue-400'
+                              )}>
+                                {drip.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4.5 text-right">
+                              <div className="flex items-center justify-end gap-2">
+                                <button
+                                  onClick={() => setExpandedDripId(isExpanded ? null : drip._id || null)}
+                                  className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 transition-colors"
+                                  title="View Drip Sending Logs"
+                                >
+                                  <Info className="w-4 h-4" />
+                                </button>
+                                
+                                {drip.status === 'active' && (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await dripsApi.pauseDrip(drip._id!);
+                                        toast.success("Drip campaign paused");
+                                        fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
+                                      } catch (e) {
+                                        toast.error("Failed to pause drip");
+                                      }
+                                    }}
+                                    className="px-2.5 py-1 text-xs font-semibold bg-yellow-600 hover:bg-yellow-700 text-white rounded-lg transition-colors"
+                                  >
+                                    Pause
+                                  </button>
+                                )}
+
+                                {drip.status === 'paused' && (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await dripsApi.resumeDrip(drip._id!);
+                                        toast.success("Drip campaign resumed");
+                                        fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
+                                      } catch (e) {
+                                        toast.error("Failed to resume drip");
+                                      }
+                                    }}
+                                    className="px-2.5 py-1 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+                                  >
+                                    Resume
+                                  </button>
+                                )}
+
+                                {(drip.status === 'completed' || drip.status === 'paused') && (
+                                  <button
+                                    onClick={async () => {
+                                      if (window.confirm(`Are you sure you want to restart the 3-day nurturing campaign from Step 1 for ${drip.name}?`)) {
+                                        try {
+                                          await dripsApi.restartDrip(drip._id!);
+                                          toast.success("Drip campaign restarted from Step 1!");
+                                          fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
+                                        } catch (e) {
+                                          toast.error("Failed to restart drip");
+                                        }
+                                      }
+                                    }}
+                                    className="px-2.5 py-1 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                                  >
+                                    Restart
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+
+                          {/* Expanded Logs Row */}
+                          {isExpanded && (
+                            <tr className="bg-gray-50/50 dark:bg-gray-900/30">
+                              <td colSpan={7} className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+                                <div className="space-y-3">
+                                  <h5 className="font-bold text-xs text-gray-500 uppercase tracking-wider">Campaign Send History Logs</h5>
+                                  {drip.logs && drip.logs.length > 0 ? (
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                      {drip.logs.map((log) => (
+                                        <div key={log.step} className="p-3 bg-white dark:bg-neutral-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm flex flex-col gap-2">
+                                          <div className="flex items-center justify-between border-b border-gray-50 dark:border-gray-700 pb-1.5">
+                                            <span className="font-bold text-sm text-gray-900 dark:text-white">Day {log.step}</span>
+                                            <span className="text-[10px] text-gray-400">{formatDate(log.sent_at)}</span>
+                                          </div>
+                                          <div className="flex gap-4 text-xs font-semibold">
+                                            <div className="flex items-center gap-1">
+                                              <span className={cn(
+                                                "w-2 h-2 rounded-full",
+                                                log.whatsapp ? "bg-emerald-500" : "bg-red-500"
+                                              )} />
+                                              <span className="text-gray-600 dark:text-gray-400">WhatsApp: {log.whatsapp ? 'Success' : 'Failed'}</span>
+                                            </div>
+                                            <div className="flex items-center gap-1">
+                                              <span className={cn(
+                                                "w-2 h-2 rounded-full",
+                                                log.email ? "bg-emerald-500" : "bg-red-500"
+                                              )} />
+                                              <span className="text-gray-600 dark:text-gray-400">Email: {log.email ? 'Success' : 'Failed'}</span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-gray-400 italic">No logs generated yet. Drip sequence will execute at the scheduled time.</p>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Pagination footer */}
+            {!isLoadingDrips && dripsTotalPages > 1 && (
+              <div className="p-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between">
+                <span className="text-xs font-semibold text-gray-500">
+                  Showing page {dripsPage} of {dripsTotalPages} ({dripsTotalCount} total drips)
+                </span>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setDripsPage((p) => Math.max(p - 1, 1))}
+                    disabled={dripsPage === 1}
+                    className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 text-gray-500 dark:text-gray-400"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={() => setDripsPage((p) => Math.min(p + 1, dripsTotalPages))}
+                    disabled={dripsPage === dripsTotalPages}
+                    className="p-1.5 border border-gray-200 dark:border-gray-700 rounded-lg disabled:opacity-50 text-gray-500 dark:text-gray-400"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}

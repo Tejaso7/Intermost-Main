@@ -134,6 +134,28 @@ class InquiryListCreateView(APIView):
         
         logger.info(f"New inquiry received: {inquiry['name']} ({inquiry['email']})")
         
+        # Queue automated lead nurturing campaign
+        try:
+            drips_col = get_collection('lead_nurture_drips')
+            existing = drips_col.find_one({'phone': inquiry['phone'], 'status': 'active'})
+            if not existing:
+                drips_col.insert_one({
+                    'lead_id': ObjectId(inquiry['_id']),
+                    'name': inquiry['name'],
+                    'phone': inquiry['phone'],
+                    'email': inquiry['email'],
+                    'country': inquiry['preferred_country'] or 'Russia',
+                    'status': 'active',
+                    'current_step': 1,
+                    'next_run': datetime.now(), # Run step 1 immediately
+                    'created_at': datetime.now(),
+                    'updated_at': datetime.now(),
+                    'logs': []
+                })
+                logger.info(f"Queued automated drip campaign for lead: {inquiry['name']}")
+        except Exception as drip_err:
+            logger.error(f"Failed to queue drip campaign: {drip_err}")
+            
         return Response({
             'message': 'Inquiry submitted successfully. Our team will contact you soon.',
             'inquiry_id': inquiry['_id']
@@ -565,3 +587,110 @@ class VerifyOTPView(APIView):
         return Response({
             'message': 'Verified and subscribed successfully!'
         }, status=status.HTTP_200_OK)
+
+
+class LeadDripCampaignView(APIView):
+    """
+    Manage automated drip campaigns for leads (Admin only).
+    """
+    permission_classes = [IsAdminUser]
+    
+    def get(self, request):
+        """Fetch all drip records with filtering."""
+        try:
+            drips_col = get_collection('lead_nurture_drips')
+            
+            # Filters
+            status_filter = request.query_params.get('status', None)
+            search = request.query_params.get('search', None)
+            
+            query = {}
+            if status_filter:
+                query['status'] = status_filter
+            if search:
+                query['$or'] = [
+                    {'name': {'$regex': search, '$options': 'i'}},
+                    {'phone': {'$regex': search, '$options': 'i'}},
+                    {'email': {'$regex': search, '$options': 'i'}},
+                ]
+                
+            page = int(request.query_params.get('page', 1))
+            limit = int(request.query_params.get('limit', 20))
+            skip = (page - 1) * limit
+            
+            total = drips_col.count_documents(query)
+            drips = list(
+                drips_col.find(query)
+                .sort('created_at', -1)
+                .skip(skip)
+                .limit(limit)
+            )
+            
+            # Load global configuration
+            config_col = get_collection('site_settings')
+            config = config_col.find_one({'_id': 'drip_nurturing_config'}) or {'is_enabled': True}
+            
+            return Response({
+                'count': total,
+                'page': page,
+                'total_pages': (total + limit - 1) // limit,
+                'is_enabled': config.get('is_enabled', True),
+                'results': [serialize_doc(d) for d in drips]
+            })
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+    def post(self, request):
+        """Toggle global config, pause, resume or restart specific drip."""
+        try:
+            action = request.data.get('action') # toggle_global, pause, resume, restart
+            drips_col = get_collection('lead_nurture_drips')
+            
+            if action == 'toggle_global':
+                is_enabled = request.data.get('is_enabled', True)
+                config_col = get_collection('site_settings')
+                config_col.update_one(
+                    {'_id': 'drip_nurturing_config'},
+                    {'$set': {'is_enabled': is_enabled, 'updated_at': datetime.now()}},
+                    upsert=True
+                )
+                return Response({'message': f"Global drip campaign status set to {is_enabled}"})
+                
+            drip_id = request.data.get('drip_id')
+            if not drip_id:
+                return Response({'error': 'drip_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            try:
+                oid = ObjectId(drip_id)
+            except Exception:
+                return Response({'error': 'Invalid drip ID format'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            if action == 'pause':
+                drips_col.update_one(
+                    {'_id': oid},
+                    {'$set': {'status': 'paused', 'updated_at': datetime.now()}}
+                )
+                return Response({'message': f"Paused drip campaign for lead"})
+                
+            elif action == 'resume':
+                drips_col.update_one(
+                    {'_id': oid},
+                    {'$set': {'status': 'active', 'next_run': datetime.now(), 'updated_at': datetime.now()}}
+                )
+                return Response({'message': f"Resumed drip campaign for lead"})
+                
+            elif action == 'restart':
+                drips_col.update_one(
+                    {'_id': oid},
+                    {'$set': {
+                        'status': 'active',
+                        'current_step': 1,
+                        'next_run': datetime.now(),
+                        'updated_at': datetime.now()
+                    }}
+                )
+                return Response({'message': f"Restarted drip campaign from Step 1"})
+                
+            return Response({'error': 'Unknown action'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

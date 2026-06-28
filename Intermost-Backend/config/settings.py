@@ -106,6 +106,9 @@ GEMINI_API_KEY = env('GEMINI_API_KEY', default='')
 # Groq API Key for Brochure Chatbot
 GROQ_API_KEY = env('GROQ_API_KEY', default='')
 
+# xAI Grok API Key for Chatbot
+GROK_API_KEY = env('GROK_API_KEY', default='')
+
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
