@@ -404,3 +404,155 @@ class YouTubeShortDetailView(APIView):
             
         return Response({'message': 'Deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
 
+
+class BrochureListCreateView(APIView):
+    """List and create Brochures/Prospectuses."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """List active brochures."""
+        collection = get_collection('brochures')
+        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        query = {}
+        if request.query_params.get('is_active') and request.query_params.get('is_active') != 'all':
+            query['is_active'] = is_active
+            
+        country = request.query_params.get('country')
+        if country:
+            query['country'] = country
+
+        brochures = list(collection.find(query).sort('created_at', -1))
+        
+        serialized_brochures = []
+        for b in brochures:
+            b['_id'] = str(b['_id'])
+            if 'created_at' in b and isinstance(b['created_at'], datetime):
+                b['created_at'] = b['created_at'].isoformat()
+            if 'updated_at' in b and isinstance(b['updated_at'], datetime):
+                b['updated_at'] = b['updated_at'].isoformat()
+            serialized_brochures.append(b)
+            
+        return Response(serialized_brochures)
+        
+    def post(self, request):
+        """Create a new brochure (admin only)."""
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('brochures')
+        data = request.data
+        
+        brochure = {
+            'title': data.get('title', ''),
+            'file_url': data.get('file_url', ''),
+            'country': data.get('country', 'General'),
+            'type': data.get('type', 'brochure'),
+            'is_active': data.get('is_active', True),
+            'downloads_count': 0,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        
+        result = collection.insert_one(brochure)
+        brochure['_id'] = str(result.inserted_id)
+        
+        brochure['created_at'] = brochure['created_at'].isoformat()
+        brochure['updated_at'] = brochure['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'Brochure created successfully',
+            'data': brochure
+        }, status=status.HTTP_201_CREATED)
+
+
+class BrochureDetailView(APIView):
+    """Retrieve, update, delete brochures."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, brochure_id):
+        collection = get_collection('brochures')
+        from bson.errors import InvalidId
+        try:
+            brochure = collection.find_one({'_id': ObjectId(brochure_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if not brochure:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        brochure['_id'] = str(brochure['_id'])
+        if 'created_at' in brochure and isinstance(brochure['created_at'], datetime):
+            brochure['created_at'] = brochure['created_at'].isoformat()
+        if 'updated_at' in brochure and isinstance(brochure['updated_at'], datetime):
+            brochure['updated_at'] = brochure['updated_at'].isoformat()
+            
+        return Response(brochure)
+        
+    def put(self, request, brochure_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('brochures')
+        data = request.data
+        data['updated_at'] = datetime.utcnow()
+        data.pop('_id', None)
+        
+        from bson.errors import InvalidId
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(brochure_id)},
+                {'$set': data}
+            )
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.matched_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        updated = collection.find_one({'_id': ObjectId(brochure_id)})
+        updated['_id'] = str(updated['_id'])
+        updated['created_at'] = updated['created_at'].isoformat()
+        updated['updated_at'] = updated['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'Brochure updated successfully',
+            'data': updated
+        })
+        
+    def delete(self, request, brochure_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('brochures')
+        from bson.errors import InvalidId
+        try:
+            result = collection.delete_one({'_id': ObjectId(brochure_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.deleted_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        return Response({'message': 'Deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class BrochureDownloadIncrementView(APIView):
+    """Increment download statistics for a brochure."""
+    permission_classes = [AllowAny]
+    
+    def post(self, request, brochure_id):
+        collection = get_collection('brochures')
+        from bson.errors import InvalidId
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(brochure_id)},
+                {'$inc': {'downloads_count': 1}}
+            )
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.matched_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        return Response({'message': 'Download count updated'})
+

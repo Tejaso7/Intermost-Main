@@ -31,4 +31,9 @@ urlpatterns = [
     # YouTube Shorts
     path('shorts/', views.YouTubeShortListCreateView.as_view(), name='shorts-list-create'),
     path('shorts/<str:short_id>/', views.YouTubeShortDetailView.as_view(), name='shorts-detail'),
+
+    # Brochures / Prospectuses
+    path('brochures/', views.BrochureListCreateView.as_view(), name='brochures-list-create'),
+    path('brochures/<str:brochure_id>/', views.BrochureDetailView.as_view(), name='brochures-detail'),
+    path('brochures/<str:brochure_id>/download/', views.BrochureDownloadIncrementView.as_view(), name='brochures-download'),
 ]

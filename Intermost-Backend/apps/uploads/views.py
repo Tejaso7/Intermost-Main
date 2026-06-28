@@ -74,8 +74,8 @@ class FileUploadView(APIView):
         uploaded_files = []
         
         for file in files:
-            # Validate file type
-            allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov']
+            # Validate file type (allow images, videos, and document brochures)
+            allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov', '.pdf', '.doc', '.docx']
             ext = os.path.splitext(file.name)[1].lower()
             if ext not in allowed_extensions:
                 continue
@@ -181,7 +181,7 @@ class FileListView(APIView):
             return Response({'files': []})
         
         files = []
-        allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov']
+        allowed_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.mp4', '.webm', '.mov', '.pdf', '.doc', '.docx']
         
         for file in upload_folder.iterdir():
             if file.is_file() and file.suffix.lower() in allowed_extensions:

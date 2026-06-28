@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ChevronDown, Sparkles, CheckCircle, RefreshCw, AlertTriangle, GraduationCap } from 'lucide-react';
+import { ArrowRight, ChevronDown, Sparkles, CheckCircle, RefreshCw, AlertTriangle, GraduationCap, FileText } from 'lucide-react';
 import { coreApi } from '@/lib/services';
 import { SiteSettings } from '@/lib/api';
 import { scrollToElement } from '@/lib/utils';
+import BrochureDownloadModal from '@/components/common/BrochureDownloadModal';
 
 interface MatchResult {
   score: number;
@@ -18,6 +19,7 @@ interface MatchResult {
 
 export default function Hero() {
   const [videoError, setVideoError] = useState(true);
+  const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // AI Matcher State
   const [targetCountry, setTargetCountry] = useState('');
@@ -280,6 +282,14 @@ export default function Hero() {
               >
                 Explore Countries
               </Link>
+              <button
+                type="button"
+                onClick={() => setIsDownloadModalOpen(true)}
+                className="btn-white px-8 py-3.5 text-center flex items-center justify-center border border-white/10 gap-2 cursor-pointer bg-white/5 hover:bg-white/10 text-white"
+              >
+                <FileText className="w-4 h-4 text-primary-400" />
+                Download Brochure
+              </button>
             </motion.div>
           </div>
 
@@ -554,6 +564,11 @@ export default function Hero() {
           <ChevronDown className="w-5 h-5 animate-bounce text-primary-400" />
         </motion.button>
       </div>
+      
+      <BrochureDownloadModal
+        isOpen={isDownloadModalOpen}
+        onClose={() => setIsDownloadModalOpen(false)}
+      />
     </section>
   );
 }

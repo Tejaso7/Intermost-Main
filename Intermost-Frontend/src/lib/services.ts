@@ -644,3 +644,41 @@ export const studentService = {
     return response.data;
   },
 };
+
+export interface Brochure {
+  _id: string;
+  title: string;
+  file_url: string;
+  country: string;
+  type: string; // brochure, prospectus, template
+  is_active: boolean;
+  downloads_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const brochuresApi = {
+  getAll: async (params?: { is_active?: string; country?: string }) => {
+    const response = await api.get<Brochure[]>('/brochures/', { params });
+    return response.data;
+  },
+  getById: async (id: string) => {
+    const response = await api.get<Brochure>(`/brochures/${id}/`);
+    return response.data;
+  },
+  create: async (data: Partial<Brochure>) => {
+    const response = await api.post<{ message: string; data: Brochure }>('/brochures/', data);
+    return response.data;
+  },
+  update: async (id: string, data: Partial<Brochure>) => {
+    const response = await api.put<{ message: string; data: Brochure }>(`/brochures/${id}/`, data);
+    return response.data;
+  },
+  delete: async (id: string) => {
+    await api.delete(`/brochures/${id}/`);
+  },
+  incrementDownload: async (id: string) => {
+    const response = await api.post<{ message: string }>(`/brochures/${id}/download/`);
+    return response.data;
+  },
+};
