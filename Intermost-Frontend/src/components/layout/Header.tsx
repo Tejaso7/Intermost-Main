@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, Phone, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { countriesApi } from '@/lib/services';
+import { countriesApi, coreApi } from '@/lib/services';
 
 interface NavSubmenuItem {
   name: string;
@@ -40,6 +40,21 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null);
   const [navItems, setNavItems] = useState(navigation);
+  const [phoneNumber, setPhoneNumber] = useState('+91 9058501818');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings && settings.contact && settings.contact.phone) {
+          setPhoneNumber(settings.contact.phone);
+        }
+      } catch (err) {
+        console.debug('Failed to fetch settings for Header', err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -172,7 +187,7 @@ export default function Header() {
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center space-x-4">
             <a
-              href="tel:+919058501818"
+              href={`tel:${phoneNumber.replace(/\s/g, '')}`}
               className={cn(
                 'flex items-center space-x-2 font-medium transition-colors duration-300',
                 useSolidHeader
@@ -181,7 +196,7 @@ export default function Header() {
               )}
             >
               <Phone className="w-5 h-5" />
-              <span>+91 9058501818</span>
+              <span>{phoneNumber}</span>
             </a>
             <Link
               href="/apply"

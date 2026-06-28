@@ -27,4 +27,8 @@ urlpatterns = [
     path('settings/', views.SiteSettingsView.as_view(), name='site-settings'),
     path('settings/env/', views.EnvConfigView.as_view(), name='env-settings'),
     path('stats/', views.StatsView.as_view(), name='stats'),
+    
+    # YouTube Shorts
+    path('shorts/', views.YouTubeShortListCreateView.as_view(), name='shorts-list-create'),
+    path('shorts/<str:short_id>/', views.YouTubeShortDetailView.as_view(), name='shorts-detail'),
 ]

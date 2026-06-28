@@ -20,6 +20,8 @@ export const metadata: Metadata = {
   description: 'Learn about Intermost Ventures - Your gateway for medical education abroad with strategic offices in UAE, India, Georgia, Ukraine and Uzbekistan.',
 };
 
+export const dynamic = 'force-dynamic';
+
 // Removed fallback stats variable
 
 const values = [

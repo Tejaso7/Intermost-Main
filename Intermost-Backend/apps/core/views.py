@@ -278,3 +278,129 @@ class EnvConfigView(APIView):
         except Exception as e:
             return Response({'error': f"Failed to save .env: {e}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+class YouTubeShortListCreateView(APIView):
+    """List and create YouTube shorts."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """List active YouTube shorts."""
+        collection = get_collection('youtube_shorts')
+        # Allow filtering by all or only active shorts
+        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        query = {}
+        if request.query_params.get('is_active'):
+            query['is_active'] = is_active
+            
+        shorts = list(collection.find(query).sort('display_order', 1))
+        
+        serialized_shorts = []
+        for s in shorts:
+            s['_id'] = str(s['_id'])
+            if 'created_at' in s and isinstance(s['created_at'], datetime):
+                s['created_at'] = s['created_at'].isoformat()
+            if 'updated_at' in s and isinstance(s['updated_at'], datetime):
+                s['updated_at'] = s['updated_at'].isoformat()
+            serialized_shorts.append(s)
+            
+        return Response(serialized_shorts)
+        
+    def post(self, request):
+        """Create a new YouTube short (admin only)."""
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('youtube_shorts')
+        data = request.data
+        
+        short = {
+            'title': data.get('title', ''),
+            'url': data.get('url', ''),
+            'is_active': data.get('is_active', True),
+            'display_order': data.get('display_order', 0),
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        
+        result = collection.insert_one(short)
+        short['_id'] = str(result.inserted_id)
+        
+        short['created_at'] = short['created_at'].isoformat()
+        short['updated_at'] = short['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'YouTube short created successfully',
+            'data': short
+        }, status=status.HTTP_201_CREATED)
+
+
+class YouTubeShortDetailView(APIView):
+    """Retrieve, update, delete YouTube shorts."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, short_id):
+        collection = get_collection('youtube_shorts')
+        from bson.errors import InvalidId
+        try:
+            short = collection.find_one({'_id': ObjectId(short_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if not short:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        short['_id'] = str(short['_id'])
+        if 'created_at' in short and isinstance(short['created_at'], datetime):
+            short['created_at'] = short['created_at'].isoformat()
+        if 'updated_at' in short and isinstance(short['updated_at'], datetime):
+            short['updated_at'] = short['updated_at'].isoformat()
+            
+        return Response(short)
+        
+    def put(self, request, short_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('youtube_shorts')
+        data = request.data
+        data['updated_at'] = datetime.utcnow()
+        data.pop('_id', None)
+        
+        from bson.errors import InvalidId
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(short_id)},
+                {'$set': data}
+            )
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.matched_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        updated = collection.find_one({'_id': ObjectId(short_id)})
+        updated['_id'] = str(updated['_id'])
+        updated['created_at'] = updated['created_at'].isoformat()
+        updated['updated_at'] = updated['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'Updated successfully',
+            'data': updated
+        })
+        
+    def delete(self, request, short_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('youtube_shorts')
+        from bson.errors import InvalidId
+        try:
+            result = collection.delete_one({'_id': ObjectId(short_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.deleted_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        return Response({'message': 'Deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+

@@ -522,3 +522,39 @@ export const messagesApi = {
     return response.data;
   },
 };
+
+export interface YouTubeShort {
+  _id?: string;
+  title: string;
+  url: string;
+  is_active: boolean;
+  display_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const shortsApi = {
+  getAll: async (params?: { is_active?: boolean | string }) => {
+    const response = await api.get<YouTubeShort[]>('/shorts/', { params });
+    return response.data || [];
+  },
+
+  getById: async (id: string) => {
+    const response = await api.get<YouTubeShort>(`/shorts/${id}/`);
+    return response.data;
+  },
+
+  create: async (data: Partial<YouTubeShort>) => {
+    const response = await api.post<{ message: string; data: YouTubeShort }>('/shorts/', data);
+    return response.data.data;
+  },
+
+  update: async (id: string, data: Partial<YouTubeShort>) => {
+    const response = await api.put<{ message: string; data: YouTubeShort }>(`/shorts/${id}/`, data);
+    return response.data.data;
+  },
+
+  delete: async (id: string) => {
+    await api.delete(`/shorts/${id}/`);
+  },
+};

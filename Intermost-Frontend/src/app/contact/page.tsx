@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { teamApi, coreApi } from '@/lib/services';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -100,6 +101,49 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
+  const [contactDetails, setContactDetails] = useState({
+    phone: '+91 9058501818',
+    email: 'admissionintermost@gmail.com',
+    whatsapp: '+91 91583 74434',
+  });
+
+  const [officesList, setOfficesList] = useState<any[]>(offices);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [settings, fetchedOffices] = await Promise.all([
+          coreApi.getSettings(),
+          teamApi.getOffices(),
+        ]);
+
+        if (settings && settings.contact) {
+          setContactDetails({
+            phone: settings.contact.phone || '+91 9058501818',
+            email: settings.contact.email || 'admissionintermost@gmail.com',
+            whatsapp: settings.contact.whatsapp || '+91 91583 74434',
+          });
+        }
+
+        if (fetchedOffices && fetchedOffices.length > 0) {
+          const activeOffices = fetchedOffices.filter((o: any) => o.is_active !== false);
+          const mapped = activeOffices.map((o: any) => ({
+            city: o.name || `${o.city} Office`,
+            company: o.company_name || 'Intermost Ventures',
+            address: o.address,
+            phone: o.phone,
+            email: o.email || 'admissionintermost@gmail.com',
+            hours: 'Mon - Sat: 10:00 AM - 7:00 PM',
+          }));
+          setOfficesList(mapped);
+        }
+      } catch (err) {
+        console.debug('Failed to fetch dynamic contact options', err);
+      }
+    };
+    loadData();
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -151,20 +195,20 @@ export default function ContactPage() {
               {
                 icon: Phone,
                 title: 'Call Us',
-                info: '+91 9058501818',
-                link: 'tel:+919058501818',
+                info: contactDetails.phone,
+                link: `tel:${contactDetails.phone.replace(/\s/g, '')}`,
               },
               {
                 icon: Mail,
                 title: 'Email Us',
-                info: 'admissionintermost@gmail.com',
-                link: 'mailto:admissionintermost@gmail.com',
+                info: contactDetails.email,
+                link: `mailto:${contactDetails.email}`,
               },
               {
                 icon: MessageCircle,
                 title: 'WhatsApp',
-                info: '+91 91583 74434',
-                link: getWhatsAppLink('Hi, I want to know about MBBS abroad'),
+                info: contactDetails.whatsapp,
+                link: `https://wa.me/${contactDetails.whatsapp.replace(/\D/g, '')}`,
               },
               {
                 icon: Clock,
@@ -395,9 +439,9 @@ export default function ContactPage() {
 
               {/* Office Cards */}
               <div className="space-y-4">
-                {offices.map((office, index) => (
+                {officesList.map((office, index) => (
                   <div
-                    key={office.city}
+                    key={office.city + index}
                     className="bg-gray-50 rounded-xl p-5 hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-start gap-4">

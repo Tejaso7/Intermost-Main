@@ -27,9 +27,12 @@ import {
   AlertCircle,
   CheckSquare,
   Square,
-  Loader2
+  Loader2,
+  Settings,
+  MessageCircle,
+  Save
 } from 'lucide-react';
-import { inquiriesApi, messagesApi } from '@/lib/services';
+import { inquiriesApi, messagesApi, type WhatsAppContact } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
 import { formatDate, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -53,7 +56,44 @@ const statusIcons = {
 
 export default function LeadsPage() {
   // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config'>('explore');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config'].includes(tab)) {
+        setActiveTab(tab as any);
+      }
+    }
+  }, []);
+
+  // Contacts Database Tab States
+  const [contacts, setContacts] = useState<WhatsAppContact[]>([]);
+  const [contactsSearchQuery, setContactsSearchQuery] = useState('');
+  const [contactsPage, setContactsPage] = useState(1);
+  const [contactsTotalPages, setContactsTotalPages] = useState(1);
+  const [contactsTotalCount, setContactsTotalCount] = useState(0);
+  const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
+  const [selectAllContactsGlobal, setSelectAllContactsGlobal] = useState(false);
+  const [contactsMessage, setContactsMessage] = useState('');
+  const [isLoadingContacts, setIsLoadingContacts] = useState(false);
+  const [isSendingContactsMessage, setIsSendingContactsMessage] = useState(false);
+  const [isImportingContacts, setIsImportingContacts] = useState(false);
+  const contactsFileInputRef = useRef<HTMLInputElement>(null);
+
+  // WhatsApp settings configuration states
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [config, setConfig] = useState({
+    gateway: 'simulation',
+    meta_phone_number_id: '',
+    meta_access_token: '',
+    twilio_account_sid: '',
+    twilio_auth_token: '',
+    twilio_sender_phone: '',
+    custom_endpoint: '',
+    custom_token: '',
+  });
 
   // Leads list states
   const [leads, setLeads] = useState<Inquiry[]>([]);
@@ -132,10 +172,163 @@ export default function LeadsPage() {
     }
   };
 
+  // Load database items based on selected tab
   useEffect(() => {
-    fetchLeads();
-    fetchStats();
-  }, [statusFilter, page]);
+    if (activeTab === 'explore') {
+      fetchLeads();
+      fetchStats();
+    } else if (activeTab === 'contacts') {
+      fetchContacts(contactsSearchQuery, contactsPage);
+    } else if (activeTab === 'config') {
+      fetchConfig();
+    }
+  }, [activeTab, page, statusFilter, contactsPage]);
+
+  // Debounced search for Contacts Database tab
+  useEffect(() => {
+    if (activeTab === 'contacts') {
+      const timer = setTimeout(() => {
+        setContactsPage(1);
+        setSelectedContactIds(new Set());
+        setSelectAllContactsGlobal(false);
+        fetchContacts(contactsSearchQuery, 1);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [contactsSearchQuery]);
+
+  const fetchContacts = async (searchParam?: string, pageParam: number = 1) => {
+    setIsLoadingContacts(true);
+    try {
+      const data = await messagesApi.getContacts(pageParam, searchParam);
+      setContacts(data.results || []);
+      setContactsTotalPages(data.total_pages || 1);
+      setContactsPage(data.page || 1);
+      setContactsTotalCount(data.count || 0);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to fetch contacts');
+    } finally {
+      setIsLoadingContacts(false);
+    }
+  };
+
+  const fetchConfig = async () => {
+    try {
+      const data = await messagesApi.getConfig();
+      if (data) {
+        setConfig({
+          gateway: data.gateway || 'simulation',
+          meta_phone_number_id: data.meta_phone_number_id || '',
+          meta_access_token: data.meta_access_token || '',
+          twilio_account_sid: data.twilio_account_sid || '',
+          twilio_auth_token: data.twilio_auth_token || '',
+          twilio_sender_phone: data.twilio_sender_phone || '',
+          custom_endpoint: data.custom_endpoint || '',
+          custom_token: data.custom_token || ''
+        });
+      }
+    } catch (error) {
+      console.debug('No saved config found');
+    }
+  };
+
+  const handleSaveConfig = async () => {
+    setIsSavingConfig(true);
+    try {
+      await messagesApi.saveConfig(config);
+      toast.success('WhatsApp configuration saved successfully!');
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to save configuration');
+    } finally {
+      setIsSavingConfig(false);
+    }
+  };
+
+  const handleContactsFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImportingContacts(true);
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const firstSheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[firstSheetName];
+      const json = XLSX.utils.sheet_to_json<any>(worksheet);
+      
+      const parsedContacts = json.map(row => {
+        const nameKey = Object.keys(row).find(k => k.toLowerCase().includes('name'));
+        const phoneKey = Object.keys(row).find(k => k.toLowerCase().includes('phone') || k.toLowerCase().includes('number') || k.toLowerCase().includes('contact'));
+        return {
+          name: nameKey ? String(row[nameKey]) : 'Unknown',
+          phone: phoneKey ? String(row[phoneKey]) : ''
+        };
+      }).filter(c => c.phone !== '');
+
+      if (parsedContacts.length === 0) {
+        toast.error('No valid contacts found. Ensure columns like Name and Phone exist.');
+        return;
+      }
+
+      const result = await messagesApi.importContacts(parsedContacts);
+      toast.success(`Successfully imported ${result.imported} contacts!`);
+      fetchContacts(contactsSearchQuery, 1);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to process Excel file');
+    } finally {
+      setIsImportingContacts(false);
+      if (contactsFileInputRef.current) contactsFileInputRef.current.value = '';
+    }
+  };
+
+  const handleSendContactsMessage = async () => {
+    if (selectedContactIds.size === 0 && !selectAllContactsGlobal) {
+      toast.error('Please select at least one contact');
+      return;
+    }
+    if (!contactsMessage.trim()) {
+      toast.error('Message cannot be empty');
+      return;
+    }
+
+    setIsSendingContactsMessage(true);
+    try {
+      const contactIdsArray = Array.from(selectedContactIds);
+      const result = await messagesApi.sendMessage(contactIdsArray, contactsMessage, selectAllContactsGlobal, contactsSearchQuery);
+      toast.success(`Message sent successfully to ${result.sent_count} contacts`);
+      setContactsMessage('');
+      setSelectedContactIds(new Set());
+      setSelectAllContactsGlobal(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to send message');
+    } finally {
+      setIsSendingContactsMessage(false);
+    }
+  };
+
+  const toggleContactSelection = (id: string) => {
+    const newSet = new Set(selectedContactIds);
+    if (newSet.has(id)) {
+      newSet.delete(id);
+      setSelectAllContactsGlobal(false);
+    } else {
+      newSet.add(id);
+    }
+    setSelectedContactIds(newSet);
+  };
+
+  const toggleSelectAllContactsOnPage = () => {
+    const allIdsOnPage = contacts.map(c => c.id || c._id).filter(Boolean) as string[];
+    const allSelected = allIdsOnPage.every(id => selectedContactIds.has(id));
+    const newSet = new Set(selectedContactIds);
+    if (allSelected) {
+      allIdsOnPage.forEach(id => newSet.delete(id));
+      setSelectAllContactsGlobal(false);
+    } else {
+      allIdsOnPage.forEach(id => newSet.add(id));
+    }
+    setSelectedContactIds(newSet);
+  };
 
   const fetchLeads = async () => {
     setLoading(true);
@@ -359,33 +552,37 @@ export default function LeadsPage() {
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-gray-900 dark:text-white flex items-center gap-2">
             <Sparkles className="w-8 h-8 text-primary-500" />
-            Leads & Campaigns
+            Leads Management
           </h1>
           <p className="text-gray-655 dark:text-gray-400">
-            Manage inquiries, import Excel sheets, and run target email campaigns
+            Manage website inquiries, Excel imports, contacts database, and execute targeted email and WhatsApp campaigns
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700">
-          {(['explore', 'import', 'campaign', 'whatsapp'] as const).map((tab) => (
+        <div className="flex flex-wrap bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700 gap-1">
+          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-semibold capitalize transition-all duration-200',
+                'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold capitalize transition-all duration-200',
                 activeTab === tab
                   ? 'bg-white dark:bg-gray-900 text-primary-600 dark:text-primary-400 shadow-sm'
                   : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
               )}
             >
               {tab === 'explore' 
-                ? 'Explore Leads' 
+                ? 'Leads from Website' 
                 : tab === 'import' 
                   ? 'Excel Import' 
                   : tab === 'campaign' 
-                    ? 'Email Campaign' 
-                    : 'WhatsApp Campaign'}
+                    ? 'Target via Email' 
+                    : tab === 'whatsapp'
+                      ? 'Target via WhatsApp'
+                      : tab === 'contacts'
+                        ? 'Contact Database'
+                        : 'WhatsApp Config'}
             </button>
           ))}
         </div>
@@ -1228,6 +1425,388 @@ export default function LeadsPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'contacts' && (
+        <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6 animate-fade-in">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-4">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <MessageCircle className="w-6 h-6 text-primary-500" />
+                Contact Database Manager
+              </h2>
+              <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+                Upload your custom student databases and dispatch instant WhatsApp messages.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              {/* Import Excel */}
+              <div>
+                <input 
+                  type="file" 
+                  accept=".xlsx, .xls, .csv" 
+                  className="hidden" 
+                  ref={contactsFileInputRef}
+                  onChange={handleContactsFileUpload}
+                />
+                <button
+                  onClick={() => contactsFileInputRef.current?.click()}
+                  disabled={isImportingContacts}
+                  className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-70 font-semibold text-sm shadow-sm"
+                >
+                  {isImportingContacts ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileSpreadsheet className="w-4 h-4" />}
+                  {isImportingContacts ? 'Importing...' : 'Import Excel'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col lg:flex-row gap-6 h-[600px] overflow-hidden">
+            {/* Left Column: Contacts List */}
+            <div className="w-full lg:w-1/3 flex flex-col bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden h-full">
+              <div className="p-3 bg-white dark:bg-gray-855 border-b border-gray-200 dark:border-gray-800">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search contacts..."
+                    value={contactsSearchQuery}
+                    onChange={(e) => setContactsSearchQuery(e.target.value)}
+                    className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-205 dark:border-gray-850 rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-primary-500 text-gray-900 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {contacts.length > 0 && (
+                <div className="p-3 bg-white dark:bg-gray-855 border-b border-gray-200 dark:border-gray-800 flex flex-col gap-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <button 
+                      onClick={toggleSelectAllContactsOnPage}
+                      className="flex items-center gap-2 font-semibold text-gray-700 dark:text-gray-300 hover:text-primary-600 transition-colors"
+                    >
+                      {contacts.every(c => selectedContactIds.has((c.id || c._id) as string)) ? (
+                        <CheckSquare className="w-4 h-4 text-primary-600" />
+                      ) : (
+                        <Square className="w-4 h-4" />
+                      )}
+                      Select All on Page
+                    </button>
+                    <span className="font-semibold bg-gray-205 dark:bg-gray-850 px-2 py-0.5 rounded-full text-gray-700 dark:text-gray-300">
+                      {contactsTotalCount} total
+                    </span>
+                  </div>
+
+                  {selectedContactIds.size > 0 && !selectAllContactsGlobal && contactsTotalCount > selectedContactIds.size && (
+                    <div className="bg-primary-50 dark:bg-primary-950/20 text-primary-700 dark:text-primary-400 text-xs p-2 rounded flex items-center justify-between">
+                      <span>Selected {selectedContactIds.size} contacts.</span>
+                      <button 
+                        onClick={() => setSelectAllContactsGlobal(true)}
+                        className="font-semibold hover:underline text-primary-800 dark:text-primary-300"
+                      >
+                        Select all {contactsTotalCount}
+                      </button>
+                    </div>
+                  )}
+
+                  {selectAllContactsGlobal && (
+                    <div className="bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-300 text-xs p-2 rounded flex items-center justify-between font-semibold">
+                      <span>All {contactsTotalCount} contacts selected.</span>
+                      <button 
+                        onClick={() => { setSelectAllContactsGlobal(false); setSelectedContactIds(new Set()); }}
+                        className="hover:underline text-primary-900 dark:text-white"
+                      >
+                        Clear Selection
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {isLoadingContacts ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-1 py-8">
+                    <Loader2 className="w-6 h-6 animate-spin text-primary-500" />
+                    <span className="text-xs">Loading contacts...</span>
+                  </div>
+                ) : contacts.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400 text-center py-8">
+                    <Users className="w-10 h-10 mb-1.5 text-gray-300 dark:text-gray-700" />
+                    <p className="text-xs font-semibold">No contacts found</p>
+                    <p className="text-[10px] mt-0.5">Import Excel spreadsheet to load database</p>
+                  </div>
+                ) : (
+                  contacts.map((contact) => {
+                    const contactId = (contact.id || contact._id) as string;
+                    const isSelected = selectedContactIds.has(contactId) || selectAllContactsGlobal;
+                    return (
+                      <div
+                        key={contactId}
+                        onClick={() => toggleContactSelection(contactId)}
+                        className={cn(
+                          "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                          isSelected 
+                            ? "bg-primary-50/50 border-primary-200 dark:bg-primary-950/20 dark:border-primary-900" 
+                            : "bg-white border-gray-150 hover:bg-gray-50/50 dark:bg-gray-850 dark:border-gray-800 dark:hover:bg-gray-800/40"
+                        )}
+                      >
+                        <div className="flex-shrink-0">
+                          {isSelected ? (
+                            <CheckSquare className="w-4.5 h-4.5 text-primary-600 dark:text-primary-400" />
+                          ) : (
+                            <Square className="w-4.5 h-4.5 text-gray-400" />
+                          )}
+                        </div>
+                        <div className={cn(
+                          "w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs shrink-0",
+                          isSelected ? "bg-primary-100 text-primary-700 dark:bg-primary-900 dark:text-primary-300" : "bg-gray-100 text-gray-650 dark:bg-gray-800 dark:text-gray-450"
+                        )}>
+                          {contact.name ? contact.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-semibold text-xs text-gray-900 dark:text-white truncate">
+                            {contact.name || 'Unknown'}
+                          </p>
+                          <p className="text-[10px] text-gray-550 truncate flex items-center gap-1 mt-0.5">
+                            <Phone className="w-3 h-3 flex-shrink-0" />
+                            {contact.phone}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {contactsTotalPages > 1 && (
+                <div className="p-3 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-855 flex items-center justify-between flex-shrink-0">
+                  <button
+                    disabled={contactsPage === 1}
+                    onClick={() => setContactsPage(contactsPage - 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-350 font-semibold"
+                  >
+                    Prev
+                  </button>
+                  <span className="text-[10px] text-gray-500 font-semibold">Page {contactsPage} of {contactsTotalPages}</span>
+                  <button
+                    disabled={contactsPage === contactsTotalPages}
+                    onClick={() => setContactsPage(contactsPage + 1)}
+                    className="px-2.5 py-1 text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors text-gray-700 dark:text-gray-350 font-semibold"
+                  >
+                    Next
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Right Column: Messages sender */}
+            <div className="flex-1 flex flex-col bg-white dark:bg-gray-850 rounded-xl border border-gray-200 dark:border-gray-800 overflow-hidden h-full">
+              {selectedContactIds.size > 0 || selectAllContactsGlobal ? (
+                <div className="p-6 flex flex-col h-full space-y-4">
+                  <div className="p-4 bg-blue-50 dark:bg-blue-955/20 text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900 rounded-xl text-xs flex gap-2">
+                    <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold mb-0.5">Quick Messaging Console</p>
+                      <p>You are sending a custom message to <strong>{selectAllContactsGlobal ? contactsTotalCount : selectedContactIds.size}</strong> selected contact(s) from your imported database.</p>
+                    </div>
+                  </div>
+
+                  <div className="flex-1 flex flex-col space-y-2">
+                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+                      Message Content
+                    </label>
+                    <textarea
+                      value={contactsMessage}
+                      onChange={(e) => setContactsMessage(e.target.value)}
+                      placeholder="Type your WhatsApp message here..."
+                      className="w-full flex-1 px-4 py-3 border border-gray-250 dark:border-gray-750 bg-white dark:bg-gray-900 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none resize-none"
+                    />
+                  </div>
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      onClick={handleSendContactsMessage}
+                      disabled={isSendingContactsMessage || !contactsMessage.trim()}
+                      className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-emerald-500/10 disabled:opacity-50"
+                    >
+                      {isSendingContactsMessage ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Send className="w-4 h-4" />
+                      )}
+                      Send to Database List
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex-1 flex flex-col items-center justify-center text-gray-400 dark:text-gray-650 p-6 text-center">
+                  <MessageCircle className="w-12 h-12 mb-3 text-gray-305 dark:text-gray-700" />
+                  <h3 className="font-semibold text-gray-900 dark:text-white">No Contact Selected</h3>
+                  <p className="text-xs text-gray-500 mt-1 max-w-xs mx-auto">
+                    Select one or more students from your Contact Database on the left to activate the WhatsApp composing console.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'config' && (
+        <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6 animate-fade-in max-w-xl mx-auto">
+          <div className="border-b border-gray-100 dark:border-gray-800 pb-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Settings className="w-6 h-6 text-primary-500" />
+              WhatsApp API Gateway Setup
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
+              Configure credentials, endpoints, and server settings for executing WhatsApp campaigns.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider">
+                Select Gateway API Provider
+              </label>
+              <select
+                value={config.gateway}
+                onChange={(e) => setConfig({ ...config, gateway: e.target.value })}
+                className="w-full bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-xs px-3.5 py-2.5 rounded-xl outline-none text-gray-950 dark:text-white focus:ring-2 focus:ring-primary-500"
+              >
+                <option value="simulation">Console Simulator (Demo Mode)</option>
+                <option value="meta">Meta Cloud API (Official)</option>
+                <option value="twilio">Twilio Programmable WhatsApp</option>
+                <option value="custom">Custom Webhook / API Gateway</option>
+              </select>
+            </div>
+
+            {config.gateway === 'simulation' && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-955/20 text-blue-800 dark:text-blue-300 rounded-xl border border-blue-100 dark:border-blue-900 text-xs leading-relaxed">
+                <p className="font-semibold mb-1">Simulator Active</p>
+                <p>Simulation mode writes messages directly to your local console. Real WhatsApp messages are simulated and will not be dispatched to external APIs.</p>
+              </div>
+            )}
+
+            {config.gateway === 'meta' && (
+              <div className="space-y-4 pt-2">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Meta Phone Number ID
+                  </label>
+                  <input
+                    type="text"
+                    value={config.meta_phone_number_id}
+                    onChange={(e) => setConfig({ ...config, meta_phone_number_id: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="Phone number ID from Meta developer panel"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Meta Permanent Access Token
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={config.meta_access_token}
+                    onChange={(e) => setConfig({ ...config, meta_access_token: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs font-mono focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white resize-none"
+                    placeholder="EAABw..."
+                  />
+                </div>
+              </div>
+            )}
+
+            {config.gateway === 'twilio' && (
+              <div className="space-y-4 pt-2">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Twilio Account SID
+                  </label>
+                  <input
+                    type="text"
+                    value={config.twilio_account_sid}
+                    onChange={(e) => setConfig({ ...config, twilio_account_sid: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="AC..."
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Twilio Auth Token
+                  </label>
+                  <input
+                    type="password"
+                    value={config.twilio_auth_token}
+                    onChange={(e) => setConfig({ ...config, twilio_auth_token: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="Auth Token"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Twilio WhatsApp Sender Phone
+                  </label>
+                  <input
+                    type="text"
+                    value={config.twilio_sender_phone}
+                    onChange={(e) => setConfig({ ...config, twilio_sender_phone: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="+14155238886"
+                  />
+                </div>
+              </div>
+            )}
+
+            {config.gateway === 'custom' && (
+              <div className="space-y-4 pt-2">
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Custom API Endpoint URL
+                  </label>
+                  <input
+                    type="url"
+                    value={config.custom_endpoint}
+                    onChange={(e) => setConfig({ ...config, custom_endpoint: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="https://api.example.com/whatsapp/send"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-xs font-bold text-gray-505 uppercase tracking-wider">
+                    Custom Auth Token / API Key
+                  </label>
+                  <input
+                    type="password"
+                    value={config.custom_token}
+                    onChange={(e) => setConfig({ ...config, custom_token: e.target.value })}
+                    className="w-full px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white"
+                    placeholder="Bearer token or API Key"
+                  />
+                </div>
+                <div className="p-3 bg-blue-50 dark:bg-blue-955/20 text-blue-800 dark:text-blue-300 rounded-xl border border-blue-100 dark:border-blue-900 text-xs">
+                  <p className="font-semibold mb-0.5">Payload Format Info</p>
+                  <p>Sends a POST request with payload: <code>{"{\"to\": \"<phone>\", \"message\": \"<message>\"}"}</code>. If provided, the authorization header is sent as <code>{"Authorization: Bearer <token>"}</code>.</p>
+                </div>
+              </div>
+            )}
+
+            <div className="pt-4 border-t border-gray-150 dark:border-gray-800 flex justify-end">
+              <button
+                onClick={handleSaveConfig}
+                disabled={isSavingConfig}
+                className="px-6 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center justify-center gap-1.5 shadow-lg shadow-primary-500/10 disabled:opacity-50"
+              >
+                {isSavingConfig ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                Save Configuration
+              </button>
             </div>
           </div>
         </div>

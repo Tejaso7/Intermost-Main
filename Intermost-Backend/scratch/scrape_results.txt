@@ -1,0 +1,1122 @@
+
+=========================================
+SCRAPED PAGE: http://intermost.eu
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: https://www.youtube.com/@InterMost_study_abroad/shorts
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+Found YT link: https://www.youtube.com/embed/GZoixzGgYNA?controls=0&modestbranding=1&rel=0
+Found YT link: https://www.youtube.com/embed/I3JH4adBwUk?controls=0&modestbranding=1&rel=0
+Found YT link: https://www.youtube.com/@IntermostStudyAbroad
+Found YT link: https://www.youtube.com/embed/qsRofiNxeRY?controls=0&modestbranding=1&rel=0
+Found YT link: https://www.youtube.com/embed/2m1pOvKRhsU?controls=0&modestbranding=1&rel=0
+Found YT link: https://www.youtube.com/embed/JZgeDZOlSl0?controls=1&modestbranding=1&rel=0
+Found YT link: https://www.youtube.com/embed/7kGQyoaKv5I?controls=0&modestbranding=1&rel=0
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Admission open for world-class Medical Universities 2025–26
+
+- We Invite you all to join our program for MBBS Abroad EXPO.
+
+- A Seminar at Kolkata Connecting for Future of the Student to go Abroad.
+
+- Students registered for abroad studies.
+
+- A Team of members from ERA University Lucknow Connecting for Future of the Student to go Abroad.
+
+- 5+ Country Partnership for abroad studies.
+
+- 50+ students registered for abroad studies.
+
+- Students registered for abroad studies.
+
+- A major initiative is underway in Agra with the establishment of a new office, featuring the involvement of top-tier members.
+
+- Our students have recently been placed at top Hospitals around the globe.
+
+- A Seminar at Panipat Connecting for Future of the Student to go Abroad.
+
+- A Seminar at Kolkata Connecting for Future of the Student to go Abroad.
+
+- A Seminar at Lucknow Connecting for Future of the Student to go Abroad.
+
+- A major initiative is underway in India with the featuring the involvement of top-tier members.
+
+- H.E. Sardor Rustambaev Amabassador of the Republic of Uzbekistan to India is staying at Oberoi Hotel Amarvilas. He was welcomed by Mr. Alakh upon his arrival in Agra and will be joining us all at the seminar at 10:00 AM [18 May]. Dr. Farruhbek Rasulav and Dr. Sudhir Dhakre. Don't miss this opportunity to interact with experts.
+
+- Join us for an informative seminar on studying MBBS abroad. Chief Speaker: Dr. Farruhbek Rasulav and Dr. Sudhir Dhakre. Don't miss this opportunity to interact with experts.
+
+- We're thrilled to announce our new branch in Agra to assist students locally. Visit us at: Shop no -1, First floor,Vinayak Mall,Deewani Crossing(Lotus Hospital Building),M G Road Agra,282002 (U.P), India.
+
+- /* Marquee styles */
+    .marquee-container {
+        width: 100%;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    /* Rajasthan marquee (3 images) */
+    .marquee-rajasthan {
+        display: flex;
+        width: 300%;
+        animation: scroll-rajasthan 18s linear infinite;
+    }
+    
+    @keyframes scroll-rajasthan {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-66.66%); }
+    }
+    
+    /* Kolkata marquee (5 images) */
+    .marquee-kolkata {
+        display: flex;
+        width: 500%;
+        animation: scroll-kolkata 25s linear infinite;
+    }
+    
+    @keyframes scroll-kolkata {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-80%); }
+    }
+    
+    .marquee-container img {
+       
+        height: 200px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const showMoreBtn = document.getElementById('showMoreBtn');
+        const extraNews = document.querySelectorAll('.extra-news');
+        let isExpanded = false;
+        
+        showMoreBtn.addEventListener('click', function() {
+            extraNews.forEach(item => {
+                item.classList.toggle('hidden');
+            });
+            
+            isExpanded = !isExpanded;
+            showMoreBtn.textContent = isExpanded ? 'Show Less' : 'Show More';
+            
+            // Rotate the arrow icon
+            const arrow = showMoreBtn.querySelector('svg');
+            arrow.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0)';
+        });
+    });
+
+
+    
+  
+
+    
+        Recognized By
+        
+            
+            
+                
+                
+                    
+                        
+                        World Health Organization
+                    
+                    
+                        
+                        World Federation for Medical Education
+                    
+                    
+                        
+                        Educational Commission for Foreign Medical Graduates
+                    
+                    
+                        
+                        Foundation for Advancement of International Medical Education and Research
+                    
+                    
+                        
+                        United States Medical Licensing Examination
+                    
+                    
+                        
+                        National Medical Commission
+                    
+                
+                
+                
+                    
+                        
+                        World Health Organization
+                    
+                    
+                        
+                        World Federation for Medical Education
+                    
+                    
+                        
+                        Educational Commission for Foreign Medical Graduates
+                    
+                    
+                        
+                        Foundation for Advancement of International Medical Education and Research
+                    
+                    
+                        
+                        United States Medical Licensing Examination
+                    
+                    
+                        
+                        National Medical Commission
+                    
+                
+            
+            
+            
+            
+        
+    
+
+    
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 20s linear infinite;
+        }
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .animate-marquee {
+                animation: marquee 5s linear infinite;
+            }
+        }
+    
+
+
+
+  Our Alumni Students
+  
+    
+  
+
+
+
+    
+    
+        
+            Your Journey to Becoming a Doctor
+            
+            
+                
+                
+                    
+                        1
+                        Counseling & Selection
+                    
+                    Our expert counselors guide you in selecting the perfect medical university based on your academic profile, budget, and career aspirations.
+
+- We handle all documentation, university applications, and entrance procedures to ensure smooth admission to your chosen medical program.
+
+- Gain hands-on experience with state-of-the-art facilities and expert faculty, preparing you for a successful medical career worldwide.
+
+- At Intermost Ventures, we're committed to transforming medical education by connecting aspiring doctors with world-class institutions. Our mission is to empower the next generation of healthcare professionals through accessible, high-quality global education.
+
+- To be the premier gateway for medical education abroad, recognized for our integrity, expertise, and commitment to student success in the global healthcare community.
+
+- With strategic offices in UAE,India,Georgia,Ukraine and Uzbekistan, we serve students across South Asia, Middle East, and Africa, providing end-to-end support for their medical education journey.
+
+- Ekam Marketing and Innovation Solutions FZ-LLC, UAE
+
+- DSA-ISM joint Venture LLC, Georgia
+
+- PE "Intermost" Company, Ukraine
+
+- "KONARK PHARM" LLC FE, Uzbekistan
+
+- Choose from our carefully selected network of medical universities offering world-class education at affordable costs
+
+- 📅 Available Mon-Sat: 9:30 AM - 6:30 PM | 100% Free Consultation
+
+- Delhi - NCR & Uttar Pradesh Head, India
+
+- Education Consultant specializing in international student admissions.
+
+- Career Development Specialist for STEM fields.
+
+- Career Development Specialist for STEM fields.
+
+- Career Development Specialist for STEM fields.
+
+- Career Development Specialist for STEM fields.
+
+- Official representatives of top medical universities recognized by WHO, MCI, and other global medical councils.
+
+- Low tuition fees starting at ₹1.5 lakh per semester with options for easy installment payments.
+
+- Dedicated counselors for each student from application to graduation and beyond.
+
+- Strong presence in multiple countries ensuring smooth transition and ongoing support.
+
+- Discover authentic student experiences through these short, captivating videos from around the globe
+
+- Dnipro State Medical University (2018 batch)
+
+- Graduated from International Medical University, Bishkek, Kyrgyztan , currently doing internship.
+                            FMGE 2024
+
+- Dnipropetrovsk state medical University, Ukraine 
+                            Recently cleared FMGE exam in first attempt.
+
+- Dnipro State Medical University,  Ukraine
+
+- Pass FMGE Exam: 2020 ,MBBS MD (Physician) DSMU
+                            PG Resident 3rd year at MS Orthopedics 
+                            Mahatma Gandhi memorial govt medical college and hospital, Jamshedpur
+
+- Lala Lajpat Rai Hospital (Hallett Hospital)
+
+- Georgian National University SEU, Batch 2025
+
+- 2019 FMGE PassedGDMO at PHC (N) Dengausta, Ganjam, Odisha since 2021
+
+- Dnipropetrovsk State Medical University, 2020
+
+- Resident - General Surgery, Metro Hospital Faridabad
+
+- Mari State University, Russia 🇷🇺
+
+- PARAS Hospital, Tapukhara Bhiwadi, Rajasthan
+
+- Andijan State Medical University, Uzbekistan, Batch 2024
+
+- Everything you need to know about eligibility, process, documents and timeline for MBBS admissions abroad.
+
+- Detailed breakdown of visa requirements for popular MBBS destinations including documents checklist.
+
+- How to effectively prepare for Indian medical licensing exams during your MBBS course overseas.
+
+- Expert Guidance for MBBS Abroad
+
+- 100% privacy guaranteed. Privacy Policy
+
+- Fill out this form and our counselor will contact you within 24 hours to guide you through the admission process.
+
+- Monday to Saturday: 9:30 AM - 6:30 PM
+
+- Follow us for updates on admissions, student life abroad, and important announcements.
+
+- Your trusted partner for global medical education since 2004.
+
+- +91-8368888629 / +91-8882204741
+
+- ©2025 Intermost Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: https://www.intermost.eu
+Link: /privacy
+Link: /georgia
+Link: /blog3
+Link: /blog2
+Link: /blog1
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /site.webmanifest
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/terms
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Welcome to Intermost Ventures Study Abroad (https://intermost.in/), operated by Intermost Consulting Private Limited (“Company”, “we”, “our”, or “us”). By accessing or using our website and services, you agree to comply with and be bound by these Terms & Conditions. Please read them carefully.
+
+- By using our website or services, you acknowledge that you have read, understood, and agree to be bound by these Terms & Conditions and our Privacy Policy.
+
+- We provide consultancy services for students seeking to study MBBS abroad, including guidance on university selection, application, admission, and visa processes.
+
+- Any fees for our consultancy services will be communicated to you in advance. All payments must be made as per the agreed terms. Fees paid are non-refundable unless otherwise stated in writing.
+
+- All content on this website, including text, graphics, logos, and images, is the property of Intermost Consulting Private Limited or its licensors and is protected by applicable copyright and intellectual property laws. You may not reproduce, distribute, or use any content without our prior written consent.
+
+- We strive to provide accurate and up-to-date information, but we do not guarantee the completeness, accuracy, or reliability of any content or services. We are not liable for any direct, indirect, incidental, or consequential damages arising from your use of our website or services.
+
+- Our website may contain links to third-party websites. We are not responsible for the content or practices of these sites. Accessing third-party sites is at your own risk.
+
+- We reserve the right to suspend or terminate your access to our website or services at our discretion, without notice, for conduct that we believe violates these Terms & Conditions or is harmful to other users or us.
+
+- We may update these Terms & Conditions from time to time. The latest version will always be available on this page with the updated effective date. Continued use of our website or services constitutes acceptance of the revised terms.
+
+- These Terms & Conditions are governed by the laws of India. Any disputes arising from these terms or your use of our services shall be subject to the exclusive jurisdiction of the courts in Agra, Uttar Pradesh, India.
+
+- For any questions or concerns regarding these Terms & Conditions, please contact us using the details above.
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/russia
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- World-class medical education with global recognition at affordable costs.
+
+- Russia offers globally recognized medical degrees from NMC & WHO-approved universities. With English-taught programs, low tuition fees, and high-quality infrastructure, it's a top choice for international students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- One of the oldest medical institutions in Russia with global recognition.
+
+- Website: https://bashgmu.ru/en/
+
+- Known for its excellence in engineering and medicine, offering world-class education.
+
+- Offers high-quality medical education with strong clinical exposure.
+
+- One of the oldest medical institutions in Russia with global recognition.
+
+- Location: Yaroslavl Oblast, Russia
+
+- One of the oldest medical institutions in Russia with global recognition.
+
+- Location: Karachay-Cherkessia, Russia
+
+- One of the oldest medical institutions in Russia with global recognition.
+
+- Website: https://www.ivgmu.com/
+
+- Location: Ivanovo Oblast, Russia
+
+- Offers excellent infrastructure and research facilities for aspiring doctors.
+
+- 10+2 with Physics, Chemistry, Biology
+
+- NEET qualification mandatory for Indian students
+
+- Minimum age: 17 years by December 31st of admission year
+
+- Living Expenses: $150–200/month
+
+- Visa: Student Visa (D), valid for 1 year (renewable)
+
+- Our expert counselors will guide you through the entire admission process and help you choose the best university.
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/tezijistan
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Premier medical institution with international collaborations and modern facilities.
+
+- Tuition: : Approx. USD 6,000–7,000
+
+- Hostel & Mess: $ 1,200 - 1,500/year
+
+- Hostel & Food: $1,000 - $2,000/year
+
+- Get expert guidance on admissions, documentation, and visa process
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: https://www.intermost.eu
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- CompareAbout UsBlogsContact+91 9058501818Apply NowAdmissions Open 2026 • Certified PartnerYour Gateway to Global Medical EducationStudy MBBS at WHO &amp; NMC approved universities in Russia, Georgia, Uzbekistan, and more. Transparent pricing, 100% English medium, and guaranteed admission letters.
+
+- Explore CountriesAdmission PredictorWHO &amp; NMC Eligibility Engine
+
+- Check Admission MatchEXPLORE OPTIONSLatest UpdatesNews &amp; UpdatesStay informed about our latest events, student achievements, and admission updates
+
+- Join us at our upcoming education fair to learn about MBBS opportunities abroad.
+
+- New DelhiFeaturedStudent Success StoriesOur students share their experiences studying MBBS abroad.
+
+- RussiaView All NewsStudy DestinationsChoose Your Dream CountryExplore top medical universities in these countries with NMC &amp; WHO approved programs
+
+- NMC Approved WHO Listed 100% EnglishDuration6 Years
+
+- MBBS in Georgia NMC Approved WHO Listed 100% EnglishDuration6 Years
+
+- MBBS in Uzbekistan NMC Approved WHO Listed 100% EnglishDuration6 Years
+
+- MBBS in Nepal NMC Approved WHO Listed 100% EnglishDuration5.5 Years
+
+- Tuition Fee₹50-65 Lakhs (Full Course)
+
+- MBBS in Kazakhstan NMC Approved WHO Listed 100% EnglishDuration5.5 Years
+
+- MBBS in Tajikistan NMC Approved WHO Listed 100% EnglishDuration5.5 Years
+
+- View All CountriesWhy Choose UsYour Trusted Partner for MBBS AbroadWe&#x27;ve helped over 5,500+ students achieve their dream of becoming doctors
+
+- NMC &amp; WHO ApprovedAll our partner universities are recognized by NMC (National Medical Commission) and WHO.
+
+- 99% Visa SuccessOur experienced team ensures highest visa success rate with proper documentation.
+
+- 21+ Years ExperienceTrusted by thousands of students and parents for over two decades.
+
+- 24/7 SupportRound-the-clock assistance for students and parents before, during, and after admission.
+
+- Complete AssistanceFrom admission to visa, travel, and accommodation - we handle everything.
+
+- FMGE/NEXT CoachingFree FMGE/NEXT exam preparation coaching for all our students.
+
+- Benefits of Studying MBBS AbroadGet world-class medical education at a fraction of the cost compared to private medical colleges in India.
+
+- Affordable fees compared to IndiaEnglish medium educationNo donation or capitation feesSafe and secure environmentIndian food availableDirect flights availableTotal Course Fee Starting From
+
+- Our track record speaks for itself - trusted by thousands of families
+
+- 0+Students PlacedSuccessfully admitted worldwide
+
+- 0+Partner UniversitiesNMC &amp; WHO approved
+
+- 0%Visa Success RateIndustry-leading success
+
+- All partner universities are recognized by leading international medical education bodies
+
+- World Federation for Medical Education
+
+- Educational Commission for Foreign Medical Graduates
+
+- Foundation for Advancement of International Medical Education
+
+- World Federation for Medical Education
+
+- Educational Commission for Foreign Medical Graduates
+
+- Foundation for Advancement of International Medical Education
+
+- 100% Safe &amp; Secure AdmissionsNMC &amp; WHO Approved UniversitiesTransparent Fee StructureStudent TestimonialsWhat Our Students SayHear from students who achieved their dream of becoming doctors with our guidance
+
+- &quot;My journey with Intermost Study Abroad was exceptional. From admission guidance to visa support, they made my MBBS dream in Russia a reality. The team was always available to help.&quot;
+
+- DADr. Ankita BoradeOrenburg State Medical University, Russia
+
+- &quot;Intermost provided complete transparency throughout the admission process. Their guidance was invaluable, and I am now a practicing doctor thanks to their support.&quot;
+
+- DSDr. Saurabh SharmaTver State Medical University, Russia
+
+- &quot;Choosing Intermost was the best decision for my medical career. The affordable fees and quality education in Russia exceeded my expectations.&quot;
+
+- DSDr. Shubham SharmaTver State Medical University, Russia
+
+- &quot;Excellent support from day one. Intermost helped me navigate every step of studying MBBS abroad. Now I am a successful doctor serving patients.&quot;
+
+- DSDr. Sanjay SharmaKSMU Kursk State Medical University, Russia
+
+- &quot;The personalized counseling and honest guidance set Intermost apart. They genuinely care about students&#x27; futures and careers.&quot;
+
+- DPDr. Pratibha KeshriOrel State University, Russia
+
+- &quot;Professional team with excellent follow-up. They helped me throughout my 6-year journey and even assisted with FMGE preparation.&quot;
+
+- DCDr. Chandan KumarOrel State University, Russia
+
+- Take the first step towards your dream of becoming a doctor. Get free counseling and guidance from our expert team today!
+
+- Chat on WhatsApp+91 9058501818Free CounselingNo Hidden ChargesComplete Documentation HelpVisa AssistanceGet In TouchLet&#x27;s Start Your JourneyHave questions about MBBS abroad? Our expert counselors are here to help you make the right decision. Get free guidance today!
+
+- Email Usadmissionintermost@gmail.com
+
+- Visit UsShop no -1, First floor, Vinayak Mall,M G Road, Agra, 282002 (U.P), India
+
+- Office HoursMonday - Saturday: 10:00 AM - 7:00 PMSunday: Closed
+
+- Submit InquiryBy submitting this form, you agree to our Privacy Policy
+
+- Your trusted partner for MBBS education abroad. We help students achieve their dreams of becoming doctors through quality education at affordable costs.
+
+- Quick LinksAbout UsCompare CountriesApply NowContact Us+91 9058501818+91 9837533887admissionintermost@gmail.comShop no -1, First floor, Vinayak Mall,M G Road, Agra, 282002 (U.P), IndiaNewsletterSubscribe to get latest updates on MBBS admissions and offers.
+
+- © 2026 Intermost Ventures LLP. All rights reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /countries/russia
+Link: /terms
+Link: /_next/static/media/0484562807a97172-s.p.woff2
+Link: /countries/tajikistan
+Link: /_next/static/css/2959200a453540a5.css
+Link: /
+Link: /countries/kazakhstan
+Link: /about
+Link: /news
+Link: /privacy
+Link: /countries/uzbekistan
+Link: /images/countries/russia.jpg
+Link: /_next/static/media/8888a3826f4a3af4-s.p.woff2
+Link: /countries/nepal
+Link: /images/logo/logo.png
+Link: /_next/static/media/e4af272ccee01ff0-s.p.woff2
+Link: /disclaimer
+Link: /apply
+Link: /compare
+Link: /_next/static/chunks/webpack-02dc7d1225b6cea8.js
+Link: /_next/static/media/b957ea75a84b6ea7-s.p.woff2
+Link: /_next/static/media/eafabf029ad39a43-s.p.woff2
+Link: /blogs
+Link: /_next/static/css/2a4b4bf0a78cd608.css
+Link: /countries/georgia
+Link: /contact
+Link: /_next/static/css/d68483cbd6d6a930.css
+Link: /countries
+Link: /_next/static/media/7db6c35d839a711c-s.p.woff2
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/privacy
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Welcome to Intermost Ventures Study Abroad (https://intermost.in/), operated by Intermost Consulting Private Limited (“Company”, “we”, “our”, or “us”). We are committed to protecting your privacy and handling your personal data transparently and securely. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or use our services.
+
+- We do not sell your personal information to third parties.
+
+- To exercise these rights, please contact us at admissionintermost@gmail.com or using the details below.
+
+- We implement industry-standard security measures to protect your personal data from unauthorized access, alteration, disclosure, or destruction. However, no method of transmission over the Internet or electronic storage is 100% secure.
+
+- We retain your personal data only as long as necessary to fulfill the purposes outlined in this policy, unless a longer retention period is required by law.
+
+- Our website may contain links to third-party sites. We are not responsible for the privacy practices or content of those sites. Please review their privacy policies before providing any personal information.
+
+- Our services are not intended for individuals under the age of 13. We do not knowingly collect personal data from children. If you believe a child has provided us with personal information, please contact us to have it removed.
+
+- We may update this Privacy Policy from time to time. The latest version will always be available on this page with the updated effective date.
+
+- For any questions or concerns regarding this Privacy Policy or your personal data, please contact us using the details above.
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/georgia
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Georgia offers high-quality medical education at affordable costs. With NMC-approved universities, English-medium instruction, and a safe environment, it's an ideal destination for Indian students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- Private university in Tbilisi offering NMC-approved MBBS with modern facilities.
+
+- Hostel & Mess: $2,500-3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Focus on practical medical training with international partnerships.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Focus on practical medical training with international partnerships.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Affordable English-medium MBBS program with strong clinical exposure.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Modern infrastructure with European-standard medical education.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Coastal university with modern campus and international faculty.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- Georgia's Biggest medical Universities offering European Standard.
+
+- Hostel & Mess: $2,500-$3,000/year
+
+- Other cost: $200 – TRC & Documentation
+
+- NEET Qualified (2023/2024/2025)
+
+- Valid Passport minimum for 1 Year
+
+- Registration & Other Expenses: $1,000–1,500
+
+- Our expert counselors will guide you through the entire admission process and help you choose the best university.
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/blog3
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- How to effectively prepare for Indian medical licensing exams during your MBBS course overseas.
+
+- Indian students pursuing MBBS abroad must clear the Foreign Medical Graduates Exam (FMGE) or NEXT (National Exit Test) to practice medicine in India. Early preparation alongside your international studies significantly improves success rates.
+
+- Daily: 1-2 hours of parallel studying
+
+- Weekly: Solve 50 MCQs from current subjects
+
+- Daily: 2-3 hours focused preparation
+
+- Monthly: Full-length mock tests
+
+- Daily: 4-5 hours intensive revision
+
+- Weekly: 2 simulated exams under timed conditions
+
+- Pro Tip: Students who start preparing from 2nd year have 3x higher pass rates than those who prepare only after graduation.
+
+- Need a personalized study plan? Our academic counselors can create a customized FMGE/NEXT preparation strategy based on your university curriculum and learning style!
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/blog2
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Detailed breakdown of visa requirements for popular MBBS destinations including documents checklist.
+
+- Securing a student visa is crucial for pursuing MBBS abroad. Each country has specific requirements and processing times. Below is a comprehensive guide to visa procedures for top medical study destinations.
+
+- While specific requirements vary by country, these documents are commonly needed:
+
+- 15-30 working days after document submission
+
+- Initially 90 days, converted to 1-year visa after arrival
+
+- X1 visa (long-term) valid for entire study duration
+
+- 6-8 weeks (including ACR I-Card processing)
+
+- Initially 1 year (convertible to resident visa)
+
+- Note: Visa policies may change. Always check the official embassy website of your destination country for the latest requirements before application.
+
+- Need help with your visa application? Contact our visa experts for personalized guidance! ✈️
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/blog1
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Everything you need to know about eligibility, process, documents, and timeline for MBBS admissions abroad.
+
+- Pursuing an MBBS degree abroad is a popular choice for Indian students due to affordable fees, global exposure, and high-quality education. If you're planning to study medicine overseas in 2025, this guide covers all the essential details.
+
+- To apply for MBBS abroad, students must meet the following criteria:
+
+- Minimum 17 years by December 31, 2025
+
+- Some universities require IELTS/TOEFL (if medium was not English in school).
+
+- Studying MBBS abroad in 2025 is a great opportunity for students who want quality education at reasonable costs. Proper research, timely applications, and choosing an NMC-recognized university are key to success.
+
+- Would you like assistance with university selection or the application process? Let us know in the comments! 🚀
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/disclaimer
+=========================================
+
+--- YOUTUBE LINKS ---
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- The information provided by Intermost Ventures Study Abroad (https://intermost.in/) and Intermost Consulting Private Limited (“Company”, “we”, “our”, or “us”) is for general informational purposes only. While we strive to ensure the accuracy and reliability of the information on our website and through our services, we make no warranties or representations of any kind, express or implied, about the completeness, accuracy, reliability, suitability, or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose.
+
+- The content on this website is not intended as legal, financial, or professional advice. Users are encouraged to consult with appropriate professionals before making any decisions based on the information provided.
+
+- Our website may contain links to external websites that are not provided or maintained by us. We do not guarantee the accuracy, relevance, timeliness, or completeness of any information on these external sites.
+
+- While we assist students in the application and admission process for MBBS abroad, we do not guarantee admission to any university or the outcome of visa applications. Admission and visa decisions are at the sole discretion of the respective authorities.
+
+- Under no circumstances shall Intermost Consulting Private Limited be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits arising out of, or in connection with, the use of this website or our services.
+
+- We may update this Disclaimer from time to time. The latest version will always be available on this page with the updated effective date.
+
+- For any questions or concerns regarding this Disclaimer, please contact us using the details above.
+
+
+--- INTERNAL LINKS ---
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/uzbekistan
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Uzbekistan offers high-quality medical education at affordable costs. With NMC-approved universities, English-medium instruction, and a safe environment, it's an ideal destination for Indian students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- Established in 1955, offering quality medical education with global recognition.
+
+- Address: Yu. Otabekov 1, Andijan city
+
+- Prestigious university located in the capital city, known for its strong academic curriculum.
+
+- Historic university offering modern medical education in a culturally rich city.
+
+- Website:  https://www.sammu.uz/en
+
+- Known for its traditional values and modern teaching techniques in a UNESCO World Heritage City.
+
+- Specializes in public health and preventive medicine programs.
+
+- Website:   https://www.fmiph.uz/
+
+- 10+2 with Physics, Chemistry, Biology
+
+- Minimum age: 17 years by December 31st of admission year
+
+- Living Expenses: $100–150/month
+
+- Visa: Student Visa (D3), valid for 1 year (renewable)
+
+- Our expert counselors will guide you through the entire admission process and help you choose the best university.
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/vietnam
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Vietnam offers high-quality medical education at affordable costs. With NMC-approved universities, English-medium instruction, and a safe environment, it's an ideal destination for Indian students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- Premier medical institution with international collaborations and modern facilities.
+
+- Tuition: : Approx. USD 6,000–7,000
+
+- Hostel & Mess: $ 1,200 - 1,500/year
+
+- Vietnam's oldest university of medical education legacy.
+
+- Hostel & Mess: $1,200 - 1,500/year
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel & Mess: $1,000 - 1400/year
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel & Mess: $1,500 - 2000/year
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel & Mess: $1,000 - 1400/year
+
+- Hostel & Food: $1,000 - $2,000/year
+
+- Get expert guidance on admissions, documentation, and visa process
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/kazakistan
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Kazakhstan offers high-quality medical education at affordable costs. With NMC-approved universities, English-medium instruction, and a safe environment, it's an ideal destination for Indian students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel :- $600-$800/year   & Mess: $120 /month
+
+- Registration & Other Expenses: $250
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel :- $800-$1000-$1200/year   & Mess: $120 /month
+
+- Registration & Other Expenses: $250
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel :- $800-$900/year   & Mess: $120 /month
+
+- Registration & Other Expenses: $250
+
+- Focus on community medicine and practical healthcare training.
+
+- Hostel :- $600-$800/year   & Mess: $120 /month
+
+- Registration & Other Expenses: $250
+
+- Hostel & Food: $1,000 - $2,000/year
+
+- Get expert guidance on admissions, documentation, and visa process
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal
+
+=========================================
+SCRAPED PAGE: http://intermost.eu/nepal
+=========================================
+
+--- YOUTUBE LINKS ---
+Found YT link: http://www.youtube.com/@IntermostStudyAbroad
+
+--- TESTIMONIALS / TEXT BLOCKS ---
+- Affordable medical education with rich cultural experience in the heart of Central Asia.
+
+- Nepal offers high-quality medical education at affordable costs. With NMC-approved universities, English-medium instruction, and a safe environment, it's an ideal destination for Indian students.
+
+- No language barrier for Indian students
+
+- Low tuition fees compared to India
+
+- Friendly for international students
+
+- Premier medical institution with international collaborations and modern facilities.
+
+- Tuition:  50 lakh /Entire MBBS Course
+
+- Hostel & Mess:10 - 12 lakh/Entire MBBS Course
+
+- Nepal's oldest university with 60+ Years of medical education legacy.
+
+- Tuition:   55 lakh /Entire MBBS Course
+
+- Hostel & Mess: 10-12 lakh/Entire MBBS Course
+
+- Focus on community medicine and practical healthcare training.
+
+- Tuition:   60 lakh /Entire MBBS Course
+
+- 25 lakh 1st installment
+              Discount 3 lakh if 200 marks above in NEET (Including Hostel)
+
+- Mess: 2.75 - 3 lakh/Entire MBBS Course
+
+- Focus on community medicine and practical healthcare training.
+
+- Tuition:   50 lakh /Entire MBBS Course
+
+- Hostel & Mess: 8-10 lakh/Entire MBBS Course
+
+- Focus on community medicine and practical healthcare training.
+
+- Tuition:    5 - 8 lakh /Entire MBBS Course
+
+- Hostel & Mess: 2.5 - 3 lakh/Entire MBBS Course
+
+- Minimum 50% marks in each subject: Physics, Chemistry, and Biology in 10+2 (Current Year)
+
+- NEET Passed mandatory 50 percentile
+
+- Total Tuition: 50 - 65 lakh/Entire MBBS Course
+
+- Hostel & Food: 5 - 12 lakh/Entire MBBS Course
+
+- Application Fee: ₹5,000 – ₹10,000 / One Time/p>
+        
+        
+      
+    
+  
+
+  
+    
+       Key Advantages
+    
+    
+      
+        
+        Affordable Fees
+
+- Get expert guidance on admissions, documentation, and visa process
+
+- Your trusted partner for global medical education since 2004.
+
+- © 2023 Intermost Ventures Study Abroad / Ekam Marketing and Innovation Solutions FZ-LLC, UAE. All Rights Reserved.
+
+
+--- INTERNAL LINKS ---
+Link: /terms
+Link: /russia
+Link: /tezijistan
+Link: /privacy
+Link: /georgia
+Link: /disclaimer
+Link: /uzbekistan
+Link: /vietnam
+Link: /kazakistan
+Link: /nepal

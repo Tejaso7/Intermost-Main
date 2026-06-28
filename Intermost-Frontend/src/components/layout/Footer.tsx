@@ -14,7 +14,7 @@ import {
   Send
 } from 'lucide-react';
 
-import { countriesApi } from '@/lib/services';
+import { countriesApi, coreApi } from '@/lib/services';
 
 const baseQuickLinks = [
   { name: 'About Us', href: '/about' },
@@ -35,6 +35,32 @@ export default function Footer() {
   const [email, setEmail] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [quickLinks, setQuickLinks] = useState([...baseQuickLinks, ...endQuickLinks]);
+  
+  const [contact, setContact] = useState({
+    phone1: '+91 9058501818',
+    phone2: '+91 9837533887',
+    email: 'admissionintermost@gmail.com',
+    address: 'Shop no -1, First floor, Vinayak Mall, Deewani Crossing (Lotus Hospital Building), M G Road Agra, 282002 (U.P), India',
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings && settings.contact) {
+          setContact({
+            phone1: settings.contact.phone || '+91 9058501818',
+            phone2: settings.contact.whatsapp || '+91 9837533887',
+            email: settings.contact.email || 'admissionintermost@gmail.com',
+            address: settings.contact.address || 'Shop no -1, First floor, Vinayak Mall, Agra',
+          });
+        }
+      } catch (err) {
+        console.debug('Failed to fetch settings for Footer', err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     const fetchLinks = async () => {
@@ -132,34 +158,31 @@ export default function Footer() {
           {/* Contact Info */}
           <div>
             <h4 className="text-white font-semibold text-lg mb-6">Contact Us</h4>
-            <ul className="space-y-4">
+            <ul className="space-y-4 text-sm">
               <li className="flex items-start space-x-3">
                 <Phone className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                 <div>
-                  <a href="tel:+919058501818" className="hover:text-white transition-colors">
-                    +91 9058501818
+                  <a href={`tel:${contact.phone1.replace(/\s/g, '')}`} className="hover:text-white transition-colors block">
+                    {contact.phone1}
                   </a>
-                  <br />
-                  <a href="tel:+919837533887" className="hover:text-white transition-colors">
-                    +91 9837533887
+                  <a href={`tel:${contact.phone2.replace(/\s/g, '')}`} className="hover:text-white transition-colors block mt-1">
+                    {contact.phone2}
                   </a>
                 </div>
               </li>
               <li className="flex items-start space-x-3">
                 <Mail className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
                 <a
-                  href="mailto:admissionintermost@gmail.com"
-                  className="hover:text-white transition-colors"
+                  href={`mailto:${contact.email}`}
+                  className="hover:text-white transition-colors break-all"
                 >
-                  admissionintermost@gmail.com
+                  {contact.email}
                 </a>
               </li>
               <li className="flex items-start space-x-3">
                 <MapPin className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
-                <span>
-                  Shop no -1, First floor, Vinayak Mall,
-                  <br />
-                  M G Road, Agra, 282002 (U.P), India
+                <span className="leading-relaxed">
+                  {contact.address}
                 </span>
               </li>
             </ul>

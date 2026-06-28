@@ -53,21 +53,40 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
     window.open(link, '_blank');
   };
 
+  const getYoutubeId = (url: string) => {
+    if (!url) return '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\/shorts\/)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
+  };
+
+  const isYoutube = country.hero_video?.includes('youtube.com') || country.hero_video?.includes('youtu.be');
+  const ytId = isYoutube ? getYoutubeId(country.hero_video || '') : '';
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         {/* Background */}
         {country.hero_video && showVideo ? (
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src={country.hero_video} type="video/mp4" />
-          </video>
+          isYoutube ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&loop=1&playlist=${ytId}&controls=0&modestbranding=1&rel=0`}
+              className="absolute inset-0 w-full h-full border-0 pointer-events-none object-cover scale-[1.35]"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
+          ) : (
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="absolute inset-0 w-full h-full object-cover"
+            >
+              <source src={country.hero_video} type="video/mp4" />
+            </video>
+          )
         ) : (
           <Image
             src={getCountryImage(country)}
