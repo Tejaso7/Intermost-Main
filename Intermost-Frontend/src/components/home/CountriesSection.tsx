@@ -76,6 +76,20 @@ const fallbackCountries: Partial<Country>[] = [
 export default function CountriesSection() {
   const [countries, setCountries] = useState<Country[]>(fallbackCountries as Country[]);
   const [loading, setLoading] = useState(true);
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const getCountryVideo = (slug: string) => {
+    const videos: Record<string, string> = {
+      russia: '/video/russia/russia.mp4',
+      georgia: '/video/georgia/georgia.mp4',
+      uzbekistan: '/video/uzbekistan/uzbekistan.mp4',
+      kazakhstan: '/video/kazakhstan/kazakhstan.mp4',
+      nepal: '/video/nepal/nepal.mp4',
+      tajikistan: '/video/tajikistan/tajikistan.mp4',
+      vietnam: '/video/vietnam/vietnam.mp4',
+    };
+    return videos[slug.toLowerCase()] || '';
+  };
 
   useEffect(() => {
     const fetchCountries = async () => {
@@ -134,23 +148,39 @@ export default function CountriesSection() {
             >
               <Link href={`/countries/${country.slug}`} className="block group h-full">
                 <motion.div
-                  className="bg-white rounded-[28px] border border-gray-200 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex(null)}
+                  className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
                   whileHover={{ y: -8 }}
                   transition={{ duration: 0.3 }}
                 >
-                  {/* Image */}
-                  <div className="relative h-48 sm:h-56 overflow-hidden">
+                  {/* Image & Video backdrop */}
+                  <div className="relative h-48 sm:h-56 overflow-hidden z-0">
                     <Image
                       src={country.hero_image || country.banner_image || '/images/placeholder.jpg'}
                       alt={`MBBS in ${country.name}`}
                       fill
-                      className="object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out"
+                      className="object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out z-0"
                     />
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent group-hover/card:from-black/90 transition-all duration-300" />
+
+                    {/* Interactive Hover Video Background */}
+                    {hoveredIndex === index && getCountryVideo(country.slug) && (
+                      <video
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500"
+                      >
+                        <source src={getCountryVideo(country.slug)} type="video/mp4" />
+                      </video>
+                    )}
+
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover/card:from-black/90 transition-all duration-300 z-10" />
 
                     {/* Flag */}
-                    <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20">
+                    <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20 z-20">
                       <Image
                         src={country.flag_url || getCountryFlag(country.code)}
                         alt={`${country.name} flag`}
@@ -161,13 +191,13 @@ export default function CountriesSection() {
 
                     {/* Featured Badge */}
                     {country.meta?.is_featured && (
-                      <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md">
+                      <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md z-20">
                         Popular Choice
                       </span>
                     )}
 
                     {/* Country Name */}
-                    <div className="absolute bottom-4 left-4 right-4">
+                    <div className="absolute bottom-4 left-4 right-4 z-20">
                       <h3 className="text-xl sm:text-2xl font-bold text-white text-shadow flex items-center gap-2">
                         MBBS in {country.name}
                       </h3>
