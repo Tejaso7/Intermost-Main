@@ -55,8 +55,11 @@ class MongoDBConnection:
                 logger.info(f"Successfully connected to MongoDB: {mongodb_name}")
                 
             except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-                logger.error(f"Failed to connect to MongoDB: {e}")
-                raise
+                logger.warning(f"Failed to connect to MongoDB on startup: {e}. Lazy connection will be retried on query execution.")
+                if self._client:
+                    self._db = self._client[mongodb_name]
+                else:
+                    raise
                 
         return self._db
     
