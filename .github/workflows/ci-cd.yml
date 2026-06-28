@@ -35,13 +35,6 @@ jobs:
       run: |
         npm audit --audit-level=high || true
 
-    - name: Build Frontend Docker Image
-      run: |
-        docker build \
-          --build-arg NEXT_PUBLIC_API_URL=https://intermost.in/api/v1 \
-          --build-arg NEXT_PUBLIC_WHATSAPP_NUMBER=919058501818 \
-          -t intermost-frontend:latest .
-
   backend-ci:
     name: Backend CI & Security
     runs-on: ubuntu-latest
@@ -80,10 +73,6 @@ jobs:
     - name: Run pip-audit dependency scan
       run: |
         pip-audit -r requirements.txt || true
-
-    - name: Build Backend Docker Image
-      run: |
-        docker build -t intermost-backend:latest .
 
   deploy:
     name: Deploy to AWS EC2
