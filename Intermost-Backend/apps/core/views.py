@@ -196,7 +196,7 @@ class SiteSettingsView(APIView):
             'stats': {
                 'students_placed': 5500,
                 'partner_universities': 35,
-                'years_experience': 21,
+                'years_experience': 23,
                 'visa_success_rate': 99
             },
             'hero_bg_type': 'image',
@@ -233,7 +233,7 @@ class StatsView(APIView):
             return Response({
                 'students_placed': 5500,
                 'partner_universities': 35,
-                'years_experience': 21,
+                'years_experience': 23,
                 'visa_success_rate': 99
             })
 

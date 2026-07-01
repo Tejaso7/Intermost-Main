@@ -1,5 +1,6 @@
 'use client';
-
+ 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   GraduationCap, 
@@ -11,45 +12,7 @@ import {
   Award,
   CheckCircle
 } from 'lucide-react';
-
-const features = [
-  {
-    icon: GraduationCap,
-    title: 'NMC & WHO Approved',
-    description: 'All our partner universities are recognized by NMC (National Medical Commission) and WHO.',
-    color: 'bg-blue-500',
-  },
-  {
-    icon: Shield,
-    title: '99% Visa Success',
-    description: 'Our experienced team ensures highest visa success rate with proper documentation.',
-    color: 'bg-green-500',
-  },
-  {
-    icon: Users,
-    title: '21+ Years Experience',
-    description: 'Trusted by thousands of students and parents for over two decades.',
-    color: 'bg-purple-500',
-  },
-  {
-    icon: HeadphonesIcon,
-    title: '24/7 Support',
-    description: 'Round-the-clock assistance for students and parents before, during, and after admission.',
-    color: 'bg-orange-500',
-  },
-  {
-    icon: Plane,
-    title: 'Complete Assistance',
-    description: 'From admission to visa, travel, and accommodation - we handle everything.',
-    color: 'bg-pink-500',
-  },
-  {
-    icon: BookOpen,
-    title: 'FMGE/NEXT Coaching',
-    description: 'Free FMGE/NEXT exam preparation coaching for all our students.',
-    color: 'bg-teal-500',
-  },
-];
+import { coreApi } from '@/lib/services';
 
 const benefits = [
   'Affordable fees compared to India',
@@ -61,6 +24,66 @@ const benefits = [
 ];
 
 export default function WhyChooseUs() {
+  const [siteStats, setSiteStats] = useState({
+    students_placed: 5500,
+    partner_universities: 35,
+    years_experience: 23, // updated default value to 23
+    visa_success_rate: 99
+  });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.stats) {
+          setSiteStats(settings.stats);
+        }
+      } catch (error) {
+        console.debug('Failed to fetch stats for WhyChooseUs, using defaults', error);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const features = [
+    {
+      icon: GraduationCap,
+      title: 'NMC & WHO Approved',
+      description: 'All our partner universities are recognized by NMC (National Medical Commission) and WHO.',
+      color: 'bg-blue-500',
+    },
+    {
+      icon: Shield,
+      title: `${siteStats.visa_success_rate}% Visa Success`,
+      description: 'Our experienced team ensures highest visa success rate with proper documentation.',
+      color: 'bg-green-500',
+    },
+    {
+      icon: Users,
+      title: `${siteStats.years_experience}+ Years Experience`,
+      description: 'Trusted by thousands of students and parents for over two decades.',
+      color: 'bg-purple-500',
+    },
+    {
+      icon: HeadphonesIcon,
+      title: '24/7 Support',
+      description: 'Round-the-clock assistance for students and parents before, during, and after admission.',
+      color: 'bg-orange-500',
+    },
+    {
+      icon: Plane,
+      title: 'Complete Assistance',
+      description: 'From admission to visa, travel, and accommodation - we handle everything.',
+      color: 'bg-pink-500',
+    },
+    {
+      icon: BookOpen,
+      title: 'FMGE/NEXT Coaching',
+      description: 'Free FMGE/NEXT exam preparation coaching for all our students.',
+      color: 'bg-teal-500',
+    },
+  ];
+
   return (
     <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
       {/* Background decoration */}
@@ -68,7 +91,7 @@ export default function WhyChooseUs() {
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-100 rounded-full blur-3xl opacity-50" />
       </div>
-
+ 
       <div className="container-custom relative z-10">
         {/* Section Header */}
         <motion.div
@@ -92,10 +115,10 @@ export default function WhyChooseUs() {
             <span className="gradient-text">MBBS Abroad</span>
           </h2>
           <p className="section-subtitle mt-4 max-w-3xl mx-auto px-2">
-            We've helped over 5,500+ students achieve their dream of becoming doctors
+            We've helped over {siteStats.students_placed.toLocaleString()}+ students achieve their dream of becoming doctors
           </p>
         </motion.div>
-
+ 
         {/* Features Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8 mb-16 sm:mb-20">
           {features.map((feature, index) => (
@@ -128,7 +151,7 @@ export default function WhyChooseUs() {
             </motion.div>
           ))}
         </div>
-
+ 
         {/* Benefits Banner */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
@@ -142,7 +165,7 @@ export default function WhyChooseUs() {
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl" />
             <div className="absolute -bottom-20 -left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
           </div>
-
+ 
           <div className="grid md:grid-cols-2 gap-8 md:gap-10 items-center relative z-10">
             <div className="flex flex-col">
               <motion.div
