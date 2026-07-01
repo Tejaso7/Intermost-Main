@@ -128,13 +128,13 @@ export default function TestimonialsSection() {
           className="text-center mb-12"
         >
           <span className="text-primary-300 font-semibold text-sm uppercase tracking-wider">
-            Student Testimonials
+            Our Alumni Students
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mt-2">
-            What Our <span className="text-primary-400">Students Say</span>
+            Stories From Our <span className="text-primary-400">Best Doctors & Heroes</span>
           </h2>
           <p className="text-primary-200 text-lg mt-4 max-w-2xl mx-auto">
-            Hear from students who achieved their dream of becoming doctors with our guidance
+            Discover authentic feedback from successful medical graduates placed at top hospitals worldwide.
           </p>
         </motion.div>
 
