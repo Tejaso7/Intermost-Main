@@ -158,25 +158,35 @@ export default function ImageUpload({
             </div>
           </div>
         ) : (
-          <div className={`flex flex-col items-center justify-center p-6 ${previewClassName}`}>
-            {uploading ? (
-              <>
-                <Loader2 className="w-10 h-10 text-primary-500 animate-spin mb-2" />
-                <p className="text-sm text-gray-500">Uploading...</p>
-              </>
-            ) : (
-              <>
-                <Upload className="w-10 h-10 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-600 text-center">
-                  <span className="font-medium text-primary-600">Click to upload</span>
-                  {' '}or drag and drop
-                </p>
-                <p className="text-xs text-gray-400 mt-1">
-                  {accept.includes('video') ? 'MP4, WebM, MOV' : 'PNG, JPG, GIF, WebP'} up to 50MB
-                </p>
-              </>
-            )}
-          </div>
+          (() => {
+            const isCompact = previewClassName.includes('h-20') || 
+                              previewClassName.includes('h-24') || 
+                              previewClassName.includes('h-28') ||
+                              previewClassName.includes('h-32');
+            return (
+              <div className={`flex flex-col items-center justify-center ${isCompact ? 'p-2' : 'p-6'} ${previewClassName}`}>
+                {uploading ? (
+                  <>
+                    <Loader2 className={`text-primary-500 animate-spin mb-1 ${isCompact ? 'w-5 h-5' : 'w-10 h-10 mb-2'}`} />
+                    <p className="text-xs text-gray-500">Uploading...</p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className={`text-gray-400 ${isCompact ? 'w-5 h-5 mb-1' : 'w-10 h-10 mb-2'}`} />
+                    <p className={`${isCompact ? 'text-[11px]' : 'text-sm'} text-gray-600 text-center leading-normal`}>
+                      <span className="font-semibold text-primary-600">Click to upload</span>
+                      {!isCompact && ' or drag and drop'}
+                    </p>
+                    {!isCompact && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        {accept.includes('video') ? 'MP4, WebM, MOV' : 'PNG, JPG, GIF, WebP'} up to 50MB
+                      </p>
+                    )}
+                  </>
+                )}
+              </div>
+            );
+          })()
         )}
       </div>
 

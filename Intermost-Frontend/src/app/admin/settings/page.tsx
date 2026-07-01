@@ -19,7 +19,7 @@ import {
 import { coreApi } from '@/lib/services';
 import toast from 'react-hot-toast';
 import ImageUpload from '@/components/admin/ImageUpload';
-import { Camera, Image as ImageIcon } from 'lucide-react'; // additional icons
+import { Camera, Image as ImageIcon, Plus, Trash2, ArrowLeft, ArrowRight } from 'lucide-react'; // additional icons
 
 interface SiteSettings {
   site_name: string;
@@ -145,6 +145,36 @@ export default function SettingsPage() {
     } else {
       setSettings(prev => ({ ...prev, [name]: value }));
     }
+  };
+
+  const handleAddAboutImage = () => {
+    setSettings(prev => ({
+      ...prev,
+      about_images: [...(prev.about_images || []), '']
+    }));
+  };
+
+  const handleRemoveAboutImage = (idx: number) => {
+    setSettings(prev => ({
+      ...prev,
+      about_images: (prev.about_images || []).filter((_, i) => i !== idx)
+    }));
+  };
+
+  const handleMoveAboutImage = (idx: number, direction: 'left' | 'right') => {
+    const images = [...(settings.about_images || [])];
+    const targetIdx = direction === 'left' ? idx - 1 : idx + 1;
+    if (targetIdx < 0 || targetIdx >= images.length) return;
+    
+    // Swap elements
+    const temp = images[idx];
+    images[idx] = images[targetIdx];
+    images[targetIdx] = temp;
+    
+    setSettings(prev => ({
+      ...prev,
+      about_images: images
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -277,33 +307,90 @@ export default function SettingsPage() {
                   />
                 </div>
 
-                {/* About Us Page Images (Multiple Images!) */}
-                <div className="border-t border-gray-100 pt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    About Us Collage Gallery (Upload up to 3 images)
-                  </label>
-                  <div className="grid grid-cols-3 gap-4">
-                    {[0, 1, 2].map((idx) => {
-                      const currentVal = settings.about_images?.[idx] || '';
-                      return (
-                        <div key={idx} className="border border-gray-150 rounded-xl p-2 bg-gray-50 flex flex-col justify-between space-y-2">
-                          <span className="text-[10px] uppercase font-bold text-gray-400">Image {idx + 1}</span>
-                          <ImageUpload
-                            value={currentVal}
-                            onChange={(url) => {
-                              const newImages = [...(settings.about_images || [])];
-                              newImages[idx] = url;
-                              setSettings(prev => ({ ...prev, about_images: newImages.filter(x => x !== undefined) }));
-                            }}
-                            category="general"
-                            accept="image/*"
-                            previewClassName="h-20"
-                          />
+                {/* About Us Page Images (Dynamic Multiple Images!) */}
+                {(() => {
+                  const aboutImages = settings.about_images || [];
+                  return (
+                    <div className="border-t border-gray-100 pt-4 space-y-4">
+                      <div className="flex justify-between items-center">
+                        <label className="block text-sm font-semibold text-gray-700">
+                          About Us Collage Gallery ({aboutImages.length} images)
+                        </label>
+                        <button
+                          type="button"
+                          onClick={handleAddAboutImage}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-2.5 py-1.5 rounded-lg transition-colors"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          Add Gallery Image
+                        </button>
+                      </div>
+                      
+                      {aboutImages.length > 0 ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                          {aboutImages.map((currentVal, idx) => (
+                            <div key={idx} className="border border-gray-200 rounded-xl p-3 bg-gray-50 flex flex-col justify-between space-y-3 relative group">
+                              
+                              {/* Image title & controls header */}
+                              <div className="flex justify-between items-center border-b border-gray-100 pb-1.5 shrink-0">
+                                <span className="text-[10px] uppercase font-bold text-gray-400">
+                                  Image #{idx + 1}
+                                </span>
+                                
+                                <div className="flex items-center space-x-1">
+                                  {/* Reorder Left */}
+                                  <button
+                                    type="button"
+                                    disabled={idx === 0}
+                                    onClick={() => handleMoveAboutImage(idx, 'left')}
+                                    className="p-1 text-gray-400 hover:text-primary-600 disabled:opacity-30 transition-colors"
+                                    title="Move Left"
+                                  >
+                                    <ArrowLeft className="w-3 h-3" />
+                                  </button>
+                                  
+                                  {/* Reorder Right */}
+                                  <button
+                                    type="button"
+                                    disabled={idx === aboutImages.length - 1}
+                                    onClick={() => handleMoveAboutImage(idx, 'right')}
+                                    className="p-1 text-gray-400 hover:text-primary-600 disabled:opacity-30 transition-colors"
+                                    title="Move Right"
+                                  >
+                                    <ArrowRight className="w-3 h-3" />
+                                  </button>
+ 
+                                  {/* Delete */}
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveAboutImage(idx)}
+                                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                    title="Delete Image"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
+                                </div>
+                              </div>
+ 
+                              {/* Image Upload Input */}
+                              <ImageUpload
+                                value={currentVal}
+                                onChange={(url) => {
+                                  const newImages = [...aboutImages];
+                                  newImages[idx] = url;
+                                  setSettings(prev => ({ ...prev, about_images: newImages }));
+                                }}
+                                category="general"
+                                accept="image/*"
+                                previewClassName="h-24"
+                              />
+                            </div>
+                          ))}
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                      ) : null}
+                    </div>
+                  );
+                })()}
               </div>
             </motion.div>
 
