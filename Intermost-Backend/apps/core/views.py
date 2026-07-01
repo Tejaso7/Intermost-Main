@@ -287,10 +287,10 @@ class YouTubeShortListCreateView(APIView):
         """List active YouTube shorts."""
         collection = get_collection('youtube_shorts')
         # Allow filtering by all or only active shorts
-        is_active = request.query_params.get('is_active', 'true').lower() == 'true'
+        is_active_param = request.query_params.get('is_active', 'true')
         query = {}
-        if request.query_params.get('is_active'):
-            query['is_active'] = is_active
+        if is_active_param.lower() != 'all':
+            query['is_active'] = is_active_param.lower() == 'true'
             
         shorts = list(collection.find(query).sort('display_order', 1))
         

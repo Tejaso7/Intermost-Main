@@ -39,7 +39,7 @@ export default function YouTubeShortsSection() {
   if (loading || shorts.length === 0) return null;
 
   return (
-    <section className="py-20 bg-gray-50 dark:bg-gray-900/40 relative overflow-hidden">
+    <section className="py-20 bg-white dark:bg-gray-950 relative overflow-hidden border-t border-gray-100 dark:border-gray-900">
       {/* Background Decor */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-red-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary-500/5 rounded-full blur-3xl pointer-events-none" />
@@ -48,24 +48,24 @@ export default function YouTubeShortsSection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12">
           <div>
-            <span className="text-red-600 dark:text-red-400 text-sm font-bold tracking-widest uppercase block mb-3">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-red-50 dark:bg-red-950/20 text-red-600 border border-red-100 dark:border-red-900/30 mb-4">
               Campus Reel Highlights
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-gray-900 dark:text-white flex items-center gap-2">
-              <Youtube className="w-8 h-8 text-red-650" />
+              <Youtube className="w-8 h-8 text-red-600" />
               Student Life Shorts
             </h2>
-            <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-xl">
+            <p className="text-gray-550 dark:text-gray-400 mt-2 max-w-xl">
               Watch real testimonials, hostel tours, and campus experiences shared by students placed through Intermost.
             </p>
           </div>
 
           {/* Custom Navigation buttons */}
           <div className="flex gap-3 mt-6 md:mt-0">
-            <button className="swiper-shorts-prev w-12 h-12 rounded-full border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-450 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm">
+            <button className="swiper-shorts-prev w-12 h-12 rounded-full border border-gray-250 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-450 hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm cursor-pointer">
               <ChevronLeft className="w-5 h-5" />
             </button>
-            <button className="swiper-shorts-next w-12 h-12 rounded-full border border-gray-200 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-450 hover:bg-red-600 hover:text-white hover:border-red-600 transition-all shadow-sm">
+            <button className="swiper-shorts-next w-12 h-12 rounded-full border border-gray-250 dark:border-gray-800 flex items-center justify-center text-gray-600 dark:text-gray-450 hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm cursor-pointer">
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
