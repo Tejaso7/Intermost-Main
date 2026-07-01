@@ -1,90 +1,31 @@
 'use client';
-
-import React, { useState } from 'react';
+ 
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane } from 'lucide-react';
-
-interface GalleryItem {
-  id: string;
-  title: string;
-  category: 'campus' | 'hostel' | 'arrivals' | 'training';
-  categoryLabel: string;
-  image: string;
-  caption: string;
-  country: string;
-}
-
-const galleryItems: GalleryItem[] = [
-  {
-    id: '1',
-    title: 'Anatomy Lab Practicals',
-    category: 'training',
-    categoryLabel: 'Clinical Training',
-    image: '/images/russia/var.jpg',
-    caption: 'Students practicing real dissection and anatomical analysis under certified foreign professors.',
-    country: 'Russia',
-  },
-  {
-    id: '2',
-    title: 'Student Orientation Moscow',
-    category: 'arrivals',
-    categoryLabel: 'Arrival Orientations',
-    image: '/images/russia/yaro.jpg',
-    caption: 'Indian students orientation meeting at Yaroslavl State Medical University.',
-    country: 'Russia',
-  },
-  {
-    id: '3',
-    title: 'Indian Hostel Mess Dining',
-    category: 'hostel',
-    categoryLabel: 'Hostel & Food',
-    image: '/images/boys.jpg',
-    caption: 'A view of the hostel mess dining hall serving fresh, hot Indian lunch menu prepared by Indian chefs.',
-    country: 'Uzbekistan',
-  },
-  {
-    id: '4',
-    title: 'Clinical Diagnostics Lab',
-    category: 'training',
-    categoryLabel: 'Clinical Training',
-    image: '/images/russia/iva.jpg',
-    caption: 'Hands-on practice with hospital testing equipment at Volgograd Medical Academy diagnostics wing.',
-    country: 'Russia',
-  },
-  {
-    id: '5',
-    title: 'University Main Campus Walkway',
-    category: 'campus',
-    categoryLabel: 'Campus Life',
-    image: '/images/russia/bashkir.jpg',
-    caption: 'Group of Indian students in front of the main library gate at Bashkir State Medical University.',
-    country: 'Russia',
-  },
-  {
-    id: '6',
-    title: 'Departure Group Delhi Airport',
-    category: 'arrivals',
-    categoryLabel: 'Arrival Orientations',
-    image: '/images/BT.jpg',
-    caption: 'Orientation departure group flight boarding for Georgia & Russia batches at Delhi IGI Airport terminal.',
-    country: 'Georgia / Russia',
-  },
-  {
-    id: '7',
-    title: 'Pre-Departure Counseling Seminar',
-    category: 'arrivals',
-    categoryLabel: 'Arrival Orientations',
-    image: '/images/BT1.jpg',
-    caption: 'Parents and student counseling batch briefing seminar prior to visa allocations.',
-    country: 'General',
-  },
-];
+import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane, Loader2 } from 'lucide-react';
+import { glimpsesApi, Glimpse } from '@/lib/services';
 
 export default function GlimpseGallerySection() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [activePhoto, setActivePhoto] = useState<GalleryItem | null>(null);
+  const [activePhoto, setActivePhoto] = useState<Glimpse | null>(null);
   const [likes, setLikes] = useState<Record<string, number>>({});
+  const [galleryItems, setGalleryItems] = useState<Glimpse[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGlimpses = async () => {
+      try {
+        const data = await glimpsesApi.getAll();
+        setGalleryItems(data);
+      } catch (error) {
+        console.error('Error fetching glimpses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchGlimpses();
+  }, []);
 
   const filteredItems = galleryItems.filter(
     (item) => selectedCategory === 'all' || item.category === selectedCategory
@@ -104,6 +45,21 @@ export default function GlimpseGallerySection() {
     { id: 'training', label: 'Clinical Training', icon: GraduationCap },
   ];
 
+  if (loading) {
+    return (
+      <section className="py-24 bg-white relative flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
+          <p className="text-gray-550 text-sm">Loading student glimpses...</p>
+        </div>
+      </section>
+    );
+  }
+
+  if (galleryItems.length === 0) {
+    return null; // Skip section if no items
+  }
+
   return (
     <section className="py-24 bg-white relative">
       <div className="container-custom">
@@ -120,7 +76,7 @@ export default function GlimpseGallerySection() {
             Browse true images of university premises, modern classrooms, departure groups, and our dining halls serving home-style Indian food.
           </p>
         </div>
-
+ 
         {/* Categories Tab Selector */}
         <div className="flex flex-wrap items-center justify-center gap-2.5 mb-12">
           {categories.map((cat) => {
@@ -130,10 +86,10 @@ export default function GlimpseGallerySection() {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all ${
+                className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-primary text-white shadow-lg shadow-primary-500/15'
-                    : 'bg-gray-50 hover:bg-gray-100 text-gray-605 border border-gray-200'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-205'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -142,7 +98,7 @@ export default function GlimpseGallerySection() {
             );
           })}
         </div>
-
+ 
         {/* Gallery Grid */}
         <motion.div
           layout
@@ -151,7 +107,7 @@ export default function GlimpseGallerySection() {
           <AnimatePresence mode="popLayout">
             {filteredItems.map((item) => (
               <motion.div
-                key={item.id}
+                key={item._id}
                 layout
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -174,18 +130,18 @@ export default function GlimpseGallerySection() {
                       <ZoomIn className="w-5 h-5" />
                     </div>
                   </div>
-
+ 
                   {/* Country Flag Badge */}
                   <span className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/65 backdrop-blur-md text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-white/10">
                     {item.country}
                   </span>
-
+ 
                   {/* Category Badge */}
                   <span className="absolute top-4 right-4 z-20 px-2.5 py-1 bg-primary/85 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg shadow-sm">
                     {item.categoryLabel}
                   </span>
                 </div>
-
+ 
                 {/* Info Text footer */}
                 <div className="p-4 bg-white border-t border-gray-150 flex items-center justify-between z-20">
                   <div className="min-w-0 flex-1 pr-3">
@@ -197,15 +153,15 @@ export default function GlimpseGallerySection() {
                     </p>
                   </div>
                   <button
-                    onClick={(e) => handleLike(item.id, e)}
-                    className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-150 rounded-xl px-2.5 py-1"
+                    onClick={(e) => handleLike(item._id || '', e)}
+                    className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-150 rounded-xl px-2.5 py-1 cursor-pointer"
                   >
                     <Heart
                       className={`w-3.5 h-3.5 ${
-                        likes[item.id] ? 'text-red-500 fill-red-500' : 'text-gray-400'
+                        item._id && likes[item._id] ? 'text-red-500 fill-red-500' : 'text-gray-400'
                       }`}
                     />
-                    <span>{likes[item.id] || 0}</span>
+                    <span>{item._id ? likes[item._id] || 0 : 0}</span>
                   </button>
                 </div>
               </motion.div>
@@ -213,7 +169,7 @@ export default function GlimpseGallerySection() {
           </AnimatePresence>
         </motion.div>
       </div>
-
+ 
       {/* Full Screen Lightbox Modal */}
       <AnimatePresence>
         {activePhoto && (
@@ -226,7 +182,7 @@ export default function GlimpseGallerySection() {
               onClick={() => setActivePhoto(null)}
               className="absolute inset-0 bg-black/90 backdrop-blur-md"
             />
-
+ 
             {/* Modal Box */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -237,11 +193,11 @@ export default function GlimpseGallerySection() {
               {/* Close Button */}
               <button
                 onClick={() => setActivePhoto(null)}
-                className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 rounded-full text-white border border-white/10 transition-colors"
+                className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 rounded-full text-white border border-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
-
+ 
               {/* Photo Box */}
               <div className="relative flex-1 bg-black min-h-[300px] md:min-h-[460px]">
                 <Image
@@ -251,7 +207,7 @@ export default function GlimpseGallerySection() {
                   className="object-contain"
                 />
               </div>
-
+ 
               {/* Detail Description */}
               <div className="p-6 md:p-8 bg-gray-950 text-white space-y-3">
                 <div className="flex items-center gap-3">

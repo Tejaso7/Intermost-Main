@@ -385,6 +385,9 @@ export interface SiteSettings {
     years_experience: number;
     visa_success_rate: number;
   };
+  hero_bg_type?: 'image' | 'video';
+  hero_bg_url?: string;
+  about_images?: string[];
 }
 
 // Chat Types

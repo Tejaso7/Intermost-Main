@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import { coreApi } from '@/lib/services';
 import toast from 'react-hot-toast';
+import ImageUpload from '@/components/admin/ImageUpload';
+import { Camera, Image as ImageIcon } from 'lucide-react'; // additional icons
 
 interface SiteSettings {
   site_name: string;
@@ -44,6 +46,9 @@ interface SiteSettings {
     years_experience: number | '';
     visa_success_rate: number | '';
   };
+  hero_bg_type?: 'image' | 'video';
+  hero_bg_url?: string;
+  about_images?: string[];
 }
 
 export default function SettingsPage() {
@@ -77,6 +82,9 @@ export default function SettingsPage() {
       years_experience: 21,
       visa_success_rate: 99,
     },
+    hero_bg_type: 'image',
+    hero_bg_url: '/images/countries/russia.jpg',
+    about_images: ['/images/about.jpg'],
   });
 
   useEffect(() => {
@@ -214,6 +222,76 @@ export default function SettingsPage() {
       {activeTab === 'website' ? (
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Design & Media Settings */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <ImageIcon className="w-5 h-5 mr-2 text-primary-600" />
+                Landing Page & About Us Media
+              </h2>
+              <div className="space-y-6">
+                {/* Hero Background Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Hero Background Media Type
+                  </label>
+                  <select
+                    name="hero_bg_type"
+                    value={settings.hero_bg_type || 'image'}
+                    onChange={(e) => setSettings(prev => ({ ...prev, hero_bg_type: e.target.value as 'image' | 'video' }))}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent cursor-pointer"
+                  >
+                    <option value="image">Static Image</option>
+                    <option value="video">Background Video (MP4)</option>
+                  </select>
+                </div>
+
+                {/* Hero Background URL Uploader */}
+                <div>
+                  <ImageUpload
+                    label={settings.hero_bg_type === 'video' ? 'Hero Background Video' : 'Hero Background Image'}
+                    value={settings.hero_bg_url || ''}
+                    onChange={(url) => setSettings(prev => ({ ...prev, hero_bg_url: url }))}
+                    category={settings.hero_bg_type === 'video' ? 'videos' : 'general'}
+                    accept={settings.hero_bg_type === 'video' ? 'video/*' : 'image/*'}
+                    previewClassName="h-32"
+                  />
+                </div>
+
+                {/* About Us Page Images (Multiple Images!) */}
+                <div className="border-t border-gray-100 pt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    About Us Collage Gallery (Upload up to 3 images)
+                  </label>
+                  <div className="grid grid-cols-3 gap-4">
+                    {[0, 1, 2].map((idx) => {
+                      const currentVal = settings.about_images?.[idx] || '';
+                      return (
+                        <div key={idx} className="border border-gray-150 rounded-xl p-2 bg-gray-50 flex flex-col justify-between space-y-2">
+                          <span className="text-[10px] uppercase font-bold text-gray-400">Image {idx + 1}</span>
+                          <ImageUpload
+                            value={currentVal}
+                            onChange={(url) => {
+                              const newImages = [...(settings.about_images || [])];
+                              newImages[idx] = url;
+                              setSettings(prev => ({ ...prev, about_images: newImages.filter(x => x !== undefined) }));
+                            }}
+                            category="general"
+                            accept="image/*"
+                            previewClassName="h-20"
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
             {/* General Settings */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}

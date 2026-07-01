@@ -198,7 +198,10 @@ class SiteSettingsView(APIView):
                 'partner_universities': 35,
                 'years_experience': 21,
                 'visa_success_rate': 99
-            }
+            },
+            'hero_bg_type': 'image',
+            'hero_bg_url': '/images/countries/russia.jpg',
+            'about_images': ['/images/about.jpg']
         }
 
 
@@ -555,4 +558,211 @@ class BrochureDownloadIncrementView(APIView):
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
             
         return Response({'message': 'Download count updated'})
+
+
+class GlimpseListCreateView(APIView):
+    """List and create Glimpses (student real journeys)."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        collection = get_collection('glimpses')
+        glimpses = list(collection.find({}).sort('display_order', 1))
+        
+        # If collection is empty, seed default glimpses
+        if not glimpses:
+            self._seed_default_glimpses(collection)
+            glimpses = list(collection.find({}).sort('display_order', 1))
+            
+        serialized = []
+        for g in glimpses:
+            g['_id'] = str(g['_id'])
+            if 'created_at' in g and isinstance(g['created_at'], datetime):
+                g['created_at'] = g['created_at'].isoformat()
+            if 'updated_at' in g and isinstance(g['updated_at'], datetime):
+                g['updated_at'] = g['updated_at'].isoformat()
+            serialized.append(g)
+            
+        return Response(serialized)
+        
+    def post(self, request):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('glimpses')
+        data = request.data
+        
+        glimpse = {
+            'title': data.get('title', ''),
+            'category': data.get('category', 'campus'),
+            'categoryLabel': data.get('categoryLabel', 'Campus Life'),
+            'image': data.get('image', ''),
+            'caption': data.get('caption', ''),
+            'country': data.get('country', 'General'),
+            'display_order': int(data.get('display_order', 0)),
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        
+        result = collection.insert_one(glimpse)
+        glimpse['_id'] = str(result.inserted_id)
+        glimpse['created_at'] = glimpse['created_at'].isoformat()
+        glimpse['updated_at'] = glimpse['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'Glimpse created successfully',
+            'data': glimpse
+        }, status=status.HTTP_201_CREATED)
+        
+    def _seed_default_glimpses(self, collection):
+        default_glimpses = [
+            {
+                'title': 'Anatomy Lab Practicals',
+                'category': 'training',
+                'categoryLabel': 'Clinical Training',
+                'image': '/images/russia/var.jpg',
+                'caption': 'Students practicing real dissection and anatomical analysis under certified foreign professors.',
+                'country': 'Russia',
+                'display_order': 1,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Student Orientation Moscow',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/russia/yaro.jpg',
+                'caption': 'Indian students orientation meeting at Yaroslavl State Medical University.',
+                'country': 'Russia',
+                'display_order': 2,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Indian Hostel Mess Dining',
+                'category': 'hostel',
+                'categoryLabel': 'Hostel & Food',
+                'image': '/images/boys.jpg',
+                'caption': 'A view of the hostel mess dining hall serving fresh, hot Indian lunch menu prepared by Indian chefs.',
+                'country': 'Uzbekistan',
+                'display_order': 3,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Clinical Diagnostics Lab',
+                'category': 'training',
+                'categoryLabel': 'Clinical Training',
+                'image': '/images/russia/iva.jpg',
+                'caption': 'Hands-on practice with hospital testing equipment at Volgograd Medical Academy diagnostics wing.',
+                'country': 'Russia',
+                'display_order': 4,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'University Main Campus Walkway',
+                'category': 'campus',
+                'categoryLabel': 'Campus Life',
+                'image': '/images/russia/bashkir.jpg',
+                'caption': 'Group of Indian students in front of the main library gate at Bashkir State Medical University.',
+                'country': 'Russia',
+                'display_order': 5,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Departure Group Delhi Airport',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/BT.jpg',
+                'caption': 'Orientation departure group flight boarding for Georgia & Russia batches at Delhi IGI Airport terminal.',
+                'country': 'Georgia / Russia',
+                'display_order': 6,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Pre-Departure Counseling Seminar',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/BT1.jpg',
+                'caption': 'Parents and student counseling batch briefing seminar prior to visa allocations.',
+                'country': 'General',
+                'display_order': 7,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            }
+        ]
+        collection.insert_many(default_glimpses)
+
+
+class GlimpseDetailView(APIView):
+    """Retrieve, update, delete Glimpses."""
+    permission_classes = [AllowAny]
+    
+    def get(self, request, glimpse_id):
+        collection = get_collection('glimpses')
+        from bson.errors import InvalidId
+        try:
+            glimpse = collection.find_one({'_id': ObjectId(glimpse_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if not glimpse:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        glimpse['_id'] = str(glimpse['_id'])
+        if 'created_at' in glimpse and isinstance(glimpse['created_at'], datetime):
+            glimpse['created_at'] = glimpse['created_at'].isoformat()
+        if 'updated_at' in glimpse and isinstance(glimpse['updated_at'], datetime):
+            glimpse['updated_at'] = glimpse['updated_at'].isoformat()
+            
+        return Response(glimpse)
+        
+    def put(self, request, glimpse_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('glimpses')
+        data = request.data
+        data['updated_at'] = datetime.utcnow()
+        data.pop('_id', None)
+        
+        from bson.errors import InvalidId
+        try:
+            result = collection.update_one(
+                {'_id': ObjectId(glimpse_id)},
+                {'$set': data}
+            )
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.matched_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        updated = collection.find_one({'_id': ObjectId(glimpse_id)})
+        updated['_id'] = str(updated['_id'])
+        updated['created_at'] = updated['created_at'].isoformat()
+        updated['updated_at'] = updated['updated_at'].isoformat()
+        
+        return Response({
+            'message': 'Glimpse updated successfully',
+            'data': updated
+        })
+        
+    def delete(self, request, glimpse_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+            
+        collection = get_collection('glimpses')
+        from bson.errors import InvalidId
+        try:
+            result = collection.delete_one({'_id': ObjectId(glimpse_id)})
+        except InvalidId:
+            return Response({'error': 'Invalid ID'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        if result.deleted_count == 0:
+            return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        return Response({'message': 'Deleted successfully'}, status=status.HTTP_200_OK)
 

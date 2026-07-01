@@ -32,6 +32,10 @@ urlpatterns = [
     path('shorts/', views.YouTubeShortListCreateView.as_view(), name='shorts-list-create'),
     path('shorts/<str:short_id>/', views.YouTubeShortDetailView.as_view(), name='shorts-detail'),
 
+    # Student Glimpses / Real Student Journeys
+    path('glimpses/', views.GlimpseListCreateView.as_view(), name='glimpses-list-create'),
+    path('glimpses/<str:glimpse_id>/', views.GlimpseDetailView.as_view(), name='glimpses-detail'),
+
     # Brochures / Prospectuses
     path('brochures/', views.BrochureListCreateView.as_view(), name='brochures-list-create'),
     path('brochures/<str:brochure_id>/', views.BrochureDetailView.as_view(), name='brochures-detail'),

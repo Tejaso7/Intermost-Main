@@ -682,3 +682,38 @@ export const brochuresApi = {
     return response.data;
   },
 };
+
+export interface Glimpse {
+  _id?: string;
+  title: string;
+  category: 'campus' | 'hostel' | 'arrivals' | 'training';
+  categoryLabel: string;
+  image: string;
+  caption: string;
+  country: string;
+  display_order: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export const glimpsesApi = {
+  getAll: async () => {
+    const response = await api.get<Glimpse[]>('/glimpses/');
+    return response.data || [];
+  },
+  getById: async (id: string) => {
+    const response = await api.get<Glimpse>(`/glimpses/${id}/`);
+    return response.data;
+  },
+  create: async (data: Partial<Glimpse>) => {
+    const response = await api.post<{ message: string; data: Glimpse }>('/glimpses/', data);
+    return response.data.data;
+  },
+  update: async (id: string, data: Partial<Glimpse>) => {
+    const response = await api.put<{ message: string; data: Glimpse }>(`/glimpses/${id}/`, data);
+    return response.data.data;
+  },
+  delete: async (id: string) => {
+    await api.delete(`/glimpses/${id}/`);
+  },
+};

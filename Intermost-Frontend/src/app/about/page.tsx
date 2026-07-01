@@ -12,7 +12,7 @@ import {
   ExternalLink,
   Mail
 } from 'lucide-react';
-import { teamApi } from '@/lib/services';
+import { teamApi, coreApi } from '@/lib/services';
 import AboutStats from '@/components/about/AboutStats';
 
 export const metadata: Metadata = {
@@ -141,11 +141,13 @@ const offices = [
 export default async function AboutPage() {
   let teamMembersList: any[] = teamMembers;
   let officesList: any[] = offices;
+  let aboutImages: string[] = ['/images/about.jpg'];
 
   try {
-    const [fetchedTeam, fetchedOffices] = await Promise.all([
+    const [fetchedTeam, fetchedOffices, settings] = await Promise.all([
       teamApi.getAll(),
       teamApi.getOffices(),
+      coreApi.getSettings().catch(() => null),
     ]);
 
     if (fetchedTeam && fetchedTeam.length > 0) {
@@ -153,6 +155,9 @@ export default async function AboutPage() {
     }
     if (fetchedOffices && fetchedOffices.length > 0) {
       officesList = fetchedOffices.filter((o: any) => o.is_active !== false);
+    }
+    if (settings && settings.about_images && settings.about_images.length > 0) {
+      aboutImages = settings.about_images;
     }
   } catch (error) {
     console.debug('Failed to fetch data for AboutPage', error);
@@ -226,13 +231,51 @@ export default async function AboutPage() {
                 </div>
               </div>
             </div>
-            <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-              <Image
-                src="/images/about.jpg"
-                alt="Intermost Ventures Team"
-                fill
-                className="object-cover"
-              />
+            <div className="grid grid-cols-2 gap-4 h-96">
+              {aboutImages.length === 1 ? (
+                <div className="col-span-2 relative h-full rounded-2xl overflow-hidden shadow-xl">
+                  <Image
+                    src={aboutImages[0]}
+                    alt="Intermost Ventures Team"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : aboutImages.length === 2 ? (
+                aboutImages.map((img, idx) => (
+                  <div key={idx} className="relative h-full rounded-2xl overflow-hidden shadow-xl">
+                    <Image
+                      src={img}
+                      alt={`Intermost Ventures Team ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ))
+              ) : (
+                <>
+                  <div className="row-span-2 relative h-full rounded-2xl overflow-hidden shadow-xl col-span-1">
+                    <Image
+                      src={aboutImages[0]}
+                      alt="Intermost Ventures Team 1"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="space-y-4 flex flex-col h-full justify-between col-span-1">
+                    {aboutImages.slice(1, 3).map((img, idx) => (
+                      <div key={idx} className="relative flex-1 rounded-2xl overflow-hidden shadow-xl min-h-[110px]">
+                        <Image
+                          src={img}
+                          alt={`Intermost Ventures Team ${idx + 2}`}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

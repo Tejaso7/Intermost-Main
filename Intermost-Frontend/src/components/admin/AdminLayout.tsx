@@ -24,6 +24,7 @@ import {
   Database,
   MapPin,
   Youtube,
+  Camera,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { storage } from '@/lib/utils';
@@ -38,6 +39,7 @@ const navItems = [
   { name: 'News', href: '/admin/news', icon: Newspaper },
   { name: 'Testimonials', href: '/admin/testimonials', icon: Users },
   { name: 'YouTube Shorts', href: '/admin/shorts', icon: Youtube },
+  { name: 'Student Journeys', href: '/admin/glimpses', icon: Camera },
   { name: 'Brochures & Templates', href: '/admin/brochures', icon: FileText },
   { name: 'Leads Management', href: '/admin/leads', icon: MessageSquare },
   { name: 'Team', href: '/admin/team', icon: Users },

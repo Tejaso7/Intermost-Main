@@ -37,6 +37,8 @@ export default function Hero() {
     years_experience: 21,
     visa_success_rate: 99
   });
+  const [heroBgType, setHeroBgType] = useState<'image' | 'video'>('image');
+  const [heroBgUrl, setHeroBgUrl] = useState('/images/countries/russia.jpg');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -45,12 +47,22 @@ export default function Hero() {
         if (settings?.stats) {
           setSiteStats(settings.stats);
         }
+        if (settings?.hero_bg_type) {
+          setHeroBgType(settings.hero_bg_type);
+        }
+        if (settings?.hero_bg_url) {
+          setHeroBgUrl(settings.hero_bg_url);
+        }
       } catch (error) {
         console.debug('Failed to fetch stats for hero, using defaults', error);
       }
     };
     fetchStats();
   }, []);
+
+  useEffect(() => {
+    setVideoError(false);
+  }, [heroBgUrl, heroBgType]);
 
   const steps = [
     'Analyzing target destination qualifications...',
@@ -152,7 +164,7 @@ export default function Hero() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-[90px] pb-12 sm:pt-[100px] md:pt-[110px]">
       {/* Background Media */}
       <div className="absolute inset-0 z-0">
-        {!videoError ? (
+        {heroBgType === 'video' && !videoError ? (
           <video
             autoPlay
             loop
@@ -161,16 +173,18 @@ export default function Hero() {
             className="w-full h-full object-cover"
             poster="/images/countries/russia.jpg"
             onError={() => setVideoError(true)}
+            key={heroBgUrl} // Force re-render of video element when URL changes
           >
-            <source src="/video/hero.mp4" type="video/mp4" />
+            <source src={heroBgUrl} type="video/mp4" />
           </video>
         ) : (
           <Image
-            src="/images/countries/russia.jpg"
+            src={heroBgUrl}
             alt="Medical Education"
             fill
             className="object-cover scale-105 filter brightness-[0.7]"
             priority
+            key={heroBgUrl}
           />
         )}
         {/* Gradient Overlay */}
