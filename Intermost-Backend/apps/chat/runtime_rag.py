@@ -1,10 +1,10 @@
 import os
 import json
 import logging
+import math
+from collections import Counter
 from typing import List, Dict, Any, Optional
-import numpy as np
 from PyPDF2 import PdfReader
-from sentence_transformers import SentenceTransformer
 from groq import Groq
 from django.conf import settings
 
@@ -14,16 +14,6 @@ logger = logging.getLogger(__name__)
 TEMP_SESSIONS_DIR = os.path.join(settings.BASE_DIR, 'temp_sessions')
 if not os.path.exists(TEMP_SESSIONS_DIR):
     os.makedirs(TEMP_SESSIONS_DIR)
-
-# Initialize embedding model lazily
-_embedding_model = None
-
-def get_embedding_model():
-    global _embedding_model
-    if _embedding_model is None:
-        logger.info("Loading sentence-transformers model...")
-        _embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
-    return _embedding_model
 
 def extract_text_from_pdf(file_obj) -> str:
     """Extracts text from an uploaded PDF file."""
@@ -47,8 +37,66 @@ def chunk_text(text: str, chunk_size: int = 1000, overlap: int = 200) -> List[st
             start = 0
     return [c for c in chunks if c.strip()]
 
+def get_tfidf_similarity(query: str, documents: List[str]) -> List[float]:
+    """Simple, pure-Python TF-IDF cosine similarity search engine."""
+    # Tokenizer
+    def tokenize(text: str) -> List[str]:
+        return [w for w in text.lower().split() if w.isalnum()]
+    
+    query_tokens = tokenize(query)
+    doc_tokens_list = [tokenize(doc) for doc in documents]
+    
+    # Build vocabulary
+    all_tokens = set(query_tokens)
+    for doc_tokens in doc_tokens_list:
+        all_tokens.update(doc_tokens)
+        
+    # Calculate IDF
+    idf = {}
+    N = len(documents)
+    if N == 0:
+        return []
+        
+    for token in all_tokens:
+        df = sum(1 for doc_tokens in doc_tokens_list if token in doc_tokens)
+        # Avoid log(0)
+        idf[token] = math.log((1 + N) / (1 + df)) + 1
+        
+    # Helper to calculate TF-IDF vector
+    def get_vector(tokens: List[str]) -> Dict[str, float]:
+        counts = Counter(tokens)
+        vector = {}
+        for token, count in counts.items():
+            vector[token] = count * idf.get(token, 0.0)
+        return vector
+        
+    query_vector = get_vector(query_tokens)
+    doc_vectors = [get_vector(doc_tokens) for doc_tokens in doc_tokens_list]
+    
+    # Calculate magnitudes
+    def magnitude(v: Dict[str, float]) -> float:
+        return math.sqrt(sum(val ** 2 for val in v.values()))
+        
+    q_mag = magnitude(query_vector)
+    if q_mag == 0:
+        return [0.0] * N
+        
+    # Calculate cosine similarity for each document
+    similarities = []
+    for d_vec in doc_vectors:
+        d_mag = magnitude(d_vec)
+        if d_mag == 0:
+            similarities.append(0.0)
+        else:
+            # Dot product
+            overlap_tokens = set(query_vector.keys()) & set(d_vec.keys())
+            dot = sum(query_vector[token] * d_vec[token] for token in overlap_tokens)
+            similarities.append(dot / (q_mag * d_mag))
+            
+    return similarities
+
 class BrochureSessionManager:
-    """Manages the lifecycle of a runtime RAG session."""
+    """Manages the lifecycle of a runtime RAG session using pure-Python indexing."""
     
     @staticmethod
     def get_session_filepath(session_id: str) -> str:
@@ -58,7 +106,7 @@ class BrochureSessionManager:
 
     @staticmethod
     def create_session(session_id: str, file_obj) -> Dict[str, Any]:
-        """Reads PDF, chunks, creates embeddings, and saves to JSON."""
+        """Reads PDF, chunks, and saves to JSON."""
         filepath = BrochureSessionManager.get_session_filepath(session_id)
         
         # Extract and chunk
@@ -68,15 +116,11 @@ class BrochureSessionManager:
             
         chunks = chunk_text(text)
         
-        # Embed
-        model = get_embedding_model()
-        embeddings = model.encode(chunks)
-        
         # Save to JSON
         data = {
             "session_id": session_id,
             "chunks": chunks,
-            "embeddings": embeddings.tolist()  # Convert numpy array to list
+            "embeddings": []  # Kept empty for schema backward-compatibility
         }
         
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -95,7 +139,7 @@ class BrochureSessionManager:
 
     @staticmethod
     def search_context(session_id: str, query: str, top_k: int = 5) -> str:
-        """Finds most relevant chunks for a query from the stored JSON."""
+        """Finds most relevant chunks for a query using TF-IDF."""
         filepath = BrochureSessionManager.get_session_filepath(session_id)
         if not os.path.exists(filepath):
             raise FileNotFoundError("Session expired or not found. Please re-upload the brochure.")
@@ -104,33 +148,20 @@ class BrochureSessionManager:
             data = json.load(f)
             
         chunks = data.get('chunks', [])
-        saved_embeddings = np.array(data.get('embeddings', []))
-        
-        if not chunks or len(saved_embeddings) == 0:
+        if not chunks:
             return ""
             
-        # Embed query
-        model = get_embedding_model()
-        query_embedding = model.encode([query])[0]
+        # Calculate similarities
+        similarities = get_tfidf_similarity(query, chunks)
         
-        # Calculate cosine similarities
-        # normalized_dot_product
-        norm_query = np.linalg.norm(query_embedding)
-        norm_saved = np.linalg.norm(saved_embeddings, axis=1)
-        
-        # Avoid division by zero
-        norm_saved[norm_saved == 0] = 1e-10
-        norm_query = norm_query if norm_query > 0 else 1e-10
-        
-        similarities = np.dot(saved_embeddings, query_embedding) / (norm_saved * norm_query)
-        
-        # Get top k indices
-        top_indices = np.argsort(similarities)[::-1][:top_k]
+        # Sort indices by score
+        sorted_indices = sorted(range(len(similarities)), key=lambda i: similarities[i], reverse=True)
+        top_indices = sorted_indices[:top_k]
         
         # Format context
         context_parts = []
         for idx in top_indices:
-            if similarities[idx] > 0.1:  # Simple threshold
+            if similarities[idx] > 0.05:  # Simple threshold
                 context_parts.append(chunks[idx])
                 
         return "\n\n...\n\n".join(context_parts)
@@ -151,13 +182,13 @@ class BrochureChat:
         client = Groq(api_key=api_key)
         
         system_prompt = f"""You are a strict QA assistant. You have been provided with extracted text from a document uploaded by the user.
-
+ 
 YOUR INSTRUCTIONS:
 1. First, analyze the provided context to determine if it appears to be a college brochure, university prospectus, or educational program guide. Look for mentions of courses, fees, campus, admissions, etc.
 2. If the context does NOT look like a college brochure, YOU MUST reply EXACTLY with: "I can't answer these questions." and provide no other text.
 3. If it IS a brochure, answer the user's question USING ONLY the provided context.
 4. If the answer cannot be found in the provided context, state that you cannot find the answer in the document. Do NOT use outside knowledge.
-
+ 
 DOCUMENT CONTEXT:
 {context}
 """
