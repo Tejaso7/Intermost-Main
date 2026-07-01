@@ -4,13 +4,33 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Phone, ArrowRight, MessageCircle } from 'lucide-react';
 import { createWhatsAppLink } from '@/lib/utils';
-
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919058501818';
+import { useState, useEffect } from 'react';
+import { coreApi } from '@/lib/services';
 
 export default function CTASection() {
+  const [whatsappNumber, setWhatsappNumber] = useState('919058501818');
+  const [phoneNumber, setPhoneNumber] = useState('+91 9058501818');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.contact?.whatsapp) {
+          setWhatsappNumber(settings.contact.whatsapp.replace(/[^0-9]/g, ''));
+        }
+        if (settings?.contact?.phone) {
+          setPhoneNumber(settings.contact.phone);
+        }
+      } catch (err) {
+        console.debug('Failed to fetch settings for CTASection', err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   const handleWhatsApp = () => {
     const link = createWhatsAppLink(
-      WHATSAPP_NUMBER,
+      whatsappNumber,
       "Hi! I'm interested in MBBS abroad. Please provide more information about admission process and fees."
     );
     window.open(link, '_blank');
@@ -94,11 +114,11 @@ export default function CTASection() {
               </button>
               
               <a
-                href="tel:+919058501818"
+                href={`tel:${phoneNumber.replace(/\s/g, '')}`}
                 className="inline-flex items-center justify-center px-6 py-3 text-white font-semibold hover:text-white/80 transition-colors"
               >
                 <Phone className="mr-2 w-5 h-5" />
-                +91 9058501818
+                {phoneNumber}
               </a>
             </motion.div>
 

@@ -1,12 +1,13 @@
 'use client';
-
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+ 
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Save, ArrowLeft, Building, MapPin, Phone, Mail, Globe } from 'lucide-react';
+import { Save, ArrowLeft, Building, MapPin, Phone, Mail, Globe, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 import { teamApi } from '@/lib/services';
 import toast from 'react-hot-toast';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 interface OfficeFormData {
   name: string;
@@ -18,6 +19,7 @@ interface OfficeFormData {
   pincode: string;
   phone: string;
   email: string;
+  image_url: string;
   is_head_office: boolean;
   is_active: boolean;
   display_order: number;
@@ -33,15 +35,17 @@ const defaultFormData: OfficeFormData = {
   pincode: '',
   phone: '',
   email: 'admissionintermost@gmail.com',
+  image_url: '',
   is_head_office: false,
   is_active: true,
   display_order: 0,
 };
 
-export default function OfficeEditPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
+export default function OfficeEditPage() {
   const router = useRouter();
-  const isNew = resolvedParams.id === 'new';
+  const params = useParams();
+  const officeId = params.id as string;
+  const isNew = officeId === 'new';
   
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -51,11 +55,11 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
     if (!isNew) {
       fetchOffice();
     }
-  }, [resolvedParams.id]);
+  }, [officeId]);
 
   const fetchOffice = async () => {
     try {
-      const data = await teamApi.getOfficeById(resolvedParams.id);
+      const data = await teamApi.getOfficeById(officeId);
       if (data) {
         setFormData({
           name: data.name || '',
@@ -67,6 +71,7 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
           pincode: data.pincode || '',
           phone: data.phone || '',
           email: data.email || '',
+          image_url: data.image_url || '',
           is_head_office: data.is_head_office || false,
           is_active: data.is_active ?? true,
           display_order: data.display_order || 0,
@@ -91,6 +96,13 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
     }));
   };
 
+  const handleImageChange = (url: string) => {
+    setFormData(prev => ({
+      ...prev,
+      image_url: url
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -100,7 +112,7 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
         await teamApi.createOffice(formData);
         toast.success('Office created successfully');
       } else {
-        await teamApi.updateOffice(resolvedParams.id, formData);
+        await teamApi.updateOffice(officeId, formData);
         toast.success('Office updated successfully');
       }
       router.push('/admin/offices');
@@ -184,6 +196,28 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
           </div>
         </motion.div>
 
+        {/* Office Image */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 space-y-6"
+        >
+          <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+            <ImageIcon className="w-5 h-5 mr-2 text-primary-600" />
+            Office Photo
+          </h2>
+          <div>
+            <ImageUpload
+              value={formData.image_url}
+              onChange={handleImageChange}
+              category="general"
+              label="Upload Office Building or Branch Photo"
+              className="max-w-xl"
+            />
+          </div>
+        </motion.div>
+
         {/* Location Details */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -263,8 +297,6 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
                 />
               </div>
             </div>
-
-
           </div>
         </motion.div>
 
@@ -292,7 +324,8 @@ export default function OfficeEditPage({ params }: { params: Promise<{ id: strin
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 outline-none"
               />
-            </div>            <div>
+            </div>
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                 <Mail className="w-4 h-4 mr-1 text-gray-400" /> Email Address
               </label>

@@ -8,7 +8,7 @@ import { coreApi } from '@/lib/services';
 const fallbackStats = [
   { value: 5500, suffix: '+', label: 'Students Placed', key: 'students_placed' },
   { value: 35, suffix: '+', label: 'Partner Universities', key: 'partner_universities' },
-  { value: 21, suffix: '+', label: 'Years Experience', key: 'years_experience' },
+  { value: 23, suffix: '+', label: 'Years Experience', key: 'years_experience' },
   { value: 99, suffix: '%', label: 'Visa Success Rate', key: 'visa_success_rate' },
 ];
 
@@ -18,7 +18,7 @@ export default function AboutStats() {
   const [siteStats, setSiteStats] = useState({
     students_placed: 5500,
     partner_universities: 35,
-    years_experience: 21,
+    years_experience: 23,
     visa_success_rate: 99
   });
 
@@ -30,7 +30,7 @@ export default function AboutStats() {
           setSiteStats({
             students_placed: settings.stats.students_placed || 5500,
             partner_universities: settings.stats.partner_universities || 35,
-            years_experience: settings.stats.years_experience || 21,
+            years_experience: settings.stats.years_experience || 23,
             visa_success_rate: settings.stats.visa_success_rate || 99,
           });
         }

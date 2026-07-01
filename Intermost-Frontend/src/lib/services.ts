@@ -264,8 +264,8 @@ export const teamApi = {
     await api.delete(`/team/${id}/`);
   },
 
-  getOffices: async () => {
-    const response = await api.get<{ count: number; results: Office[] }>('/team/offices/');
+  getOffices: async (params?: { is_active?: string }) => {
+    const response = await api.get<{ count: number; results: Office[] }>('/team/offices/', { params });
     return response.data.results || [];
   },
 

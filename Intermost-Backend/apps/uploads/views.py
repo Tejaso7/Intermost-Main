@@ -87,13 +87,29 @@ class FileUploadView(APIView):
             # Generate unique filename
             filename = generate_filename(file.name)
             
-            # Save file using default_storage (Cloudinary or Local Media)
+            # Save file. For videos, save locally to bypass Cloudinary resource type constraints.
+            # For other categories, try Cloudinary first, falling back to local file storage.
             try:
                 save_path = f"uploads/{category}/{filename}"
-                saved_file_path = default_storage.save(save_path, file)
                 
-                # Retrieve URL
-                url_path = default_storage.url(saved_file_path)
+                if category == 'videos' or ext in ['.mp4', '.webm', '.mov']:
+                    # Force local file storage
+                    from django.core.files.storage import FileSystemStorage
+                    from django.conf import settings as django_settings
+                    local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url=django_settings.MEDIA_URL)
+                    saved_file_path = local_storage.save(save_path, file)
+                    url_path = local_storage.url(saved_file_path)
+                else:
+                    try:
+                        saved_file_path = default_storage.save(save_path, file)
+                        url_path = default_storage.url(saved_file_path)
+                    except Exception as cloudinary_err:
+                        logger.warning(f"Cloudinary upload failed, falling back to local storage: {cloudinary_err}")
+                        from django.core.files.storage import FileSystemStorage
+                        from django.conf import settings as django_settings
+                        local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url=django_settings.MEDIA_URL)
+                        saved_file_path = local_storage.save(save_path, file)
+                        url_path = local_storage.url(saved_file_path)
                 
                 # Ensure local URL starts with a slash
                 if not (url_path.startswith('http://') or url_path.startswith('https://')) and not url_path.startswith('/'):
@@ -107,7 +123,7 @@ class FileUploadView(APIView):
                     'category': category
                 })
                 
-                logger.info(f"File uploaded: {filename} to {category} via storage")
+                logger.info(f"File uploaded: {filename} to {category} successfully")
                 
             except Exception as e:
                 logger.error(f"Error uploading file {file.name}: {str(e)}")

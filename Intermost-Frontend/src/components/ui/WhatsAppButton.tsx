@@ -3,14 +3,29 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X } from 'lucide-react';
+import { coreApi } from '@/lib/services';
 import { createWhatsAppLink } from '@/lib/utils';
 
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919058501818';
 const DEFAULT_MESSAGE = "Hi! I'm interested in MBBS abroad. Please provide more information.";
 
 export default function WhatsAppButton() {
   const [isVisible, setIsVisible] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [whatsappNumber, setWhatsappNumber] = useState('919058501818');
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.contact?.whatsapp) {
+          setWhatsappNumber(settings.contact.whatsapp.replace(/[^0-9]/g, ''));
+        }
+      } catch (err) {
+        console.debug('Failed to fetch settings for WhatsAppButton', err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     // Show button after 2 seconds
@@ -36,7 +51,7 @@ export default function WhatsAppButton() {
   }, []);
 
   const handleClick = () => {
-    const link = createWhatsAppLink(WHATSAPP_NUMBER, DEFAULT_MESSAGE);
+    const link = createWhatsAppLink(whatsappNumber, DEFAULT_MESSAGE);
     window.open(link, '_blank');
   };
 

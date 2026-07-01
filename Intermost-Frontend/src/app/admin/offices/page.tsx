@@ -28,7 +28,7 @@ export default function OfficesPage() {
   const fetchOffices = async () => {
     try {
       setLoading(true);
-      const data = await teamApi.getOffices();
+      const data = await teamApi.getOffices({ is_active: 'all' });
       setOffices(data);
     } catch (error) {
       toast.error('Failed to fetch offices');

@@ -723,6 +723,7 @@ export interface Office {
   phone: string;
   email: string;
   country: string;
+  image_url?: string;
 }
 
 export const offices: Office[] = [

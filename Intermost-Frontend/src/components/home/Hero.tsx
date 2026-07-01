@@ -34,7 +34,7 @@ export default function Hero() {
   const [siteStats, setSiteStats] = useState({
     students_placed: 5500,
     partner_universities: 35,
-    years_experience: 21,
+    years_experience: 23,
     visa_success_rate: 99
   });
   const [heroBgType, setHeroBgType] = useState<'image' | 'video'>('image');

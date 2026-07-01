@@ -138,7 +138,14 @@ class OfficeListView(APIView):
     def get(self, request):
         collection = get_collection('offices')
         
-        offices = list(collection.find({'is_active': True}).sort('display_order', 1))
+        is_active_filter = request.query_params.get('is_active', 'true').lower()
+        query = {}
+        if is_active_filter == 'true':
+            query['is_active'] = True
+        elif is_active_filter == 'false':
+            query['is_active'] = False
+        
+        offices = list(collection.find(query).sort('display_order', 1))
         
         return Response({
             'count': len(offices),
@@ -160,6 +167,7 @@ class OfficeListView(APIView):
             'phone': data.get('phone', ''),
             'email': data.get('email', 'admissionintermost@gmail.com'),
             'map_url': data.get('map_url', ''),
+            'image_url': data.get('image_url', ''),
             'is_active': data.get('is_active', True),
             'is_head_office': data.get('is_head_office', False),
             'display_order': data.get('display_order', 0),

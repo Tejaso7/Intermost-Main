@@ -352,6 +352,7 @@ export interface Office {
   country: string;
   phone: string;
   email: string;
+  image_url?: string;
   is_head_office: boolean;
   is_active: boolean;
   display_order: number;

@@ -79,7 +79,7 @@ export default function SettingsPage() {
     stats: {
       students_placed: 5500,
       partner_universities: 35,
-      years_experience: 21,
+      years_experience: 23,
       visa_success_rate: 99,
     },
     hero_bg_type: 'image',
@@ -92,7 +92,16 @@ export default function SettingsPage() {
       try {
         const data = await coreApi.getSettings();
         if (data) {
-          setSettings(prev => ({ ...prev, ...data }));
+          const raw = data as any;
+          setSettings(prev => ({
+            ...prev,
+            ...data,
+            contact_email: data.contact?.email || raw.contact_email || '',
+            contact_phone: data.contact?.phone || raw.contact_phone || '',
+            contact_phone_alt: raw.contact_phone_alt || '',
+            whatsapp_number: data.contact?.whatsapp || raw.whatsapp_number || '',
+            address: data.contact?.address || raw.address || '',
+          }));
         }
       } catch (error) {
         console.debug('Using default settings');
@@ -142,9 +151,15 @@ export default function SettingsPage() {
     e.preventDefault();
     setSaving(true);
 
-    // Ensure empty stats fallback to 0 before saving
+    // Ensure empty stats fallback to 0 before saving, and map contact fields
     const payloadToSave = {
       ...settings,
+      contact: {
+        email: settings.contact_email,
+        phone: settings.contact_phone,
+        whatsapp: settings.whatsapp_number,
+        address: settings.address,
+      },
       stats: {
         students_placed: settings.stats?.students_placed || 0,
         partner_universities: settings.stats?.partner_universities || 0,

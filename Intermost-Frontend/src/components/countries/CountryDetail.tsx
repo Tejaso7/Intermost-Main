@@ -12,6 +12,7 @@ import {
   CheckCircle,
   ChevronDown,
   ChevronUp,
+  ChevronRight,
   Play,
   MapPin,
   Phone,
@@ -352,67 +353,94 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {colleges.map((college, index) => (
-                <motion.div
-                  key={college._id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                >
-                  <Link
-                    href={`/colleges/${college.slug}`}
-                    className="card p-6 block hover:shadow-xl transition-shadow"
+              {colleges.map((college, index) => {
+                const bannerImage = college.banner_image || '/images/countries/russia.jpg';
+                return (
+                  <motion.div
+                    key={college._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
                   >
-                    <div className="flex items-start mb-4">
-                      {college.logo ? (
+                    <Link
+                      href={`/colleges/${college.slug}`}
+                      className="group bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full"
+                    >
+                      {/* Top banner image */}
+                      <div className="relative h-48 w-full bg-gray-100 overflow-hidden shrink-0">
                         <Image
-                          src={college.logo}
+                          src={bannerImage}
                           alt={college.name}
-                          width={60}
-                          height={60}
-                          className="rounded-lg mr-4"
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                      ) : (
-                        <div className="w-15 h-15 bg-primary-100 rounded-lg flex items-center justify-center mr-4">
-                          <Building className="w-8 h-8 text-primary-600" />
-                        </div>
-                      )}
-                      <div>
-                        <h3 className="font-semibold text-gray-900 line-clamp-2">
-                          {college.name}
-                        </h3>
-                        {college.contact?.city ? (
-                          <div className="flex items-center text-sm text-gray-500 mb-3">
-                            <MapPin className="w-4 h-4 mr-1 text-primary-500" />
-                            {college.contact?.city}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 to-transparent" />
+                        
+                        {/* Established badge overlay */}
+                        {college.overview?.established_year && (
+                          <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider">
+                            Est. {college.overview.established_year}
                           </div>
-                        ) : null}
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {college.recognition?.slice(0, 3).map((rec) => (
-                        <span
-                          key={rec.name}
-                          className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded"
-                        >
-                          {rec.name}
-                        </span>
-                      ))}
-                    </div>
+                        )}
+                        
+                        {/* World rank overlay */}
+                        {college.rankings?.world_rank && (
+                          <div className="absolute top-3 right-3 bg-primary-600 text-white px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider">
+                            Rank #{college.rankings.world_rank}
+                          </div>
+                        )}
 
-                    {college.fees?.total_package && (
-                      <p className="text-sm text-gray-600">
-                        <span className="font-semibold text-primary-600">
-                          {college.fees.total_package}
-                        </span>{' '}
-                        Total Fee
-                      </p>
-                    )}
-                  </Link>
-                </motion.div>
-              ))}
+                        {/* Title overlap on image */}
+                        <div className="absolute bottom-3 left-3 right-3 text-white">
+                          <h3 className="font-bold text-shadow-md text-base leading-snug line-clamp-2">
+                            {college.name}
+                          </h3>
+                        </div>
+                      </div>
+
+                      {/* Info body */}
+                      <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
+                        <div className="space-y-3">
+                          {/* Location */}
+                          {college.contact?.city && (
+                            <div className="flex items-center text-xs text-gray-500">
+                              <MapPin className="w-3.5 h-3.5 mr-1.5 text-primary-500 shrink-0" />
+                              <span>{college.contact.city}</span>
+                            </div>
+                          )}
+
+                          {/* Approval tags */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {college.recognition?.slice(0, 3).map((rec) => (
+                              <span
+                                key={rec.name}
+                                className="px-2 py-0.5 bg-green-50 text-green-700 border border-green-150 text-[10px] font-bold uppercase rounded-md"
+                              >
+                                {rec.name}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Cost footer */}
+                        <div className="pt-3.5 border-t border-gray-100 flex items-center justify-between">
+                          <div>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Course Fee</span>
+                            <span className="text-base font-extrabold text-primary-600">
+                              {college.fees?.total_package || 'Contact Us'}
+                            </span>
+                          </div>
+                          <span className="inline-flex items-center gap-0.5 text-xs font-bold text-primary group-hover:translate-x-1 transition-transform">
+                            View Details
+                            <ChevronRight className="w-3.5 h-3.5" />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
         </section>
