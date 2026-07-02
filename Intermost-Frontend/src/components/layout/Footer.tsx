@@ -50,7 +50,7 @@ export default function Footer() {
         if (settings && settings.contact) {
           setContact({
             phone1: settings.contact.phone || '+91 9058501818',
-            phone2: settings.contact.whatsapp || '+91 9837533887',
+            phone2: settings.contact.alt_phone || settings.contact.whatsapp || '+91 9837533887',
             email: settings.contact.email || 'admissionintermost@gmail.com',
             address: settings.contact.address || 'Shop no -1, First floor, Vinayak Mall, Agra',
           });

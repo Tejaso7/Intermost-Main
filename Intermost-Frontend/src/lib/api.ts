@@ -366,6 +366,7 @@ export interface SiteSettings {
   contact: {
     email: string;
     phone: string;
+    alt_phone?: string;
     whatsapp: string;
     address: string;
   };

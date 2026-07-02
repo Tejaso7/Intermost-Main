@@ -98,7 +98,7 @@ export default function SettingsPage() {
             ...data,
             contact_email: data.contact?.email || raw.contact_email || '',
             contact_phone: data.contact?.phone || raw.contact_phone || '',
-            contact_phone_alt: raw.contact_phone_alt || '',
+            contact_phone_alt: data.contact?.alt_phone || raw.contact_phone_alt || '',
             whatsapp_number: data.contact?.whatsapp || raw.whatsapp_number || '',
             address: data.contact?.address || raw.address || '',
           }));
@@ -187,6 +187,7 @@ export default function SettingsPage() {
       contact: {
         email: settings.contact_email,
         phone: settings.contact_phone,
+        alt_phone: settings.contact_phone_alt,
         whatsapp: settings.whatsapp_number,
         address: settings.address,
       },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +14,7 @@ import {
   Clock,
   CheckCircle
 } from 'lucide-react';
-import { inquiriesApi } from '@/lib/services';
+import { inquiriesApi, coreApi } from '@/lib/services';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
@@ -41,6 +41,31 @@ const countries = [
 export default function ContactSection() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [contact, setContact] = useState({
+    phone1: '+91 9058501818',
+    phone2: '+91 9837533887',
+    email: 'admissionintermost@gmail.com',
+    address: 'Shop no -1, First floor, Vinayak Mall,\nM G Road, Agra, 282002 (U.P), India',
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings && settings.contact) {
+          setContact({
+            phone1: settings.contact.phone || '+91 9058501818',
+            phone2: settings.contact.alt_phone || settings.contact.whatsapp || '+91 9837533887',
+            email: settings.contact.email || 'admissionintermost@gmail.com',
+            address: settings.contact.address || 'Shop no -1, First floor, Vinayak Mall,\nM G Road, Agra, 282002 (U.P), India',
+          });
+        }
+      } catch (err) {
+        console.debug('Failed to fetch settings for ContactSection', err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   const {
     register,
@@ -106,7 +131,7 @@ export default function ContactSection() {
             {/* Contact Cards */}
             <div className="space-y-4 mb-8">
               <a
-                href="tel:+919058501818"
+                href={`tel:${contact.phone1.replace(/\s/g, '')}`}
                 className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-primary-50 transition-colors group"
               >
                 <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary-600 transition-colors">
@@ -114,13 +139,13 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Call Us</h4>
-                  <p className="text-gray-600">+91 9058501818</p>
-                  <p className="text-gray-600">+91 9837533887</p>
+                  <p className="text-gray-600">{contact.phone1}</p>
+                  {contact.phone2 && <p className="text-gray-600">{contact.phone2}</p>}
                 </div>
               </a>
 
               <a
-                href="mailto:admissionintermost@gmail.com"
+                href={`mailto:${contact.email}`}
                 className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-primary-50 transition-colors group"
               >
                 <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary-600 transition-colors">
@@ -128,7 +153,7 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Email Us</h4>
-                  <p className="text-gray-600">admissionintermost@gmail.com</p>
+                  <p className="text-gray-600">{contact.email}</p>
                 </div>
               </a>
 
@@ -138,10 +163,8 @@ export default function ContactSection() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Visit Us</h4>
-                  <p className="text-gray-600">
-                    Shop no -1, First floor, Vinayak Mall,
-                    <br />
-                    M G Road, Agra, 282002 (U.P), India
+                  <p className="text-gray-600 whitespace-pre-line">
+                    {contact.address}
                   </p>
                 </div>
               </div>
