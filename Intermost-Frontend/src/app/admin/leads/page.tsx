@@ -113,6 +113,63 @@ export default function LeadsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedLead, setSelectedLead] = useState<Inquiry | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    country_code: '',
+    phone: '',
+    interested_country: '',
+    neet_score: '',
+  });
+
+  useEffect(() => {
+    if (selectedLead) {
+      setEditForm({
+        name: selectedLead.name || '',
+        email: selectedLead.email || '',
+        country_code: selectedLead.country_code || '+91',
+        phone: selectedLead.phone || '',
+        interested_country: selectedLead.interested_country || '',
+        neet_score: selectedLead.neet_score !== undefined ? String(selectedLead.neet_score) : '',
+      });
+      setIsEditing(false);
+    }
+  }, [selectedLead]);
+
+  const handleSaveEdit = async () => {
+    if (!selectedLead) return;
+    if (!editForm.name.trim() || !editForm.email.trim() || !editForm.phone.trim()) {
+      toast.error("Name, email and phone number are required!");
+      return;
+    }
+
+    setIsSavingEdit(true);
+    try {
+      const payload: any = {
+        name: editForm.name.trim(),
+        email: editForm.email.trim(),
+        country_code: editForm.country_code.trim(),
+        phone: editForm.phone.trim(),
+        preferred_country: editForm.interested_country.trim(),
+        interested_country: editForm.interested_country.trim(),
+        neet_score: editForm.neet_score ? parseInt(editForm.neet_score, 10) : '',
+      };
+      
+      await inquiriesApi.update(selectedLead._id, payload);
+      toast.success("Lead details updated successfully!");
+      setIsEditing(false);
+      setSelectedLead(null);
+      fetchLeads();
+      fetchStats();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || "Failed to save lead updates");
+    } finally {
+      setIsSavingEdit(false);
+    }
+  };
+  
   
   // Selection state
   const [selectedLeadIds, setSelectedLeadIds] = useState<string[]>([]);
@@ -2166,59 +2223,134 @@ export default function LeadsPage() {
               </div>
 
               <div className="space-y-4 text-sm">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</label>
-                    <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedLead.name}</p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</label>
-                    <p className="mt-0.5">
-                      <span className={cn(
-                        'px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider',
-                        statusColors[selectedLead.status]
-                      )}>
-                        {selectedLead.status}
-                      </span>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
-                    <p className="font-semibold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      {selectedLead.email}
-                    </p>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</label>
-                    <p className="font-semibold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      {selectedLead.country_code} {selectedLead.phone}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  {selectedLead.interested_country && (
+                {isEditing ? (
+                  <>
                     <div>
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Preferred Destination</label>
-                      <p className="font-medium text-gray-900 dark:text-white mt-0.5">{selectedLead.interested_country}</p>
+                      <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Name *</label>
+                      <input
+                        type="text"
+                        value={editForm.name}
+                        onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                        className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-semibold"
+                        placeholder="Lead Name"
+                        required
+                      />
                     </div>
-                  )}
-                  {selectedLead.neet_score && (
-                    <div>
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">NEET Score</label>
-                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedLead.neet_score}</p>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Email Address *</label>
+                        <input
+                          type="email"
+                          value={editForm.email}
+                          onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-semibold"
+                          placeholder="Email Address"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Phone Number *</label>
+                        <div className="flex mt-1">
+                          <input
+                            type="text"
+                            value={editForm.country_code}
+                            onChange={(e) => setEditForm({ ...editForm, country_code: e.target.value })}
+                            className="w-16 px-2 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-l-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white text-center font-semibold"
+                            placeholder="+91"
+                          />
+                          <input
+                            type="tel"
+                            value={editForm.phone}
+                            onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                            className="flex-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-l-0 border-gray-250 dark:border-gray-800 rounded-r-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-semibold"
+                            placeholder="Phone Number"
+                            required
+                          />
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Preferred Destination</label>
+                        <input
+                          type="text"
+                          value={editForm.interested_country}
+                          onChange={(e) => setEditForm({ ...editForm, interested_country: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-medium"
+                          placeholder="e.g. Russia"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">NEET Score</label>
+                        <input
+                          type="number"
+                          value={editForm.neet_score}
+                          onChange={(e) => setEditForm({ ...editForm, neet_score: e.target.value })}
+                          className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-semibold"
+                          placeholder="e.g. 350"
+                        />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Name</label>
+                        <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedLead.name}</p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</label>
+                        <p className="mt-0.5">
+                          <span className={cn(
+                            'px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider',
+                            statusColors[selectedLead.status]
+                          )}>
+                            {selectedLead.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
+                        <p className="font-semibold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
+                          <Mail className="w-4 h-4 text-gray-400" />
+                          {selectedLead.email}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</label>
+                        <p className="font-semibold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
+                          <Phone className="w-4 h-4 text-gray-400" />
+                          {selectedLead.country_code} {selectedLead.phone}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      {selectedLead.interested_country && (
+                        <div>
+                          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Preferred Destination</label>
+                          <p className="font-medium text-gray-900 dark:text-white mt-0.5">{selectedLead.interested_country}</p>
+                        </div>
+                      )}
+                      {selectedLead.neet_score && (
+                        <div>
+                          <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">NEET Score</label>
+                          <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedLead.neet_score}</p>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
 
                 <div>
                   <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Source</label>
-                  <p className="font-semibold text-gray-950 dark:text-white mt-0.5 capitalize">{selectedLead.source.replace(/_/g, ' ')}</p>
+                  <p className="font-semibold text-gray-955 dark:text-white mt-0.5 capitalize">{selectedLead.source.replace(/_/g, ' ')}</p>
                 </div>
 
                 {selectedLead.message && (
@@ -2257,43 +2389,82 @@ export default function LeadsPage() {
               </div>
 
               <div className="mt-8 pt-4 border-t border-gray-100 dark:border-gray-800 flex flex-wrap justify-end gap-3">
-                <button
-                  onClick={() => setSelectedLead(null)}
-                  className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Close Detail
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedLeadIds([selectedLead._id]);
-                    setActiveTab('campaign');
-                    setSelectedLead(null);
-                    toast.success(`Drafting email to ${selectedLead.name}`);
-                  }}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
-                >
-                  <Mail className="w-4 h-4" />
-                  Send Email
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedLeadIds([selectedLead._id]);
-                    setActiveTab('whatsapp');
-                    setSelectedLead(null);
-                    toast.success(`Drafting WhatsApp message for ${selectedLead.name}`);
-                  }}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Send WhatsApp
-                </button>
-                <a
-                  href={`tel:${selectedLead.country_code}${selectedLead.phone}`}
-                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-primary-500/10 transition-colors"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call Now
-                </a>
+                {isEditing ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditing(false)}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSaveEdit}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-primary-500/10 transition-colors disabled:opacity-50"
+                    >
+                      {isSavingEdit ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-4 h-4" />
+                          Save Changes
+                        </>
+                      )}
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => setSelectedLead(null)}
+                      className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-750 dark:text-gray-300 rounded-xl font-semibold hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      Close Detail
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="px-4 py-2 bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900 rounded-xl font-semibold hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors"
+                    >
+                      Edit Details
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedLeadIds([selectedLead._id]);
+                        setActiveTab('campaign');
+                        setSelectedLead(null);
+                        toast.success(`Drafting email to ${selectedLead.name}`);
+                      }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Send Email
+                    </button>
+                    <button
+                      onClick={() => {
+                        setSelectedLeadIds([selectedLead._id]);
+                        setActiveTab('whatsapp');
+                        setSelectedLead(null);
+                        toast.success(`Drafting WhatsApp message for ${selectedLead.name}`);
+                      }}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-sm transition-colors"
+                    >
+                      <MessageSquare className="w-4 h-4" />
+                      Send WhatsApp
+                    </button>
+                    <a
+                      href={`tel:${selectedLead.country_code}${selectedLead.phone}`}
+                      className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-lg shadow-primary-500/10 transition-colors"
+                    >
+                      <Phone className="w-4 h-4" />
+                      Call Now
+                    </a>
+                  </>
+                )}
               </div>
             </div>
           </div>

@@ -178,6 +178,11 @@ export const inquiriesApi = {
     return response.data;
   },
 
+  update: async (id: string, data: Partial<Inquiry>) => {
+    const response = await api.put<{ message: string; data: Inquiry }>(`/inquiries/${id}/`, data);
+    return response.data.data;
+  },
+
   updateStatus: async (id: string, status: string) => {
     const response = await api.patch<Inquiry>(`/inquiries/${id}/status/`, { status });
     return response.data;
