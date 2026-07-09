@@ -120,15 +120,15 @@ export default function GlimpseGallerySection() {
     const fetchGlimpses = async () => {
       try {
         const data = await glimpsesApi.getAll();
-        const combined = [...(data || []), ...localGlimpses];
-        // Remove duplicates based on image url
-        const unique = combined.filter((v, i, a) => a.findIndex(t => t.image === v.image) === i);
-        // Sort by display order
-        unique.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
-        setGalleryItems(unique);
+        if (data && data.length > 0) {
+          const sorted = [...data].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+          setGalleryItems(sorted);
+        } else {
+          setGalleryItems([]);
+        }
       } catch (error) {
-        console.error('Error fetching glimpses, using fallbacks:', error);
-        setGalleryItems(localGlimpses);
+        console.error('Error fetching glimpses:', error);
+        setGalleryItems([]);
       } finally {
         setLoading(false);
       }

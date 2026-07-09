@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { Star, Quote, Play } from 'lucide-react';
-import { testimonialsApi } from '@/lib/services';
+import { testimonialsApi, coreApi } from '@/lib/services';
 import type { Testimonial } from '@/lib/api';
 import { getInitials } from '@/lib/utils';
 
@@ -148,6 +148,7 @@ const fallbackTestimonials: Testimonial[] = [
 export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
   const [loading, setLoading] = useState(true);
+  const [marqueeImages, setMarqueeImages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -163,7 +164,22 @@ export default function TestimonialsSection() {
       }
     };
 
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings && settings.alumni_marquee_images && settings.alumni_marquee_images.length > 0) {
+          setMarqueeImages(settings.alumni_marquee_images);
+        } else {
+          setMarqueeImages([...Array(15)].map((_, i) => `/images/alu/alumini pdf-images-${i}-min.jpg`));
+        }
+      } catch (error) {
+        console.error('Error fetching settings for marquee:', error);
+        setMarqueeImages([...Array(15)].map((_, i) => `/images/alu/alumini pdf-images-${i}-min.jpg`));
+      }
+    };
+
     fetchTestimonials();
+    fetchSettings();
   }, []);
 
   return (
@@ -283,55 +299,57 @@ export default function TestimonialsSection() {
         </motion.div>
 
         {/* Alumni Documents Marquee */}
-        <div className="mt-20 border-t border-white/10 pt-16">
-          <div className="text-center mb-10">
-            <span className="text-primary-300 font-semibold text-xs uppercase tracking-wider">
-              Verified Records
-            </span>
-            <h3 className="text-2xl md:text-3xl font-bold text-white mt-1">Our Successful Alumni Placements</h3>
-            <p className="text-primary-200 text-sm mt-2 max-w-xl mx-auto">
-              Glance at the historical admissions, visa copies, and university allocations of students placed by Intermost.
-            </p>
-          </div>
+        {marqueeImages.length > 0 && (
+          <div className="mt-20 border-t border-white/10 pt-16">
+            <div className="text-center mb-10">
+              <span className="text-primary-300 font-semibold text-xs uppercase tracking-wider">
+                Verified Records
+              </span>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mt-1">Our Successful Alumni Placements</h3>
+              <p className="text-primary-200 text-sm mt-2 max-w-xl mx-auto">
+                Glance at the historical admissions, visa copies, and university allocations of students placed by Intermost.
+              </p>
+            </div>
 
-          <div className="relative overflow-hidden w-full py-4">
-            {/* Gradient overlays for smooth fade effect */}
-            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-primary-900 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary-900 to-transparent z-10 pointer-events-none" />
-            
-            <div className="flex animate-marquee-alumni whitespace-nowrap gap-6 w-max">
-              {/* First loop of images */}
-              <div className="flex gap-6 shrink-0">
-                {[...Array(15)].map((_, idx) => (
-                  <div key={`marquee-1-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
-                    <Image
-                      src={`/images/alu/alumini pdf-images-${idx}-min.jpg`}
-                      alt={`Alumni placement record ${idx + 1}`}
-                      fill
-                      sizes="280px"
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
+            <div className="relative overflow-hidden w-full py-4">
+              {/* Gradient overlays for smooth fade effect */}
+              <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-primary-900 to-transparent z-10 pointer-events-none" />
+              <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary-900 to-transparent z-10 pointer-events-none" />
               
-              {/* Duplicate loop for infinite sliding */}
-              <div className="flex gap-6 shrink-0">
-                {[...Array(15)].map((_, idx) => (
-                  <div key={`marquee-2-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
-                    <Image
-                      src={`/images/alu/alumini pdf-images-${idx}-min.jpg`}
-                      alt={`Alumni placement record ${idx + 1} clone`}
-                      fill
-                      sizes="280px"
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+              <div className="flex animate-marquee-alumni whitespace-nowrap gap-6 w-max">
+                {/* First loop of images */}
+                <div className="flex gap-6 shrink-0">
+                  {marqueeImages.map((src, idx) => (
+                    <div key={`marquee-1-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
+                      <Image
+                        src={src}
+                        alt={`Alumni placement record ${idx + 1}`}
+                        fill
+                        sizes="280px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Duplicate loop for infinite sliding */}
+                <div className="flex gap-6 shrink-0">
+                  {marqueeImages.map((src, idx) => (
+                    <div key={`marquee-2-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
+                      <Image
+                        src={src}
+                        alt={`Alumni placement record ${idx + 1} clone`}
+                        fill
+                        sizes="280px"
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <style jsx global>{`

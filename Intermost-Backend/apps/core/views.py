@@ -201,7 +201,8 @@ class SiteSettingsView(APIView):
             },
             'hero_bg_type': 'image',
             'hero_bg_url': '/images/countries/russia.jpg',
-            'about_images': ['/images/about.jpg']
+            'about_images': ['/images/about.jpg'],
+            'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)]
         }
 
 

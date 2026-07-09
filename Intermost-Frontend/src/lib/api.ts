@@ -390,6 +390,7 @@ export interface SiteSettings {
   hero_bg_type?: 'image' | 'video';
   hero_bg_url?: string;
   about_images?: string[];
+  alumni_marquee_images?: string[];
 }
 
 // Chat Types

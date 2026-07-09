@@ -1379,6 +1379,8 @@ def seed_site_settings():
             'years_experience': 21,
             'visa_success_rate': 99
         },
+        'about_images': ['/images/about.jpg'],
+        'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)],
         'updated_at': datetime.utcnow()
     }
     
