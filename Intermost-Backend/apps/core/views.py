@@ -199,8 +199,8 @@ class SiteSettingsView(APIView):
                 'years_experience': 23,
                 'visa_success_rate': 99
             },
-            'hero_bg_type': 'image',
-            'hero_bg_url': '/images/countries/russia.jpg',
+            'hero_bg_type': 'video',
+            'hero_bg_url': 'https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4',
             'about_images': ['/images/about.jpg'],
             'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)]
         }

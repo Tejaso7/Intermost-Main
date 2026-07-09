@@ -37,8 +37,8 @@ export default function Hero() {
     years_experience: 23,
     visa_success_rate: 99
   });
-  const [heroBgType, setHeroBgType] = useState<'image' | 'video'>('image');
-  const [heroBgUrl, setHeroBgUrl] = useState('/images/countries/russia.jpg');
+  const [heroBgType, setHeroBgType] = useState<'image' | 'video'>('video');
+  const [heroBgUrl, setHeroBgUrl] = useState('https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4');
 
   useEffect(() => {
     const fetchStats = async () => {

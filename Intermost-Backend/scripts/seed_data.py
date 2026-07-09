@@ -1381,6 +1381,8 @@ def seed_site_settings():
         },
         'about_images': ['/images/about.jpg'],
         'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)],
+        'hero_bg_type': 'video',
+        'hero_bg_url': 'https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4',
         'updated_at': datetime.utcnow()
     }
     
