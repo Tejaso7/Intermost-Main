@@ -15,81 +15,130 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 // Fallback testimonials (real alumni from intermost.in)
+// Fallback testimonials (real alumni from intermost.in)
 const fallbackTestimonials: Testimonial[] = [
   {
-    _id: '1',
-    name: 'Dr. Ankita Borade',
-    university: 'Orenburg State Medical University',
-    country: 'Russia',
-    year: 2019,
+    _id: 'alumni-1',
+    name: 'Dr. Sumant Maharana',
+    university: 'Dnipro State Medical University',
+    country: 'Ukraine',
+    year: 2020,
     rating: 5,
-    quote: 'My journey with Intermost Study Abroad was exceptional. From admission guidance to visa support, they made my MBBS dream in Russia a reality. The team was always available to help.',
-    content: 'My journey with Intermost Study Abroad was exceptional. From admission guidance to visa support, they made my MBBS dream in Russia a reality. The team was always available to help.',
+    quote: "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling.",
+    content: "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling. Pass FMGE Exam: 2020, PG Resident in MS Orthopedics.",
+    photo: '/images/dr/sumant.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
   },
   {
-    _id: '2',
-    name: 'Dr. Saurabh Sharma',
-    university: 'Tver State Medical University',
-    country: 'Russia',
-    year: 2019,
+    _id: 'alumni-2',
+    name: 'Dr. Zainab Khan',
+    university: 'Dnipropetrovsk State Medical University',
+    country: 'Ukraine',
+    year: 2024,
     rating: 5,
-    quote: 'Intermost provided complete transparency throughout the admission process. Their guidance was invaluable, and I am now a practicing doctor thanks to their support.',
-    content: 'Intermost provided complete transparency throughout the admission process. Their guidance was invaluable, and I am now a practicing doctor thanks to their support.',
+    quote: "Studying in Ukraine through Intermost was the best decision. Their team helped me with every step, even after arrival. The quality of medical education here is world-class at a fraction of Indian private college costs.",
+    content: "Studying in Ukraine through Intermost was the best decision. Their team helped me with every step, even after arrival. The quality of medical education here is world-class at a fraction of Indian private college costs. Recently cleared FMGE exam in first attempt.",
+    photo: '/images/dr/zainab.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
   },
   {
-    _id: '3',
-    name: 'Dr. Shubham Sharma',
-    university: 'Tver State Medical University',
-    country: 'Russia',
-    year: 2019,
+    _id: 'alumni-3',
+    name: 'Dr. Priyanka Mishra',
+    university: 'Dnipro State Medical University',
+    country: 'Ukraine',
+    year: 2018,
     rating: 5,
-    quote: 'Choosing Intermost was the best decision for my medical career. The affordable fees and quality education in Russia exceeded my expectations.',
-    content: 'Choosing Intermost was the best decision for my medical career. The affordable fees and quality education in Russia exceeded my expectations.',
+    quote: "Intermost made my dream of studying medicine abroad come true. Their guidance from application to visa was impeccable. The university has excellent facilities and clinical exposure.",
+    content: "Intermost made my dream of studying medicine abroad come true. Their guidance from application to visa was impeccable. The university has excellent facilities and clinical exposure. Recently cleared FMGE 2024.",
+    photo: '/images/dr/priya.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
   },
   {
-    _id: '4',
-    name: 'Dr. Sanjay Sharma',
-    university: 'KSMU Kursk State Medical University',
-    country: 'Russia',
-    year: 2016,
+    _id: 'alumni-4',
+    name: 'Vishal Srivastava',
+    university: 'Alte University',
+    country: 'Georgia',
+    year: 2024,
     rating: 5,
-    quote: 'Excellent support from day one. Intermost helped me navigate every step of studying MBBS abroad. Now I am a successful doctor serving patients.',
-    content: 'Excellent support from day one. Intermost helped me navigate every step of studying MBBS abroad. Now I am a successful doctor serving patients.',
+    quote: "The support I received made everything easier—from the admission process to settling abroad. I'm grateful to be pursuing my dream at Alte University.",
+    content: "The support I received made everything easier—from the admission process to settling abroad. I'm grateful to be pursuing my dream at Alte University. Now working at Lala Lajpat Rai Hospital.",
+    photo: '/images/dr/vishal.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
   },
   {
-    _id: '5',
-    name: 'Dr. Pratibha Keshri',
-    university: 'Orel State University',
-    country: 'Russia',
-    year: 2019,
+    _id: 'alumni-5',
+    name: 'Shubhangi Chaturvedi',
+    university: 'Georgian National University SEU',
+    country: 'Georgia',
+    year: 2025,
     rating: 5,
-    quote: 'The personalized counseling and honest guidance set Intermost apart. They genuinely care about students\' futures and careers.',
-    content: 'The personalized counseling and honest guidance set Intermost apart. They genuinely care about students\' futures and careers.',
+    quote: "Choosing SEU was a turning point in my career. Thankful for the transparent and smooth guidance I received through every step.",
+    content: "Choosing SEU was a turning point in my career. Thankful for the transparent and smooth guidance I received through every step.",
+    photo: '/images/dr/shubhangi.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
   },
   {
-    _id: '6',
-    name: 'Dr. Chandan Kumar',
-    university: 'Orel State University',
+    _id: 'alumni-6',
+    name: 'Dr. Abinash Mohanty',
+    university: 'DSMA Ukraine',
+    country: 'Ukraine',
+    year: 2018,
+    rating: 5,
+    quote: "My FMGE journey was successful thanks to solid guidance and preparation. Working as a GDMO now has been a fulfilling experience in public service.",
+    content: "My FMGE journey was successful thanks to solid guidance and preparation. Working as a GDMO now has been a fulfilling experience in public service. 2019 FMGE Passed, GDMO at PHC since 2021.",
+    photo: '/images/dr/abinash.jpg',
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    _id: 'alumni-7',
+    name: 'Dr. Lalit Chaudhary',
+    university: 'Dnipropetrovsk State Medical University',
+    country: 'Ukraine',
+    year: 2020,
+    rating: 5,
+    quote: "Medical education in Ukraine shaped me into the professional I am today. I'm currently working as a surgery resident and pursuing specialization.",
+    content: "Medical education in Ukraine shaped me into the professional I am today. I'm currently working as a surgery resident and pursuing specialization. Resident in General Surgery at Metro Hospital.",
+    photo: '/images/dr/lalit.jpg',
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    _id: 'alumni-8',
+    name: 'Dr. Sandeep Yadav',
+    university: 'Mari State University',
     country: 'Russia',
     year: 2020,
     rating: 5,
-    quote: 'Professional team with excellent follow-up. They helped me throughout my 6-year journey and even assisted with FMGE preparation.',
-    content: 'Professional team with excellent follow-up. They helped me throughout my 6-year journey and even assisted with FMGE preparation.',
+    quote: "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital.",
+    content: "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital (PARAS Hospital, Rajasthan).",
+    photo: '/images/dr/sandeep.jpg',
+    is_featured: true,
+    is_active: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    _id: 'alumni-9',
+    name: 'Dr. Amit Kumar',
+    university: 'Andijan State Medical University',
+    country: 'Uzbekistan',
+    year: 2024,
+    rating: 5,
+    quote: "The journey through Andijan State Medical University has been truly transformative. The support from Intermost ensured a smooth process throughout.",
+    content: "The journey through Andijan State Medical University has been truly transformative. The support from Intermost ensured a smooth process throughout.",
+    photo: '/images/dr/amit.jpg',
     is_featured: true,
     is_active: true,
     created_at: new Date().toISOString(),
@@ -232,7 +281,71 @@ export default function TestimonialsSection() {
             ))}
           </Swiper>
         </motion.div>
+
+        {/* Alumni Documents Marquee */}
+        <div className="mt-20 border-t border-white/10 pt-16">
+          <div className="text-center mb-10">
+            <span className="text-primary-300 font-semibold text-xs uppercase tracking-wider">
+              Verified Records
+            </span>
+            <h3 className="text-2xl md:text-3xl font-bold text-white mt-1">Our Successful Alumni Placements</h3>
+            <p className="text-primary-200 text-sm mt-2 max-w-xl mx-auto">
+              Glance at the historical admissions, visa copies, and university allocations of students placed by Intermost.
+            </p>
+          </div>
+
+          <div className="relative overflow-hidden w-full py-4">
+            {/* Gradient overlays for smooth fade effect */}
+            <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-primary-900 to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary-900 to-transparent z-10 pointer-events-none" />
+            
+            <div className="flex animate-marquee-alumni whitespace-nowrap gap-6 w-max">
+              {/* First loop of images */}
+              <div className="flex gap-6 shrink-0">
+                {[...Array(15)].map((_, idx) => (
+                  <div key={`marquee-1-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
+                    <Image
+                      src={`/images/alu/alumini pdf-images-${idx}-min.jpg`}
+                      alt={`Alumni placement record ${idx + 1}`}
+                      fill
+                      sizes="280px"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+              
+              {/* Duplicate loop for infinite sliding */}
+              <div className="flex gap-6 shrink-0">
+                {[...Array(15)].map((_, idx) => (
+                  <div key={`marquee-2-${idx}`} className="relative w-[280px] h-[180px] rounded-xl overflow-hidden shadow-lg border border-white/10 hover:border-primary-400 transition-all duration-300 flex-shrink-0 group hover:scale-105 bg-white/5 cursor-pointer">
+                    <Image
+                      src={`/images/alu/alumini pdf-images-${idx}-min.jpg`}
+                      alt={`Alumni placement record ${idx + 1} clone`}
+                      fill
+                      sizes="280px"
+                      className="object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <style jsx global>{`
+        @keyframes marquee-alumni {
+          0% { transform: translateX(0); }
+          100% { transform: translateX(-50%); }
+        }
+        .animate-marquee-alumni {
+          animation: marquee-alumni 40s linear infinite;
+        }
+        .animate-marquee-alumni:hover {
+          animation-play-state: paused;
+        }
+      `}</style>
     </section>
   );
 }

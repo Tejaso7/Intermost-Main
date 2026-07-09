@@ -691,6 +691,83 @@ class GlimpseListCreateView(APIView):
                 'display_order': 7,
                 'created_at': datetime.utcnow(),
                 'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Alte University Student Meet',
+                'category': 'campus',
+                'categoryLabel': 'Campus Life',
+                'image': '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.52_6853b407.jpg',
+                'caption': 'Indian medical students sharing their study experiences at Alte University, Georgia.',
+                'country': 'Georgia',
+                'display_order': 8,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Clinical Practice Discussion',
+                'category': 'training',
+                'categoryLabel': 'Clinical Training',
+                'image': '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.53_42cb5130.jpg',
+                'caption': 'Alte University medical batch discussing clinical case studies outside the campus lab.',
+                'country': 'Georgia',
+                'display_order': 9,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Student Assembly at Alte',
+                'category': 'campus',
+                'categoryLabel': 'Campus Life',
+                'image': '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.55_6209e60a.jpg',
+                'caption': 'Student meet and peer interaction program organized on Alte University campus.',
+                'country': 'Georgia',
+                'display_order': 10,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Kanpur Pre-Departure Seminar',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/kanpur-meet/IMG-20250525-WA0110.jpg',
+                'caption': 'Selected medical students attending the orientation briefing in Kanpur prior to departure.',
+                'country': 'India',
+                'display_order': 11,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Academic Briefing Event',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/kanpur-meet/IMG-20250525-WA0115.jpg',
+                'caption': 'Counseling and visa briefing session for incoming freshmen going abroad.',
+                'country': 'India',
+                'display_order': 12,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Intermost Kanpur Student Meet',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/kanpur-meet/IMG-20250525-WA0120.jpg',
+                'caption': 'Addressing parent queries regarding hostel facilities, flight batches, and Indian mess services.',
+                'country': 'India',
+                'display_order': 13,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
+            },
+            {
+                'title': 'Kolkata MBBS Seminar',
+                'category': 'arrivals',
+                'categoryLabel': 'Arrival Orientations',
+                'image': '/images/kalkata/1.jpg',
+                'caption': 'Information session on studying medical courses overseas in Kolkata.',
+                'country': 'India',
+                'display_order': 14,
+                'created_at': datetime.utcnow(),
+                'updated_at': datetime.utcnow()
             }
         ]
         collection.insert_many(default_glimpses)

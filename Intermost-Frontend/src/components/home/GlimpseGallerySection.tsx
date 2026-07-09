@@ -6,6 +6,109 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane, Loader2 } from 'lucide-react';
 import { glimpsesApi, Glimpse } from '@/lib/services';
 
+const localGlimpses: Glimpse[] = [
+  {
+    _id: 'local-glimpse-1',
+    title: 'Alte University Student Meet',
+    category: 'campus',
+    categoryLabel: 'Campus Life',
+    image: '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.52_6853b407.jpg',
+    caption: 'Indian medical students sharing their study experiences at Alte University, Georgia.',
+    country: 'Georgia',
+    display_order: 10,
+  },
+  {
+    _id: 'local-glimpse-2',
+    title: 'Clinical Practice Discussion',
+    category: 'training',
+    categoryLabel: 'Clinical Training',
+    image: '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.53_42cb5130.jpg',
+    caption: 'Alte University medical batch discussing clinical case studies outside the campus lab.',
+    country: 'Georgia',
+    display_order: 11,
+  },
+  {
+    _id: 'local-glimpse-3',
+    title: 'Student Assembly at Alte',
+    category: 'campus',
+    categoryLabel: 'Campus Life',
+    image: '/images/alte-meet/WhatsApp Image 2025-05-08 at 03.26.55_6209e60a.jpg',
+    caption: 'Student meet and peer interaction program organized on Alte University campus.',
+    country: 'Georgia',
+    display_order: 12,
+  },
+  {
+    _id: 'local-glimpse-4',
+    title: 'Kanpur Pre-Departure Seminar',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kanpur-meet/IMG-20250525-WA0110.jpg',
+    caption: 'Selected medical students attending the orientation briefing in Kanpur prior to departure.',
+    country: 'India',
+    display_order: 13,
+  },
+  {
+    _id: 'local-glimpse-5',
+    title: 'Academic Briefing Event',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kanpur-meet/IMG-20250525-WA0115.jpg',
+    caption: 'Counseling and visa briefing session for incoming freshmen going abroad.',
+    country: 'India',
+    display_order: 14,
+  },
+  {
+    _id: 'local-glimpse-6',
+    title: 'Intermost Kanpur Student Meet',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kanpur-meet/IMG-20250525-WA0120.jpg',
+    caption: 'Addressing parent queries regarding hostel facilities, flight batches, and Indian mess services.',
+    country: 'India',
+    display_order: 15,
+  },
+  {
+    _id: 'local-glimpse-7',
+    title: 'Group Photo - Kanpur Meetup',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kanpur-meet/IMG-20250525-WA0125.jpg',
+    caption: 'Students celebrating their university selection during the Kanpur meet.',
+    country: 'India',
+    display_order: 16,
+  },
+  {
+    _id: 'local-glimpse-8',
+    title: 'Agra Head Office Consultation',
+    category: 'campus',
+    categoryLabel: 'Campus Life',
+    image: '/images/kanpur/team.jpg',
+    caption: 'Intermost Ventures team and senior counseling staff coordinating admissions.',
+    country: 'India',
+    display_order: 17,
+  },
+  {
+    _id: 'local-glimpse-9',
+    title: 'Kolkata MBBS Seminar',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kalkata/1.jpg',
+    caption: 'Information session on studying medical courses overseas in Kolkata.',
+    country: 'India',
+    display_order: 18,
+  },
+  {
+    _id: 'local-glimpse-10',
+    title: 'Individual Counseling - Kolkata',
+    category: 'arrivals',
+    categoryLabel: 'Student Arrivals',
+    image: '/images/kalkata/4.jpg',
+    caption: 'Direct one-on-one document verification and assessment for MBBS admissions.',
+    country: 'India',
+    display_order: 19,
+  }
+];
+
 export default function GlimpseGallerySection() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activePhoto, setActivePhoto] = useState<Glimpse | null>(null);
@@ -17,9 +120,15 @@ export default function GlimpseGallerySection() {
     const fetchGlimpses = async () => {
       try {
         const data = await glimpsesApi.getAll();
-        setGalleryItems(data);
+        const combined = [...(data || []), ...localGlimpses];
+        // Remove duplicates based on image url
+        const unique = combined.filter((v, i, a) => a.findIndex(t => t.image === v.image) === i);
+        // Sort by display order
+        unique.sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
+        setGalleryItems(unique);
       } catch (error) {
-        console.error('Error fetching glimpses:', error);
+        console.error('Error fetching glimpses, using fallbacks:', error);
+        setGalleryItems(localGlimpses);
       } finally {
         setLoading(false);
       }
