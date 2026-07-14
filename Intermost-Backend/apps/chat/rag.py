@@ -21,6 +21,8 @@ logger = logging.getLogger(__name__)
 
 # Get API key and create client
 GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
+if GEMINI_API_KEY == 'your-gemini-api-key':
+    GEMINI_API_KEY = ''
 client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 

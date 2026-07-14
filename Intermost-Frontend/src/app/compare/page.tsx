@@ -321,8 +321,29 @@ export default function CountryComparisonPage() {
 
         {/* Comparison grid dashboard */}
         {loading ? (
-          <div className="flex justify-center py-20">
-            <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="bg-white border border-slate-200 rounded-3xl p-6 shadow-md flex flex-col space-y-6 animate-pulse h-[600px]">
+                <div className="w-full h-1 bg-slate-200 rounded-full" />
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-8 bg-slate-200 rounded shadow-sm shrink-0" />
+                  <div className="space-y-2 flex-grow">
+                    <div className="h-5 bg-slate-200 rounded w-2/3" />
+                    <div className="h-3 bg-slate-200 rounded w-1/3" />
+                  </div>
+                </div>
+                <div className="space-y-4 flex-grow">
+                  {[0, 1, 2].map((j) => (
+                    <div key={j} className="space-y-2 pt-4 border-t border-slate-100">
+                      <div className="h-4 bg-slate-200 rounded w-1/3" />
+                      <div className="h-3 bg-slate-200 rounded w-full" />
+                      <div className="h-3 bg-slate-200 rounded w-5/6" />
+                    </div>
+                  ))}
+                </div>
+                <div className="h-12 bg-slate-200 rounded-xl mt-auto" />
+              </div>
+            ))}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">

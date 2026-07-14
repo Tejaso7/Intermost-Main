@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, User, ArrowRight, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { formatDate } from '@/lib/utils';
 import type { Blog } from '@/lib/api';
 
@@ -189,55 +190,62 @@ export default function BlogList({ blogs, featuredBlog }: Props) {
           
           {filteredBlogs.length > 0 ? (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBlogs.map((blog) => (
-                <Link
+              {filteredBlogs.map((blog, idx) => (
+                <motion.div
                   key={blog._id}
-                  href={`/blogs/${blog.slug}`}
-                  className="group"
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: Math.min(idx * 0.05, 0.3) }}
                 >
-                  <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all h-full flex flex-col">
-                    <div className="relative h-56">
-                      <Image
-                        src={blog.featured_image || '/images/placeholder.jpg'}
-                        alt={blog.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-4 left-4">
-                        <span className="px-3 py-1 bg-white/95 backdrop-blur-sm text-primary text-xs font-semibold rounded-full shadow-sm">
-                          {blog.category}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="p-6 flex-1 flex flex-col">
-                      <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {formatDate(blog.created_at)}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          {blog.read_time}
-                        </span>
-                      </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                        {blog.title}
-                      </h3>
-                      <p className="text-gray-600 text-sm line-clamp-3 flex-1 mb-6">
-                        {blog.excerpt}
-                      </p>
-                      <div className="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
-                            <User className="w-4 h-4 text-gray-500" />
-                          </div>
-                          <span className="text-sm font-medium text-gray-700">
-                            {blog.author || 'Admin'}
+                  <Link
+                    href={`/blogs/${blog.slug}`}
+                    className="group"
+                  >
+                    <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all h-full flex flex-col">
+                      <div className="relative h-56">
+                        <Image
+                          src={blog.featured_image || '/images/placeholder.jpg'}
+                          alt={blog.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <div className="absolute top-4 left-4">
+                          <span className="px-3 py-1 bg-white/95 backdrop-blur-sm text-primary text-xs font-semibold rounded-full shadow-sm">
+                            {blog.category}
                           </span>
                         </div>
                       </div>
-                    </div>
-                  </article>
-                </Link>
+                      <div className="p-6 flex-1 flex flex-col">
+                        <div className="flex items-center gap-4 text-xs text-gray-500 mb-3">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5" />
+                            {formatDate(blog.created_at)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            {blog.read_time}
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-bold text-gray-900 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                          {blog.title}
+                        </h3>
+                        <p className="text-gray-600 text-sm line-clamp-3 flex-1 mb-6">
+                          {blog.excerpt}
+                        </p>
+                        <div className="pt-4 border-t border-gray-100 flex items-center justify-between mt-auto">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                              <User className="w-4 h-4 text-gray-500" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-700">
+                              {blog.author || 'Admin'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  </Link>
+                </motion.div>
               ))}
             </div>
           ) : (
