@@ -32,7 +32,7 @@ import {
   MessageCircle,
   Save
 } from 'lucide-react';
-import { inquiriesApi, messagesApi, dripsApi, type WhatsAppContact, type LeadDripRecord } from '@/lib/services';
+import { inquiriesApi, messagesApi, dripsApi, apkApi, type WhatsAppContact, type LeadDripRecord } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
 import { formatDate, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -55,14 +55,13 @@ const statusIcons = {
 };
 
 export default function LeadsPage() {
-  // Navigation & Tabs
-  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips' | 'coldcalling'>('explore');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
-      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config', 'drips'].includes(tab)) {
+      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config', 'drips', 'coldcalling'].includes(tab)) {
         setActiveTab(tab as any);
       }
     }
@@ -93,6 +92,196 @@ export default function LeadsPage() {
   const [isLoadingDrips, setIsLoadingDrips] = useState(false);
   const [isTogglingDrips, setIsTogglingDrips] = useState(false);
   const [expandedDripId, setExpandedDripId] = useState<string | null>(null);
+
+  // Cold Calling Tab States
+  const [apkUsers, setApkUsers] = useState<any[]>([]);
+  const [loadingApkUsers, setLoadingApkUsers] = useState(false);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newApkUser, setNewApkUser] = useState({ name: '', username: '', password: '' });
+
+  const [coldLeads, setColdLeads] = useState<any[]>([]);
+  const [loadingColdLeads, setLoadingColdLeads] = useState(false);
+  const [coldLeadsPage, setColdLeadsPage] = useState(1);
+  const [coldLeadsTotalPages, setColdLeadsTotalPages] = useState(1);
+  const [coldLeadsTotalCount, setColdLeadsTotalCount] = useState(0);
+  const [coldLeadsSearch, setColdLeadsSearch] = useState('');
+  const [coldLeadsStatusFilter, setColdLeadsStatusFilter] = useState('all');
+  const [coldLeadsAssignedFilter, setColdLeadsAssignedFilter] = useState('all');
+  const [selectedColdLeadIds, setSelectedColdLeadIds] = useState<string[]>([]);
+  const [showAssignModal, setShowAssignModal] = useState(false);
+  const [assignConfig, setAssignConfig] = useState({ usernames: [] as string[], method: 'manual' as 'manual' | 'random', total_count: 0 });
+  const [isAssigning, setIsAssigning] = useState(false);
+
+  // Excel / CSV Import states for Cold Calling
+  const coldFileInputRef = useRef<HTMLInputElement>(null);
+  const [importedColdData, setImportedColdData] = useState<any[]>([]);
+  const [columnColdMapping, setColumnColdMapping] = useState({ name: '', phone: '', email: '' });
+  const [coldHeaders, setColdHeaders] = useState<string[]>([]);
+  const [importingCold, setImportingCold] = useState(false);
+
+  const fetchApkUsers = async () => {
+    setLoadingApkUsers(true);
+    try {
+      const data = await apkApi.getUsers();
+      setApkUsers(data || []);
+    } catch (err) {
+      toast.error('Failed to load APK users');
+    } finally {
+      setLoadingApkUsers(false);
+    }
+  };
+
+  const handleCreateApkUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newApkUser.name.trim() || !newApkUser.username.trim() || !newApkUser.password) {
+      toast.error('Please fill in all user fields');
+      return;
+    }
+    try {
+      await apkApi.createUser(newApkUser);
+      toast.success('APK User created successfully');
+      setNewApkUser({ name: '', username: '', password: '' });
+      setShowAddUserModal(false);
+      fetchApkUsers();
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Failed to create APK user');
+    }
+  };
+
+  const handleDeleteApkUser = async (username: string) => {
+    if (!confirm(`Are you sure you want to delete APK user ${username}?`)) return;
+    try {
+      await apkApi.deleteUser(username);
+      toast.success('APK User deleted successfully');
+      fetchApkUsers();
+    } catch (err) {
+      toast.error('Failed to delete APK user');
+    }
+  };
+
+  const fetchColdLeads = async (pageParam: number = 1) => {
+    setLoadingColdLeads(true);
+    try {
+      const params: any = { page: pageParam };
+      if (coldLeadsSearch) params.search = coldLeadsSearch;
+      if (coldLeadsStatusFilter !== 'all') params.status = coldLeadsStatusFilter;
+      if (coldLeadsAssignedFilter !== 'all') {
+        params.assigned_to = coldLeadsAssignedFilter;
+      }
+      const data = await apkApi.getColdLeads(params);
+      setColdLeads(data.results || []);
+      setColdLeadsTotalPages(data.total_pages || 1);
+      setColdLeadsTotalCount(data.count || 0);
+    } catch (err) {
+      toast.error('Failed to load cold leads');
+    } finally {
+      setLoadingColdLeads(false);
+    }
+  };
+
+  const handleColdFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      try {
+        const data = new Uint8Array(evt.target?.result as ArrayBuffer);
+        const wb = XLSX.read(data, { type: 'array' });
+        const sheetName = wb.SheetNames[0];
+        const sheet = wb.Sheets[sheetName];
+        
+        const rows: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+        if (rows.length === 0) {
+          toast.error("File is empty!");
+          return;
+        }
+
+        const rawHeaders = rows[0].map((h: any) => String(h || '').trim());
+        setColdHeaders(rawHeaders);
+
+        const objects = XLSX.utils.sheet_to_json<any>(sheet);
+        setImportedColdData(objects);
+
+        // Auto-detect columns mapping
+        const newMapping = { name: '', phone: '', email: '' };
+        rawHeaders.forEach((h: string) => {
+          const lower = h.toLowerCase().replace(/[\s_-]/g, '');
+          if (['name', 'fullname', 'studentname', 'name'].includes(lower)) newMapping.name = h;
+          if (['email', 'emailid', 'emailaddress', 'mail'].includes(lower)) newMapping.email = h;
+          if (['phone', 'phonenumber', 'mobile', 'mobilenumber', 'contact', 'phone_number'].includes(lower)) newMapping.phone = h;
+        });
+        setColumnColdMapping(newMapping);
+        toast.success(`Parsed ${objects.length} rows successfully!`);
+      } catch (err) {
+        toast.error("Failed to read Excel/CSV file");
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  const executeColdImport = async () => {
+    if (!columnColdMapping.name || !columnColdMapping.phone) {
+      toast.error("Name and Phone columns must be mapped!");
+      return;
+    }
+
+    setImportingCold(true);
+    try {
+      const cleanedLeads = importedColdData.map((row) => ({
+        name: String(row[columnColdMapping.name] || ''),
+        phone: String(row[columnColdMapping.phone] || ''),
+        email: columnColdMapping.email ? String(row[columnColdMapping.email] || '') : '',
+      }));
+
+      await apkApi.importColdLeads(cleanedLeads);
+      toast.success("Cold calling leads imported successfully!");
+      setImportedColdData([]);
+      if (coldFileInputRef.current) coldFileInputRef.current.value = '';
+      fetchColdLeads(1);
+    } catch (error) {
+      toast.error("Failed to upload cold leads to backend");
+    } finally {
+      setImportingCold(false);
+    }
+  };
+
+  const executeAssignLeads = async () => {
+    if (assignConfig.usernames.length === 0) {
+      toast.error('Please select at least one APK user');
+      return;
+    }
+    
+    setIsAssigning(true);
+    try {
+      const payload: any = {
+        usernames: assignConfig.usernames,
+        method: assignConfig.method,
+      };
+
+      if (assignConfig.method === 'random' && assignConfig.total_count > 0) {
+        payload.total_count = assignConfig.total_count;
+      } else {
+        if (selectedColdLeadIds.length === 0) {
+          toast.error('Please select leads to assign or use random method with a count');
+          setIsAssigning(false);
+          return;
+        }
+        payload.lead_ids = selectedColdLeadIds;
+      }
+
+      await apkApi.assignColdLeads(payload);
+      toast.success('Leads assigned successfully!');
+      setSelectedColdLeadIds([]);
+      setShowAssignModal(false);
+      setAssignConfig({ usernames: [], method: 'manual', total_count: 0 });
+      fetchColdLeads(coldLeadsPage);
+    } catch (err) {
+      toast.error('Failed to assign leads');
+    } finally {
+      setIsAssigning(false);
+    }
+  };
 
   // WhatsApp settings configuration states
   const [isSavingConfig, setIsSavingConfig] = useState(false);
@@ -252,8 +441,22 @@ export default function LeadsPage() {
       fetchConfig();
     } else if (activeTab === 'drips') {
       fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
+    } else if (activeTab === 'coldcalling') {
+      fetchApkUsers();
+      fetchColdLeads(coldLeadsPage);
     }
-  }, [activeTab, page, statusFilter, contactsPage, dripsPage]);
+  }, [activeTab, page, statusFilter, contactsPage, dripsPage, coldLeadsPage]);
+
+  // Debounced search for Cold Calling tab
+  useEffect(() => {
+    if (activeTab === 'coldcalling') {
+      const timer = setTimeout(() => {
+        setColdLeadsPage(1);
+        fetchColdLeads(1);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [coldLeadsSearch, coldLeadsStatusFilter, coldLeadsAssignedFilter]);
 
   // Debounced search for Contacts Database tab
   useEffect(() => {
@@ -662,7 +865,7 @@ export default function LeadsPage() {
 
         {/* Tab Buttons */}
         <div className="flex flex-wrap bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700 gap-1">
-          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'drips', 'config'] as const).map((tab) => (
+          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'drips', 'coldcalling', 'config'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -685,7 +888,9 @@ export default function LeadsPage() {
                         ? 'Contact Database'
                         : tab === 'drips'
                           ? 'Drip Nurturing'
-                          : 'WhatsApp Config'}
+                          : tab === 'coldcalling'
+                            ? 'Cold Calling (APK)'
+                            : 'WhatsApp Config'}
             </button>
           ))}
         </div>
@@ -2204,6 +2409,341 @@ export default function LeadsPage() {
         </div>
       )}
 
+      {activeTab === 'coldcalling' && (
+        <div className="space-y-8 animate-fade-in">
+          {/* Top actions/stats summary */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm">
+              <h3 className="text-sm font-bold text-gray-450 uppercase tracking-wider">Total Cold Leads</h3>
+              <p className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2">{coldLeadsTotalCount}</p>
+            </div>
+            <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-gray-455 uppercase tracking-wider">APK Agents</h3>
+                <p className="text-3xl font-extrabold text-gray-900 dark:text-white mt-2">{apkUsers.length}</p>
+              </div>
+              <button
+                onClick={() => setShowAddUserModal(true)}
+                className="px-4 py-2 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 shadow-sm transition-colors"
+              >
+                Create APK User
+              </button>
+            </div>
+            <div className="bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-bold text-gray-455 uppercase tracking-wider">Assigned Leads</h3>
+                <p className="text-3xl font-extrabold text-emerald-600 mt-2">
+                  {coldLeads.filter(l => l.assigned_to).length}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setAssignConfig({ usernames: [], method: 'random', total_count: 50 });
+                  setShowAssignModal(true);
+                }}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-colors"
+              >
+                Distribute Leads
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left: APK Users List (4 cols) */}
+            <div className="lg:col-span-4 bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <Users className="w-5 h-5 text-primary-500" />
+                APK Agents / Users
+              </h3>
+
+              {loadingApkUsers ? (
+                <div className="flex justify-center py-10">
+                  <Loader2 className="w-6 h-6 animate-spin text-primary-600" />
+                </div>
+              ) : apkUsers.length === 0 ? (
+                <p className="text-sm text-gray-500 text-center py-6">No APK agents configured.</p>
+              ) : (
+                <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  {apkUsers.map((u) => (
+                    <div key={u.username} className="p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-150 dark:border-gray-800 flex items-center justify-between">
+                      <div>
+                        <p className="font-bold text-sm text-gray-900 dark:text-white">{u.name}</p>
+                        <p className="text-xs text-gray-500 mt-0.5">@{u.username}</p>
+                        {u.last_login && (
+                          <p className="text-[10px] text-gray-450 mt-1">Logged: {formatDate(u.last_login)}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteApkUser(u.username)}
+                        className="p-1.5 hover:bg-red-50 text-red-500 rounded-lg transition-colors"
+                        title="Delete User"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Right: Cold Leads Database & Excel Upload (8 cols) */}
+            <div className="lg:col-span-8 bg-white dark:bg-gray-850 rounded-2xl border border-gray-100 dark:border-gray-800 p-6 shadow-sm space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <FileSpreadsheet className="w-5 h-5 text-emerald-500" />
+                  Cold Calling Leads Database
+                </h3>
+
+                {/* Import section */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="file"
+                    ref={coldFileInputRef}
+                    onChange={handleColdFileChange}
+                    accept=".xlsx,.xls,.csv"
+                    className="hidden"
+                  />
+                  <button
+                    onClick={() => coldFileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-250 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    Select Excel File
+                  </button>
+                </div>
+              </div>
+
+              {/* Column Mapping Preview if data imported */}
+              {importedColdData.length > 0 && (
+                <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900 rounded-2xl space-y-4">
+                  <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+                    Map Excel Columns ({importedColdData.length} records parsed)
+                  </p>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Name Column</label>
+                      <select
+                        value={columnColdMapping.name}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, name: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Phone Column</label>
+                      <select
+                        value={columnColdMapping.phone}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, phone: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Email Column</label>
+                      <select
+                        value={columnColdMapping.email}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, email: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-3 pt-2">
+                    <button
+                      onClick={() => setImportedColdData([])}
+                      className="px-3.5 py-1.5 bg-gray-105 hover:bg-gray-200 rounded-lg text-xs font-semibold text-gray-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={executeColdImport}
+                      disabled={importingCold}
+                      className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold disabled:opacity-50"
+                    >
+                      {importingCold ? 'Importing...' : 'Confirm Upload'}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Filters / Selection */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="flex flex-wrap gap-3">
+                  <input
+                    type="text"
+                    placeholder="Search cold leads..."
+                    value={coldLeadsSearch}
+                    onChange={(e) => setColdLeadsSearch(e.target.value)}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs outline-none text-gray-900 dark:text-white"
+                  />
+                  <select
+                    value={coldLeadsStatusFilter}
+                    onChange={(e) => setColdLeadsStatusFilter(e.target.value)}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-xs text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    <option value="all">All Statuses</option>
+                    <option value="pending">Pending</option>
+                    <option value="picked">Picked</option>
+                    <option value="not_picked">Not Picked</option>
+                    <option value="busy">Busy</option>
+                    <option value="failed">Failed</option>
+                  </select>
+                  <select
+                    value={coldLeadsAssignedFilter}
+                    onChange={(e) => setColdLeadsAssignedFilter(e.target.value)}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-xs text-gray-700 dark:text-gray-300 font-semibold"
+                  >
+                    <option value="all">All Assignments</option>
+                    <option value="unassigned">Unassigned</option>
+                    {apkUsers.map(u => (
+                      <option key={u.username} value={u.username}>Assigned: {u.name}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {selectedColdLeadIds.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setAssignConfig({ usernames: [], method: 'manual', total_count: 0 });
+                      setShowAssignModal(true);
+                    }}
+                    className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 shadow-sm"
+                  >
+                    Assign Selected ({selectedColdLeadIds.length})
+                  </button>
+                )}
+              </div>
+
+              {/* Table */}
+              <div className="overflow-x-auto border border-gray-150 dark:border-gray-800 rounded-xl">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-900 border-b">
+                    <tr className="text-left text-xs text-gray-500 uppercase font-semibold">
+                      <th className="px-4 py-3 w-8">
+                        <input
+                          type="checkbox"
+                          checked={selectedColdLeadIds.length === coldLeads.length && coldLeads.length > 0}
+                          onChange={() => {
+                            if (selectedColdLeadIds.length === coldLeads.length) {
+                              setSelectedColdLeadIds([]);
+                            } else {
+                              setSelectedColdLeadIds(coldLeads.map(l => l._id));
+                            }
+                          }}
+                        />
+                      </th>
+                      <th className="px-4 py-3">Lead Info</th>
+                      <th className="px-4 py-3">Agent Assigned</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Calls Logs</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y text-xs">
+                    {loadingColdLeads ? (
+                      <tr>
+                        <td colSpan={5} className="text-center py-10">
+                          <Loader2 className="w-6 h-6 animate-spin text-primary-600 mx-auto" />
+                        </td>
+                      </tr>
+                    ) : coldLeads.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="text-center py-6 text-gray-500">No cold leads found.</td>
+                      </tr>
+                    ) : (
+                      coldLeads.map((l) => (
+                        <tr key={l._id} className="hover:bg-gray-50/50">
+                          <td className="px-4 py-3">
+                            <input
+                              type="checkbox"
+                              checked={selectedColdLeadIds.includes(l._id)}
+                              onChange={() => {
+                                if (selectedColdLeadIds.includes(l._id)) {
+                                  setSelectedColdLeadIds(selectedColdLeadIds.filter(id => id !== l._id));
+                                } else {
+                                  setSelectedColdLeadIds([...selectedColdLeadIds, l._id]);
+                                }
+                              }}
+                            />
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="font-bold text-gray-900 dark:text-white">{l.name}</p>
+                            <p className="text-gray-500">{l.phone}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            {l.assigned_to ? (
+                              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold">
+                                @{l.assigned_to}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 italic">Unassigned</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-3 capitalize">
+                            <span className={cn(
+                              'px-2 py-0.5 rounded text-[10px] font-bold',
+                              l.status === 'pending' && 'bg-gray-100 text-gray-600',
+                              l.status === 'picked' && 'bg-green-100 text-green-700',
+                              l.status === 'not_picked' && 'bg-red-100 text-red-700',
+                              l.status === 'busy' && 'bg-yellow-100 text-yellow-750',
+                              l.status === 'failed' && 'bg-red-200 text-red-800'
+                            )}>
+                              {l.status.replace(/_/g, ' ')}
+                            </span>
+                          </td>
+                          <td className="px-4 py-3">
+                            {l.call_logs && l.call_logs.length > 0 ? (
+                              <div className="space-y-1 max-h-[85px] overflow-y-auto">
+                                {l.call_logs.map((log: any, idx: number) => (
+                                  <div key={idx} className="text-[10px] text-gray-500 bg-gray-50 dark:bg-gray-900 p-1 rounded">
+                                    <span className="font-bold">@{log.caller}:</span> {log.status} ({log.duration}s)
+                                    {log.notes && <p className="italic font-normal">"{log.notes}"</p>}
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <span className="text-gray-400">No call logs</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Pagination controls */}
+              {coldLeadsTotalPages > 1 && (
+                <div className="flex justify-between items-center pt-2">
+                  <span className="text-xs text-gray-500">Page {coldLeadsPage} of {coldLeadsTotalPages}</span>
+                  <div className="flex gap-2">
+                    <button
+                      disabled={coldLeadsPage <= 1}
+                      onClick={() => setColdLeadsPage(p => Math.max(1, p - 1))}
+                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      disabled={coldLeadsPage >= coldLeadsTotalPages}
+                      onClick={() => setColdLeadsPage(p => Math.min(coldLeadsTotalPages, p + 1))}
+                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Details Modal */}
       {selectedLead && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
@@ -2466,6 +3006,155 @@ export default function LeadsPage() {
                   </>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Create APK User Modal */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-sm w-full border border-gray-150 dark:border-gray-800 shadow-2xl p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Create APK Caller Agent</h3>
+            <form onSubmit={handleCreateApkUser} className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Agent Name</label>
+                <input
+                  type="text"
+                  required
+                  value={newApkUser.name}
+                  onChange={(e) => setNewApkUser({ ...newApkUser, name: e.target.value })}
+                  placeholder="e.g. Rahul Sharma"
+                  className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-medium"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Username (For Login)</label>
+                <input
+                  type="text"
+                  required
+                  value={newApkUser.username}
+                  onChange={(e) => setNewApkUser({ ...newApkUser, username: e.target.value })}
+                  placeholder="e.g. rahul123"
+                  className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-medium"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Login Password</label>
+                <input
+                  type="password"
+                  required
+                  value={newApkUser.password}
+                  onChange={(e) => setNewApkUser({ ...newApkUser, password: e.target.value })}
+                  placeholder="********"
+                  className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-medium"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddUserModal(false)}
+                  className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold"
+                >
+                  Create Agent
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Leads Modal */}
+      {showAssignModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-md w-full border border-gray-150 dark:border-gray-800 shadow-2xl p-6 space-y-4">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white">Assign Cold Leads</h3>
+            
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Distribution Method</label>
+                <div className="grid grid-cols-2 gap-3 mt-1">
+                  <button
+                    onClick={() => setAssignConfig({ ...assignConfig, method: 'manual' })}
+                    className={cn(
+                      'py-2 border rounded-xl text-xs font-semibold text-center',
+                      assignConfig.method === 'manual' ? 'bg-primary-600 text-white border-transparent' : 'bg-gray-50 text-gray-700 border-gray-200'
+                    )}
+                  >
+                    Manual (Selected Leads)
+                  </button>
+                  <button
+                    onClick={() => setAssignConfig({ ...assignConfig, method: 'random' })}
+                    className={cn(
+                      'py-2 border rounded-xl text-xs font-semibold text-center',
+                      assignConfig.method === 'random' ? 'bg-primary-600 text-white border-transparent' : 'bg-gray-50 text-gray-700 border-gray-200'
+                    )}
+                  >
+                    Auto-Distribute (Random)
+                  </button>
+                </div>
+              </div>
+
+              {assignConfig.method === 'random' && (
+                <div>
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Number of Leads to Distribute</label>
+                  <input
+                    type="number"
+                    value={assignConfig.total_count}
+                    onChange={(e) => setAssignConfig({ ...assignConfig, total_count: Math.max(0, parseInt(e.target.value) || 0) })}
+                    placeholder="e.g. 50"
+                    className="w-full mt-1 px-3 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-sm outline-none text-gray-900 dark:text-white font-semibold"
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Select Caller Agent(s)</label>
+                <div className="mt-1 space-y-1.5 max-h-[150px] overflow-y-auto border border-gray-150 dark:border-gray-800 rounded-xl p-2.5">
+                  {apkUsers.map(u => {
+                    const isChecked = assignConfig.usernames.includes(u.username);
+                    return (
+                      <label key={u.username} className="flex items-center gap-2 text-xs font-semibold text-gray-700 dark:text-gray-300 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => {
+                            if (isChecked) {
+                              setAssignConfig({ ...assignConfig, usernames: assignConfig.usernames.filter(un => un !== u.username) });
+                            } else {
+                              setAssignConfig({ ...assignConfig, usernames: [...assignConfig.usernames, u.username] });
+                            }
+                          }}
+                        />
+                        {u.name} (@{u.username})
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowAssignModal(false)}
+                className="px-4 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={executeAssignLeads}
+                disabled={isAssigning}
+                className="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+              >
+                {isAssigning ? 'Assigning...' : 'Confirm Assignment'}
+              </button>
             </div>
           </div>
         </div>

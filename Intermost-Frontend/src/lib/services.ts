@@ -722,3 +722,31 @@ export const glimpsesApi = {
     await api.delete(`/glimpses/${id}/`);
   },
 };
+
+// APK Auto-dialer & Cold Calling API
+export const apkApi = {
+  getUsers: async () => {
+    const response = await api.get<any[]>('/inquiries/apk/users/');
+    return response.data;
+  },
+  createUser: async (data: any) => {
+    const response = await api.post('/inquiries/apk/users/', data);
+    return response.data;
+  },
+  deleteUser: async (username: string) => {
+    const response = await api.delete('/inquiries/apk/users/', { params: { username } });
+    return response.data;
+  },
+  getColdLeads: async (params?: { status?: string; assigned_to?: string; search?: string; page?: number; limit?: number }) => {
+    const response = await api.get<any>('/inquiries/cold-leads/', { params });
+    return response.data;
+  },
+  importColdLeads: async (leads: any[]) => {
+    const response = await api.post('/inquiries/cold-leads/import/', { leads });
+    return response.data;
+  },
+  assignColdLeads: async (payload: { lead_ids?: string[]; total_count?: number; usernames: string[]; method: 'manual' | 'random' }) => {
+    const response = await api.post('/inquiries/cold-leads/assign/', payload);
+    return response.data;
+  },
+};
