@@ -27,33 +27,50 @@ export const viewport: Viewport = {
   themeColor: '#2563eb',
 };
 
-export const metadata: Metadata = {
-  title: 'Intermost Study Abroad - Your Gateway to Global Medical Education',
-  description:
-    'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad. Study MBBS in Russia, Georgia, Nepal, Uzbekistan, and more.',
-  keywords:
-    'MBBS abroad, study medicine abroad, MBBS in Russia, MBBS in Georgia, medical universities abroad, NMC approved universities',
-  authors: [{ name: 'Intermost Ventures LLP' }],
-  metadataBase: new URL('https://intermoststudyabroad.com'),
-  openGraph: {
-    title: 'Intermost Study Abroad - MBBS Overseas Education Consultants',
-    description:
-      'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad.',
-    type: 'website',
-    locale: 'en_IN',
-    siteName: 'Intermost Study Abroad',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Intermost Study Abroad - MBBS Overseas Education Consultants',
-    description:
-      'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad.',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+import { coreApi } from '@/lib/services';
+
+export async function generateMetadata(): Promise<Metadata> {
+  let settings: any = null;
+  try {
+    settings = await coreApi.getSettings();
+  } catch (error) {
+    console.debug('Failed to fetch site settings for layout metadata, using default fallbacks.');
+  }
+
+  const title = settings?.seo?.title || settings?.meta_title || 'Intermost Study Abroad - Your Gateway to Global Medical Education';
+  const description = settings?.seo?.description || settings?.meta_description || 'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad. Study MBBS in Russia, Georgia, Nepal, Uzbekistan, and more.';
+  const keywords = settings?.seo?.keywords || settings?.meta_keywords || 'MBBS abroad, study medicine abroad, MBBS in Russia, MBBS in Georgia, medical universities abroad, NMC approved universities';
+  
+  const ogTitle = settings?.seo?.og_title || settings?.meta_title || 'Intermost Study Abroad - Your Gateway to Global Medical Education';
+  const ogDescription = settings?.seo?.og_description || settings?.meta_description || 'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad.';
+  const canonicalUrl = settings?.seo?.canonical_url || 'https://intermost.in/';
+  const robotsVal = settings?.seo?.robots || 'index, follow, max-image-preview:large';
+
+  return {
+    title,
+    description,
+    keywords,
+    authors: [{ name: 'Intermost Ventures LLP' }],
+    metadataBase: new URL(canonicalUrl),
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    openGraph: {
+      title: ogTitle,
+      description: ogDescription,
+      type: 'website',
+      locale: 'en_IN',
+      siteName: settings?.site_name || 'Intermost Study Abroad',
+      url: canonicalUrl,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: ogTitle,
+      description: ogDescription,
+    },
+    robots: robotsVal,
+  };
+}
 
 export default function RootLayout({
   children,

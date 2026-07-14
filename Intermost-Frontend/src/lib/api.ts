@@ -380,6 +380,11 @@ export interface SiteSettings {
     title: string;
     description: string;
     keywords: string;
+    og_title?: string;
+    og_description?: string;
+    canonical_url?: string;
+    robots?: string;
+    focus_keyword?: string;
   };
   stats: {
     students_placed: number;

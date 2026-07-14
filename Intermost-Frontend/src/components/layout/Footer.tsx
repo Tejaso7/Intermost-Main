@@ -43,17 +43,32 @@ export default function Footer() {
     address: 'Shop no -1, First floor, Vinayak Mall, Deewani Crossing (Lotus Hospital Building), M G Road Agra, 282002 (U.P), India',
   });
 
+  const [social, setSocial] = useState({
+    facebook: 'http://facebook.com/intermoststudyabr0ad',
+    instagram: 'https://www.instagram.com/intermoststudyabroad/',
+    youtube: 'http://www.youtube.com/@IntermostStudyAbroad',
+  });
+
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         const settings = await coreApi.getSettings();
-        if (settings && settings.contact) {
-          setContact({
-            phone1: settings.contact.phone || '+91 9058501818',
-            phone2: settings.contact.alt_phone || settings.contact.whatsapp || '+91 9837533887',
-            email: settings.contact.email || 'admissionintermost@gmail.com',
-            address: settings.contact.address || 'Shop no -1, First floor, Vinayak Mall, Agra',
-          });
+        if (settings) {
+          if (settings.contact) {
+            setContact({
+              phone1: settings.contact.phone || '+91 9058501818',
+              phone2: settings.contact.alt_phone || settings.contact.whatsapp || '+91 9837533887',
+              email: settings.contact.email || 'admissionintermost@gmail.com',
+              address: settings.contact.address || 'Shop no -1, First floor, Vinayak Mall, Agra',
+            });
+          }
+          if (settings.social) {
+            setSocial({
+              facebook: settings.social.facebook || 'http://facebook.com/intermoststudyabr0ad',
+              instagram: settings.social.instagram || 'https://www.instagram.com/intermoststudyabroad/',
+              youtube: settings.social.youtube || 'http://www.youtube.com/@IntermostStudyAbroad',
+            });
+          }
         }
       } catch (err) {
         console.debug('Failed to fetch settings for Footer', err);
@@ -111,30 +126,36 @@ export default function Footer() {
               their dreams of becoming doctors through quality education at affordable costs.
             </p>
             <div className="flex space-x-4">
-              <a
-                href="http://facebook.com/intermoststudyabr0ad"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
-              >
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a
-                href="https://www.instagram.com/intermoststudyabroad/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
-              >
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a
-                href="http://www.youtube.com/@IntermostStudyAbroad"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
-              >
-                <Youtube className="w-5 h-5" />
-              </a>
+              {social.facebook && (
+                <a
+                  href={social.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+              )}
+              {social.instagram && (
+                <a
+                  href={social.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                </a>
+              )}
+              {social.youtube && (
+                <a
+                  href={social.youtube}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                >
+                  <Youtube className="w-5 h-5" />
+                </a>
+              )}
             </div>
           </div>
 

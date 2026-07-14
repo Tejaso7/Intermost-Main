@@ -38,6 +38,11 @@ interface SiteSettings {
   meta_title: string;
   meta_description: string;
   meta_keywords: string;
+  og_title?: string;
+  og_description?: string;
+  canonical_url?: string;
+  robots?: string;
+  focus_keyword?: string;
   google_analytics_id: string;
   facebook_pixel_id: string;
   stats: {
@@ -75,6 +80,11 @@ export default function SettingsPage() {
     meta_title: 'Intermost Study Abroad - MBBS Overseas Education',
     meta_description: 'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad.',
     meta_keywords: 'MBBS abroad, study medicine abroad, medical universities',
+    og_title: '',
+    og_description: '',
+    canonical_url: '',
+    robots: '',
+    focus_keyword: '',
     google_analytics_id: '',
     facebook_pixel_id: '',
     stats: {
@@ -103,6 +113,14 @@ export default function SettingsPage() {
             contact_phone_alt: data.contact?.alt_phone || raw.contact_phone_alt || '',
             whatsapp_number: data.contact?.whatsapp || raw.whatsapp_number || '',
             address: data.contact?.address || raw.address || '',
+            meta_title: data.seo?.title || raw.meta_title || raw.seo?.title || '',
+            meta_description: data.seo?.description || raw.meta_description || raw.seo?.description || '',
+            meta_keywords: data.seo?.keywords || raw.meta_keywords || raw.seo?.keywords || '',
+            og_title: data.seo?.og_title || raw.og_title || '',
+            og_description: data.seo?.og_description || raw.og_description || '',
+            canonical_url: data.seo?.canonical_url || raw.canonical_url || '',
+            robots: data.seo?.robots || raw.robots || '',
+            focus_keyword: data.seo?.focus_keyword || raw.focus_keyword || '',
           }));
         }
       } catch (error) {
@@ -186,6 +204,16 @@ export default function SettingsPage() {
     // Ensure empty stats fallback to 0 before saving, and map contact fields
     const payloadToSave = {
       ...settings,
+      seo: {
+        title: settings.meta_title,
+        description: settings.meta_description,
+        keywords: settings.meta_keywords,
+        og_title: settings.og_title || '',
+        og_description: settings.og_description || '',
+        canonical_url: settings.canonical_url || '',
+        robots: settings.robots || '',
+        focus_keyword: settings.focus_keyword || '',
+      },
       contact: {
         email: settings.contact_email,
         phone: settings.contact_phone,
@@ -628,6 +656,71 @@ export default function SettingsPage() {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     placeholder="keyword1, keyword2, keyword3"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Open Graph Title
+                  </label>
+                  <input
+                    type="text"
+                    name="og_title"
+                    value={settings.og_title}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="OG Title for Social Sharing"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Open Graph Description
+                  </label>
+                  <textarea
+                    name="og_description"
+                    value={settings.og_description}
+                    onChange={handleChange}
+                    rows={2}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="OG Description for Social Sharing"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Canonical URL
+                  </label>
+                  <input
+                    type="text"
+                    name="canonical_url"
+                    value={settings.canonical_url}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="https://example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Robots
+                  </label>
+                  <input
+                    type="text"
+                    name="robots"
+                    value={settings.robots}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="index, follow"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Focus Keyword
+                  </label>
+                  <input
+                    type="text"
+                    name="focus_keyword"
+                    value={settings.focus_keyword}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    placeholder="Focus Keyword"
                   />
                 </div>
                 <div>
