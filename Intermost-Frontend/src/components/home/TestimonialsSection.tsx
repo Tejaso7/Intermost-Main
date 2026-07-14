@@ -204,100 +204,120 @@ export default function TestimonialsSection() {
           </p>
         </motion.div>
 
-        {/* Testimonials Slider */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-        >
-          <Swiper
-            modules={[Autoplay, Pagination, Navigation]}
-            spaceBetween={30}
-            slidesPerView={1}
-            breakpoints={{
-              640: { slidesPerView: 1 },
-              768: { slidesPerView: 2 },
-              1024: { slidesPerView: 3 },
-            }}
-            autoplay={{
-              delay: 5000,
-              disableOnInteraction: false,
-            }}
-            pagination={{
-              clickable: true,
-              bulletClass: 'swiper-pagination-bullet !bg-white/50',
-              bulletActiveClass: 'swiper-pagination-bullet-active !bg-primary-400',
-            }}
-            className="pb-14"
-          >
-            {testimonials.map((testimonial) => (
-              <SwiperSlide key={testimonial._id}>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 h-full">
-                  {/* Quote Icon */}
-                  <Quote className="w-10 h-10 text-primary-400 mb-4" />
-
-                  {/* Content */}
-                  <p className="text-white/90 leading-relaxed mb-6 line-clamp-4">
-                    "{testimonial.content}"
-                  </p>
-
-                  {/* Rating */}
-                  <div className="flex items-center mb-4">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-5 h-5 ${
-                          i < testimonial.rating
-                            ? 'text-yellow-400 fill-yellow-400'
-                            : 'text-gray-400'
-                        }`}
-                      />
-                    ))}
+        {/* Testimonials Slider / Skeletons */}
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 h-64 animate-pulse flex flex-col space-y-4">
+                <div className="w-10 h-10 bg-white/20 rounded" />
+                <div className="h-4 bg-white/20 rounded w-full" />
+                <div className="h-4 bg-white/20 rounded w-5/6" />
+                <div className="h-4 bg-white/20 rounded w-3/4" />
+                <div className="flex items-center space-x-2 mt-auto">
+                  <div className="w-12 h-12 bg-white/20 rounded-full" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-white/20 rounded w-1/3" />
+                    <div className="h-3 bg-white/20 rounded w-1/2" />
                   </div>
-
-                  {/* Author */}
-                  <div className="flex items-center">
-                    {testimonial.photo ? (
-                      <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
-                        <Image
-                          src={testimonial.photo}
-                          alt={testimonial.name}
-                          fill
-                          className="object-cover"
-                        />
-                      </div>
-                    ) : (
-                      <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center mr-4">
-                        <span className="text-white font-semibold">
-                          {getInitials(testimonial.name)}
-                        </span>
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="font-semibold text-white">
-                        {testimonial.name}
-                      </h4>
-                      <p className="text-primary-300 text-sm">
-                        {testimonial.university}, {testimonial.country}
-                      </p>
-                      <p className="text-primary-400 text-xs">
-                        Batch of {testimonial.year}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Video Link */}
-                  {testimonial.video_url && (
-                    <button className="mt-4 flex items-center text-primary-300 hover:text-white transition-colors text-sm">
-                      <Play className="w-4 h-4 mr-1" />
-                      Watch Video Testimonial
-                    </button>
-                  )}
                 </div>
-              </SwiperSlide>
+              </div>
             ))}
-          </Swiper>
-        </motion.div>
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <Swiper
+              modules={[Autoplay, Pagination, Navigation]}
+              spaceBetween={30}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 1 },
+                768: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 },
+              }}
+              autoplay={{
+                delay: 5000,
+                disableOnInteraction: false,
+              }}
+              pagination={{
+                clickable: true,
+                bulletClass: 'swiper-pagination-bullet !bg-white/50',
+                bulletActiveClass: 'swiper-pagination-bullet-active !bg-primary-400',
+              }}
+              className="pb-14"
+            >
+              {testimonials.map((testimonial) => (
+                <SwiperSlide key={testimonial._id}>
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 h-full">
+                    {/* Quote Icon */}
+                    <Quote className="w-10 h-10 text-primary-400 mb-4" />
+
+                    {/* Content */}
+                    <p className="text-white/90 leading-relaxed mb-6 line-clamp-4">
+                      "{testimonial.content}"
+                    </p>
+
+                    {/* Rating */}
+                    <div className="flex items-center mb-4">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-5 h-5 ${
+                            i < testimonial.rating
+                              ? 'text-yellow-400 fill-yellow-400'
+                              : 'text-gray-400'
+                          }`}
+                        />
+                      ))}
+                    </div>
+
+                    {/* Author */}
+                    <div className="flex items-center">
+                      {testimonial.photo ? (
+                        <div className="relative w-12 h-12 rounded-full overflow-hidden mr-4">
+                          <Image
+                            src={testimonial.photo}
+                            alt={testimonial.name}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-primary-600 flex items-center justify-center mr-4">
+                          <span className="text-white font-semibold">
+                            {getInitials(testimonial.name)}
+                          </span>
+                        </div>
+                      )}
+                      <div>
+                        <h4 className="font-semibold text-white">
+                          {testimonial.name}
+                        </h4>
+                        <p className="text-primary-300 text-sm">
+                          {testimonial.university}, {testimonial.country}
+                        </p>
+                        <p className="text-primary-400 text-xs">
+                          Batch of {testimonial.year}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Video Link */}
+                    {testimonial.video_url && (
+                      <button className="mt-4 flex items-center text-primary-300 hover:text-white transition-colors text-sm">
+                        <Play className="w-4 h-4 mr-1" />
+                        Watch Video Testimonial
+                      </button>
+                    )}
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </motion.div>
+        )}
 
         {/* Alumni Documents Marquee */}
         {marqueeImages.length > 0 && (

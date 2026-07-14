@@ -53,12 +53,6 @@ export default function WhyChooseUs() {
       color: 'bg-blue-500',
     },
     {
-      icon: Shield,
-      title: `${siteStats.visa_success_rate}% Visa Success`,
-      description: 'Our experienced team ensures highest visa success rate with proper documentation.',
-      color: 'bg-green-500',
-    },
-    {
       icon: Users,
       title: `${siteStats.years_experience}+ Years Experience`,
       description: 'Trusted by thousands of students and parents for over two decades.',

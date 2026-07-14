@@ -137,136 +137,152 @@ export default function CountriesSection() {
         </motion.div>
 
         {/* Countries Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
-          {countries.map((country, index) => (
-            <motion.div
-              key={country._id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
-            >
-              <Link href={`/countries/${country.slug}`} className="block group h-full">
-                <motion.div
-                  onMouseEnter={() => setHoveredIndex(index)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
-                  whileHover={{ y: -8 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  {/* Image & Video backdrop */}
-                  <div className="relative h-48 sm:h-56 overflow-hidden z-0">
-                    <Image
-                      src={country.hero_image || country.banner_image || '/images/placeholder.jpg'}
-                      alt={`MBBS in ${country.name}`}
-                      fill
-                      className="object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out z-0"
-                    />
-
-                    {/* Interactive Hover Video Background */}
-                    {hoveredIndex === index && getCountryVideo(country.slug) && (
-                      <video
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500"
-                      >
-                        <source src={getCountryVideo(country.slug)} type="video/mp4" />
-                      </video>
-                    )}
-
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover/card:from-black/90 transition-all duration-300 z-10" />
-
-                    {/* Flag */}
-                    <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20 z-20">
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-[28px] border border-gray-200 overflow-hidden flex flex-col h-full animate-pulse shadow-sm">
+                <div className="bg-gray-200 h-48 sm:h-56 w-full" />
+                <div className="p-5 flex-1 flex flex-col space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-1/3" />
+                  <div className="h-6 bg-gray-200 rounded w-3/4" />
+                  <div className="h-10 bg-gray-150 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-2/3 mt-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8">
+            {countries.map((country, index) => (
+              <motion.div
+                key={country._id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
+              >
+                <Link href={`/countries/${country.slug}`} className="block group h-full">
+                  <motion.div
+                    onMouseEnter={() => setHoveredIndex(index)}
+                    onMouseLeave={() => setHoveredIndex(null)}
+                    className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
+                    whileHover={{ y: -8 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    {/* Image & Video backdrop */}
+                    <div className="relative h-48 sm:h-56 overflow-hidden z-0">
                       <Image
-                        src={country.flag_url || getCountryFlag(country.code)}
-                        alt={`${country.name} flag`}
+                        src={country.hero_image || country.banner_image || '/images/placeholder.jpg'}
+                        alt={`MBBS in ${country.name}`}
                         fill
-                        className="object-cover"
+                        className="object-cover group-hover/card:scale-110 transition-transform duration-700 ease-out z-0"
                       />
-                    </div>
 
-                    {/* Featured Badge */}
-                    {country.meta?.is_featured && (
-                      <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md z-20">
-                        Popular Choice
-                      </span>
-                    )}
+                      {/* Interactive Hover Video Background */}
+                      {hoveredIndex === index && getCountryVideo(country.slug) && (
+                        <video
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                          className="absolute inset-0 w-full h-full object-cover z-0 transition-opacity duration-500"
+                        >
+                          <source src={getCountryVideo(country.slug)} type="video/mp4" />
+                        </video>
+                      )}
 
-                    {/* Country Name */}
-                    <div className="absolute bottom-4 left-4 right-4 z-20">
-                      <h3 className="text-xl sm:text-2xl font-bold text-white text-shadow flex items-center gap-2">
-                        MBBS in {country.name}
-                      </h3>
-                    </div>
-                  </div>
+                      {/* Gradient Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover/card:from-black/90 transition-all duration-300 z-10" />
 
-                  {/* Info */}
-                  <div className="p-5 flex-1 flex flex-col">
-                    {/* Trust Badges */}
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50/70 border border-primary-100 rounded-full text-[10px] font-semibold text-primary-700">
-                        <Check className="w-3 h-3" /> NMC Approved
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-50/70 border border-secondary-100 rounded-full text-[10px] font-semibold text-secondary-700">
-                        <Check className="w-3 h-3" /> WHO Listed
-                      </span>
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50/70 border border-green-100 rounded-full text-[10px] font-semibold text-green-700">
-                        <Check className="w-3 h-3" /> 100% English
-                      </span>
-                    </div>
-
-                    {/* Quick Stats */}
-                    <div className="grid grid-cols-3 gap-3 mb-5 bg-gray-50/70 p-3 rounded-2xl border border-gray-100">
-                      <div className="text-center">
-                        <Clock className="w-4 h-4 text-primary-500 mx-auto mb-1" />
-                        <span className="text-[10px] text-gray-500 block">Duration</span>
-                        <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                          {country.course_details?.duration || '6 Years'}
-                        </p>
+                      {/* Flag */}
+                      <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20 z-20">
+                        <Image
+                          src={country.flag_url || getCountryFlag(country.code)}
+                          alt={`${country.name} flag`}
+                          fill
+                          className="object-cover"
+                        />
                       </div>
-                      <div className="text-center border-x border-gray-200">
-                        <GraduationCap className="w-4 h-4 text-primary-500 mx-auto mb-1" />
-                        <span className="text-[10px] text-gray-500 block">Medium</span>
-                        <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
-                          {country.course_details?.medium || 'English'}
-                        </p>
-                      </div>
-                      <div className="text-center">
-                        <DollarSign className="w-4 h-4 text-primary-500 mx-auto mb-1" />
-                        <span className="text-[10px] text-gray-500 block">Tuition Fee</span>
-                        <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5 line-clamp-2">
-                          {country.pricing?.total_course_fee || 'Contact Us'}
-                        </p>
+
+                      {/* Featured Badge */}
+                      {country.meta?.is_featured && (
+                        <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md z-20">
+                          Popular Choice
+                        </span>
+                      )}
+
+                      {/* Country Name */}
+                      <div className="absolute bottom-4 left-4 right-4 z-20">
+                        <h3 className="text-xl sm:text-2xl font-bold text-white text-shadow flex items-center gap-2">
+                          MBBS in {country.name}
+                        </h3>
                       </div>
                     </div>
 
-                    {/* Recognition */}
-                    <div className="flex items-center justify-between gap-3 mt-auto pt-3.5 border-t border-gray-100">
-                      <div className="flex items-center space-x-1.5 flex-wrap">
-                        {country.course_details?.recognition?.slice(0, 3).map((rec) => (
-                          <span
-                            key={rec}
-                            className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-semibold rounded whitespace-nowrap"
-                          >
-                            {rec}
-                          </span>
-                        ))}
+                    {/* Info */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      {/* Trust Badges */}
+                      <div className="flex flex-wrap gap-1.5 mb-5">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50/70 border border-primary-100 rounded-full text-[10px] font-semibold text-primary-700">
+                          <Check className="w-3 h-3" /> NMC Approved
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-50/70 border border-secondary-100 rounded-full text-[10px] font-semibold text-secondary-700">
+                          <Check className="w-3 h-3" /> WHO Listed
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50/70 border border-green-100 rounded-full text-[10px] font-semibold text-green-700">
+                          <Check className="w-3 h-3" /> 100% English
+                        </span>
                       </div>
-                      <span className="text-primary-600 font-bold text-xs sm:text-sm flex items-center group-hover/card:translate-x-1 transition-transform">
-                        <span>Learn More</span>
-                        <ArrowRight className="w-4 h-4 ml-1" />
-                      </span>
+
+                      {/* Quick Stats */}
+                      <div className="grid grid-cols-3 gap-3 mb-5 bg-gray-50/70 p-3 rounded-2xl border border-gray-100">
+                        <div className="text-center">
+                          <Clock className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                          <span className="text-[10px] text-gray-500 block">Duration</span>
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
+                            {country.course_details?.duration || '6 Years'}
+                          </p>
+                        </div>
+                        <div className="text-center border-x border-gray-200">
+                          <GraduationCap className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                          <span className="text-[10px] text-gray-500 block">Medium</span>
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5">
+                            {country.course_details?.medium || 'English'}
+                          </p>
+                        </div>
+                        <div className="text-center">
+                          <DollarSign className="w-4 h-4 text-primary-500 mx-auto mb-1" />
+                          <span className="text-[10px] text-gray-500 block">Tuition Fee</span>
+                          <p className="text-xs sm:text-sm font-semibold text-gray-900 mt-0.5 line-clamp-2">
+                            {country.pricing?.total_course_fee || 'Contact Us'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Recognition */}
+                      <div className="flex items-center justify-between gap-3 mt-auto pt-3.5 border-t border-gray-100">
+                        <div className="flex items-center space-x-1.5 flex-wrap">
+                          {country.course_details?.recognition?.slice(0, 3).map((rec) => (
+                            <span
+                              key={rec}
+                              className="px-2 py-0.5 bg-gray-100 text-gray-600 text-[10px] font-semibold rounded whitespace-nowrap"
+                            >
+                              {rec}
+                            </span>
+                          ))}
+                        </div>
+                        <span className="text-primary-600 font-bold text-xs sm:text-sm flex items-center group-hover/card:translate-x-1 transition-transform">
+                          <span>Learn More</span>
+                          <ArrowRight className="w-4 h-4 ml-1" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </motion.div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
+                  </motion.div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* View All Link */}
         <motion.div

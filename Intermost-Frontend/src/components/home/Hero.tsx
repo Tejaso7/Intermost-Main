@@ -250,7 +250,7 @@ export default function Hero() {
                 transition={{ duration: 0.7, delay: 0.2, ease: 'easeOut' }}
                 className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed font-light"
               >
-                Study MBBS at WHO & NMC approved universities in Russia, Georgia, 
+                Study MBBS at WHO & NMC approved universities in Georgia, 
                 Uzbekistan, and more. Transparent pricing, 100% English medium, and guaranteed admission letters.
               </motion.p>
             </div>
@@ -260,14 +260,13 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-2xl"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-w-2xl"
             >
               {[
                 { value: `${siteStats.students_placed}+`, label: 'Students Placed' },
                 { value: `${siteStats.pioneer_students || 4725}+`, label: 'Pioneer Students' },
                 { value: `${siteStats.partner_universities}+`, label: 'Partner Colleges' },
                 { value: `${siteStats.years_experience}+`, label: 'Years Experience' },
-                { value: `${siteStats.visa_success_rate}%`, label: 'Visa Success' },
               ].map((stat, i) => (
                 <div key={i} className="p-3.5 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl">
                   <p className="text-xl sm:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary-300 to-secondary-300">

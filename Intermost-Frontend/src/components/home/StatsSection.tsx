@@ -91,13 +91,6 @@ export default function StatsSection() {
       label: 'Years Experience',
       description: 'Trusted since 2003',
     },
-    {
-      icon: Award,
-      value: siteStats.visa_success_rate,
-      suffix: '%',
-      label: 'Visa Success Rate',
-      description: 'Industry-leading success',
-    },
   ];
 
   return (
@@ -129,7 +122,7 @@ export default function StatsSection() {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {dynamicStats.map((stat, index) => (
             <motion.div
               key={stat.label}

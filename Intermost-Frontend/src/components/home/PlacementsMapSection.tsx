@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Globe, CheckCircle2, ChevronRight, Download, BookOpen, Star } from 'lucide-react';
 import BrochureDownloadModal from '@/components/common/BrochureDownloadModal';
+import { coreApi } from '@/lib/services';
 
 interface MapDestination {
   id: string;
@@ -89,6 +90,51 @@ const destinations: MapDestination[] = [
 export default function PlacementsMapSection() {
   const [selectedDest, setSelectedDest] = useState<MapDestination>(destinations[0]);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+  const [siteStats, setSiteStats] = useState({
+    students_placed: 5500,
+  });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const settings = await coreApi.getSettings();
+        if (settings?.stats) {
+          setSiteStats(settings.stats);
+        }
+      } catch (error) {
+        console.debug('Failed to fetch stats for PlacementsMap, using defaults', error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const getDynamicPlacements = (destId: string) => {
+    const total = siteStats.students_placed;
+    let count = 0;
+    switch (destId) {
+      case 'russia':
+        count = total - 1700;
+        break;
+      case 'uzbekistan':
+        count = total - 4100;
+        break;
+      case 'kazakhstan':
+        count = total - 4400;
+        break;
+      case 'georgia':
+        count = total - 4550;
+        break;
+      case 'nepal':
+        count = total - 4700;
+        break;
+      case 'tajikistan':
+        count = total - 4900;
+        break;
+      default:
+        return destinations.find(d => d.id === destId)?.placements || '';
+    }
+    return `${count.toLocaleString()}+ Students Placed`;
+  };
 
   return (
     <section className="py-24 bg-gray-950 text-white relative overflow-hidden">
@@ -250,7 +296,7 @@ export default function PlacementsMapSection() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
                       <p className="text-[10px] font-bold text-gray-400 uppercase">Alumni Count</p>
-                      <p className="text-sm font-extrabold text-white mt-1">{selectedDest.placements}</p>
+                      <p className="text-sm font-extrabold text-white mt-1">{getDynamicPlacements(selectedDest.id)}</p>
                     </div>
                     <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
                       <p className="text-[10px] font-bold text-gray-400 uppercase">Average Fees</p>

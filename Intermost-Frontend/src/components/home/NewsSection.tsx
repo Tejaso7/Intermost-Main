@@ -103,148 +103,168 @@ export default function NewsSection() {
         </motion.div>
 
         {/* Marquee Banner */}
-        {marqueeNews.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl mb-8 sm:mb-10 overflow-hidden"
-          >
-            <div className="animate-marquee whitespace-nowrap text-xs sm:text-sm md:text-base">
-              {marqueeNews.map((item, index) => (
-                <span key={item._id} className="mx-4 sm:mx-8 inline-flex items-center">
-                  <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
-                  {item.title}
-                  {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
-                </span>
-              ))}
-              {/* Duplicate for seamless loop */}
-              {marqueeNews.map((item, index) => (
-                <span key={`dup-${item._id}`} className="mx-4 sm:mx-8 inline-flex items-center">
-                  <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
-                  {item.title}
-                  {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
-                </span>
-              ))}
-            </div>
-          </motion.div>
-        )}
-
-        {/* News Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
-          {gridNews.map((item, index) => (
-            <motion.div
-              key={item._id}
+        {loading ? (
+          <div className="bg-gray-200 h-10 rounded-xl mb-8 animate-pulse border border-gray-300/40" />
+        ) : (
+          marqueeNews.length > 0 && (
+            <motion.div 
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="card card-hover overflow-hidden group flex flex-col h-full"
-              whileHover={{ y: -4 }}
+              className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl mb-8 sm:mb-10 overflow-hidden"
             >
-              {/* Media */}
-              <div className="relative h-40 sm:h-48 overflow-hidden">
-                {item.media_type === 'video' ? (
-                  playingVideoId === item._id ? (
-                    getYoutubeId(item.media_url || '') ? (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${getYoutubeId(item.media_url || '')}?autoplay=1`}
-                        className="w-full h-full object-cover"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                      />
-                    ) : (
-                      <video
-                        src={item.media_url}
-                        className="w-full h-full object-cover bg-black"
-                        controls
-                        autoPlay
-                      />
-                    )
-                  ) : (
-                    <div 
-                      className="relative w-full h-full cursor-pointer group"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setPlayingVideoId(item._id);
-                      }}
-                    >
-                      {getYoutubeId(item.media_url || '') ? (
-                        <Image
-                          src={`https://img.youtube.com/vi/${getYoutubeId(item.media_url || '')}/hqdefault.jpg`}
-                          alt={item.title}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+              <div className="animate-marquee whitespace-nowrap text-xs sm:text-sm md:text-base">
+                {marqueeNews.map((item, index) => (
+                  <span key={item._id} className="mx-4 sm:mx-8 inline-flex items-center">
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
+                    {item.title}
+                    {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                  </span>
+                ))}
+                {/* Duplicate for seamless loop */}
+                {marqueeNews.map((item, index) => (
+                  <span key={`dup-${item._id}`} className="mx-4 sm:mx-8 inline-flex items-center">
+                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
+                    {item.title}
+                    {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          )
+        )}
+
+        {/* News Grid / Skeletons */}
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl border border-gray-150 overflow-hidden flex flex-col h-full animate-pulse shadow-sm">
+                <div className="bg-gray-200 h-40 sm:h-48 w-full" />
+                <div className="p-5 flex-1 flex flex-col space-y-4">
+                  <div className="h-4 bg-gray-200 rounded w-1/4" />
+                  <div className="h-6 bg-gray-200 rounded w-3/4" />
+                  <div className="h-4 bg-gray-200 rounded w-full" />
+                  <div className="h-4 bg-gray-200 rounded w-5/6 mt-auto" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
+            {gridNews.map((item, index) => (
+              <motion.div
+                key={item._id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="card card-hover overflow-hidden group flex flex-col h-full"
+                whileHover={{ y: -4 }}
+              >
+                {/* Media */}
+                <div className="relative h-40 sm:h-48 overflow-hidden">
+                  {item.media_type === 'video' ? (
+                    playingVideoId === item._id ? (
+                      getYoutubeId(item.media_url || '') ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${getYoutubeId(item.media_url || '')}?autoplay=1`}
+                          className="w-full h-full object-cover"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
                         />
                       ) : (
                         <video
                           src={item.media_url}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                          muted
-                          playsInline
+                          className="w-full h-full object-cover bg-black"
+                          controls
+                          autoPlay
                         />
-                      )}
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
-                        <motion.div 
-                          className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"
-                          whileHover={{ scale: 1.1 }}
-                        >
-                          <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
-                        </motion.div>
+                      )
+                    ) : (
+                      <div 
+                        className="relative w-full h-full cursor-pointer group"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPlayingVideoId(item._id);
+                        }}
+                      >
+                        {getYoutubeId(item.media_url || '') ? (
+                          <Image
+                            src={`https://img.youtube.com/vi/${getYoutubeId(item.media_url || '')}/hqdefault.jpg`}
+                            alt={item.title}
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <video
+                            src={item.media_url}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            muted
+                            playsInline
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/30 transition-colors">
+                          <motion.div 
+                            className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"
+                            whileHover={{ scale: 1.1 }}
+                          >
+                            <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
+                          </motion.div>
+                        </div>
                       </div>
-                    </div>
-                  )
-                ) : (
-                  <Image
-                    src={item.media_url || '/images/placeholder.jpg'}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                )}
-                
-                {/* Badge */}
-                {item.badge_text && (
-                  <motion.span 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    className="absolute top-2 sm:top-4 left-2 sm:left-4 px-2 sm:px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full"
-                  >
-                    {item.badge_text}
-                  </motion.span>
-                )}
-              </div>
-
-              {/* Content */}
-              <div className="p-4 sm:p-5 flex flex-col flex-1">
-                <h3 className="font-semibold text-base sm:text-lg text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
-                  {item.title}
-                </h3>
-                <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2 flex-1">
-                  {item.description}
-                </p>
-                
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 gap-2">
-                  {item.location && (
-                    <span className="flex items-center text-xs sm:text-sm text-gray-500">
-                      <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
-                      <span className="truncate">{item.location}</span>
-                    </span>
+                    )
+                  ) : (
+                    <Image
+                      src={item.media_url || '/images/placeholder.jpg'}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   )}
-                  {item.link && (
-                    <Link
-                      href={item.link}
-                      className="text-primary-600 text-xs sm:text-sm font-medium flex items-center hover:text-primary-700 whitespace-nowrap"
+                  
+                  {/* Badge */}
+                  {item.badge_text && (
+                    <motion.span 
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      className="absolute top-2 sm:top-4 left-2 sm:left-4 px-2 sm:px-3 py-1 bg-primary-600 text-white text-xs font-semibold rounded-full"
                     >
-                      Read More
-                      <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" />
-                    </Link>
+                      {item.badge_text}
+                    </motion.span>
                   )}
                 </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+
+                {/* Content */}
+                <div className="p-4 sm:p-5 flex flex-col flex-1">
+                  <h3 className="font-semibold text-base sm:text-lg text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-gray-600 text-xs sm:text-sm mt-1 line-clamp-2 flex-1">
+                    {item.description}
+                  </p>
+                  
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 gap-2">
+                    {item.location && (
+                      <span className="flex items-center text-xs sm:text-sm text-gray-500">
+                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                        <span className="truncate">{item.location}</span>
+                      </span>
+                    )}
+                    {item.link && (
+                      <Link
+                        href={item.link}
+                        className="text-primary-600 text-xs sm:text-sm font-medium flex items-center hover:text-primary-700 whitespace-nowrap"
+                      >
+                        Read More
+                        <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {/* View All Link */}
         <motion.div
