@@ -32,49 +32,22 @@ client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
 # Use available model
 CHAT_MODEL = "gemini-2.0-flash"
-GROK_API_KEY = getattr(django_settings, 'GROK_API_KEY', '') or os.environ.get('GROK_API_KEY', '')
-if GROK_API_KEY == 'your-grok-api-key':
-    GROK_API_KEY = ''
 
 
 def generate_response(prompt: str) -> str:
-    """Generate response using xAI Grok API, falling back to Gemini."""
-    # 1. Attempt Grok API
-    if GROK_API_KEY:
-        try:
-            url = "https://api.x.ai/v1/chat/completions"
-            headers = {
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {GROK_API_KEY}"
-            }
-            payload = {
-                "model": "grok-beta",
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ],
-                "temperature": 0.7
-            }
-            res = requests.post(url, json=payload, headers=headers, timeout=20)
-            if res.status_code == 200:
-                res_data = res.json()
-                return res_data['choices'][0]['message']['content']
-            else:
-                logger.warning(f"Grok API error: status {res.status_code}, response: {res.text}. Falling back to Gemini.")
-        except Exception as e:
-            logger.warning(f"Grok API request exception: {str(e)}. Falling back to Gemini.")
-
-    # 2. Gemini Fallback
-    if client:
-        try:
-            response = client.models.generate_content(
-                model=CHAT_MODEL,
-                contents=prompt
-            )
-            return response.text
-        except Exception as e:
-            logger.error(f"Gemini generation error: {e}")
-            
-    raise ValueError("AI services failed. Grok and Gemini keys are either missing, expired, or unauthorized.")
+    """Generate response using Google Gemini."""
+    if not client:
+        raise ValueError("Google Gemini client is not initialized. Please configure GEMINI_API_KEY.")
+    
+    try:
+        response = client.models.generate_content(
+            model=CHAT_MODEL,
+            contents=prompt
+        )
+        return response.text
+    except Exception as e:
+        logger.error(f"Gemini generation error: {e}")
+        raise e
 
 
 def serialize_doc(doc):
@@ -244,7 +217,7 @@ class StudentChatView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            if not GEMINI_API_KEY and not GROK_API_KEY:
+            if not GEMINI_API_KEY:
                 return Response(
                     {'error': 'AI service not configured'},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE
