@@ -641,26 +641,26 @@ export interface Alumni {
 
 export const alumniData: Alumni[] = [
   {
-    name: 'Dr. Priyanka Mishra',
-    university: 'Dnipro State Medical University',
+    name: 'Dr. Priyanka',
+    university: 'Dnipro State',
     batch: '2018',
-    testimonial: "Intermost made my dream of studying medicine abroad come true. Their guidance from application to visa was impeccable. The university in Tbilisi has excellent facilities and faculty.",
+    testimonial: "Intermost made my dream of studying medicine abroad come true. Their guidance from application to visa was impeccable. The university has excellent facilities and clinical exposure.",
     currentRole: 'Graduated from International Medical University, Bishkek, Kyrgyzstan, currently doing internship. FMGE 2024',
     image: '/images/dr/priya.jpg'
   },
   {
-    name: 'Dr. Zainab Khan',
-    university: 'MBBS in Ukraine',
+    name: 'Dr. Zainab',
+    university: 'Dnipro State',
     batch: '2024',
     testimonial: "Studying in Ukraine through Intermost was the best decision. Their team helped me with every step, even after arrival. The quality of medical education here is world-class at a fraction of Indian private college costs.",
-    currentRole: 'Dnipropetrovsk State Medical University, Ukraine. Recently cleared FMGE exam in first attempt.',
+    currentRole: 'Recently cleared FMGE exam in first attempt.',
     image: '/images/dr/zainab.jpg'
   },
   {
-    name: 'Dr. Sumant Maharana',
-    university: 'Dnipro State Medical University, Ukraine',
+    name: 'Dr. Sumant',
+    university: 'Dnipro State',
     batch: '2020',
-    testimonial: "The affordable fees and excellent clinical exposure in Hanoi were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling.",
+    testimonial: "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling.",
     currentRole: 'Pass FMGE Exam: 2020, MBBS MD (Physician) DSMU PG Resident 3rd year at MS Orthopedics Mahatma Gandhi Memorial Govt Medical College and Hospital, Jamshedpur',
     image: '/images/dr/sumant.jpg'
   },
@@ -673,39 +673,39 @@ export const alumniData: Alumni[] = [
     image: '/images/dr/vishal.jpg'
   },
   {
-    name: 'Shubhangi Chaturvedi',
-    university: 'Georgian National University SEU',
+    name: 'Shubhangi',
+    university: 'SEU',
     batch: '2025',
     testimonial: "Choosing SEU was a turning point in my career. Thankful for the transparent and smooth guidance I received through every step.",
     image: '/images/dr/shubhangi.jpg'
   },
   {
-    name: 'Dr. Abinash Mohanty',
-    university: 'DSMA Ukraine',
-    batch: 'June 2018',
+    name: 'Dr. Abinash',
+    university: 'DSMA',
+    batch: '2018',
     testimonial: "My FMGE journey was successful thanks to solid guidance and preparation. Working as a GDMO now has been a fulfilling experience in public service.",
     currentRole: '2019 FMGE Passed, GDMO at PHC (N) Dengausta, Ganjam, Odisha since 2021',
     image: '/images/dr/abinash.jpg'
   },
   {
-    name: 'Dr. Lalit Chaudhary',
-    university: 'Dnipropetrovsk State Medical University',
+    name: 'Dr. Lalit',
+    university: 'Dnipro State',
     batch: '2020',
     testimonial: "Medical education in Ukraine shaped me into the professional I am today. I'm currently working as a surgery resident and pursuing specialization.",
     currentRole: 'Resident - General Surgery, Metro Hospital Faridabad',
     image: '/images/dr/lalit.jpg'
   },
   {
-    name: 'Dr. Sandeep Yadav',
-    university: 'Mari State University, Russia',
-    batch: '2020',
+    name: 'Dr. Sandeep',
+    university: 'Mari State',
+    batch: '2021',
     testimonial: "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital.",
     currentRole: 'PARAS Hospital, Tapukhara Bhiwadi, Rajasthan',
     image: '/images/dr/sandeep.jpg'
   },
   {
-    name: 'Dr. Amit Kumar',
-    university: 'Andijan State Medical University, Uzbekistan',
+    name: 'Dr. Amit',
+    university: 'Andijan State',
     batch: '2024',
     testimonial: "The journey through Andijan State Medical University has been truly transformative. The support from Intermost ensured a smooth process throughout.",
     image: '/images/dr/amit.jpg'

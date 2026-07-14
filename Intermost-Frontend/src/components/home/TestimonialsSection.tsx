@@ -19,11 +19,11 @@ import 'swiper/css/navigation';
 const fallbackTestimonials: Testimonial[] = [
   {
     _id: 'alumni-1',
-    name: 'Dr. Sumant Maharana',
-    university: 'Dnipro State Medical University',
+    name: 'Dr. Sumant',
+    university: 'Dnipro State',
     country: 'Ukraine',
     year: 2020,
-    rating: 5,
+    rating: 4.5,
     quote: "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling.",
     content: "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling. Pass FMGE Exam: 2020, PG Resident in MS Orthopedics.",
     photo: '/images/dr/sumant.jpg',
@@ -33,8 +33,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-2',
-    name: 'Dr. Zainab Khan',
-    university: 'Dnipropetrovsk State Medical University',
+    name: 'Dr. Zainab',
+    university: 'Dnipro State',
     country: 'Ukraine',
     year: 2024,
     rating: 5,
@@ -47,8 +47,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-3',
-    name: 'Dr. Priyanka Mishra',
-    university: 'Dnipro State Medical University',
+    name: 'Dr. Priyanka',
+    university: 'Dnipro State',
     country: 'Ukraine',
     year: 2018,
     rating: 5,
@@ -75,8 +75,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-5',
-    name: 'Shubhangi Chaturvedi',
-    university: 'Georgian National University SEU',
+    name: 'Shubhangi',
+    university: 'SEU',
     country: 'Georgia',
     year: 2025,
     rating: 5,
@@ -89,8 +89,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-6',
-    name: 'Dr. Abinash Mohanty',
-    university: 'DSMA Ukraine',
+    name: 'Dr. Abinash',
+    university: 'DSMA',
     country: 'Ukraine',
     year: 2018,
     rating: 5,
@@ -103,8 +103,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-7',
-    name: 'Dr. Lalit Chaudhary',
-    university: 'Dnipropetrovsk State Medical University',
+    name: 'Dr. Lalit',
+    university: 'Dnipro State',
     country: 'Ukraine',
     year: 2020,
     rating: 5,
@@ -117,10 +117,10 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-8',
-    name: 'Dr. Sandeep Yadav',
-    university: 'Mari State University',
+    name: 'Dr. Sandeep',
+    university: 'Mari State',
     country: 'Russia',
-    year: 2020,
+    year: 2021,
     rating: 5,
     quote: "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital.",
     content: "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital (PARAS Hospital, Rajasthan).",
@@ -131,8 +131,8 @@ const fallbackTestimonials: Testimonial[] = [
   },
   {
     _id: 'alumni-9',
-    name: 'Dr. Amit Kumar',
-    university: 'Andijan State Medical University',
+    name: 'Dr. Amit',
+    university: 'Andijan State',
     country: 'Uzbekistan',
     year: 2024,
     rating: 5,
@@ -155,7 +155,8 @@ export default function TestimonialsSection() {
       try {
         const data = await testimonialsApi.getAll({ featured: true });
         if (data && data.length > 0) {
-          setTestimonials(data);
+          const sorted = [...data].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0));
+          setTestimonials(sorted);
         }
       } catch (error) {
         console.error('Error fetching testimonials:', error);

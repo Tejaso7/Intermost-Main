@@ -1618,14 +1618,14 @@ def seed_testimonials():
     
     testimonials = [
         {
-            'name': 'Dr. Sumant Maharana',
+            'name': 'Dr. Sumant',
             'title': 'Dr.',
-            'designation': 'Dnipro State Medical University, Batch 2020',
-            'university': 'Dnipro State Medical University',
+            'designation': 'Dnipro State, Batch 2020',
+            'university': 'Dnipro State',
             'country': 'Ukraine',
             'photo': '/images/dr/sumant.jpg',
             'quote': "The affordable fees and excellent clinical exposure in Dnipro were exactly what I needed. Intermost's local support team in Ukraine made the transition smooth. I'm grateful for their honest counseling.",
-            'rating': 5,
+            'rating': 4.5,
             'batch_year': '2020',
             'is_active': True,
             'display_order': 1,
@@ -1633,10 +1633,10 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Zainab Khan',
+            'name': 'Dr. Zainab',
             'title': 'Dr.',
-            'designation': 'Dnipropetrovsk State Medical University, Batch 2024',
-            'university': 'Dnipropetrovsk State Medical University',
+            'designation': 'Dnipro State, Batch 2024',
+            'university': 'Dnipro State',
             'country': 'Ukraine',
             'photo': '/images/dr/zainab.jpg',
             'quote': "Studying in Ukraine through Intermost was the best decision. Their team helped me with every step, even after arrival. The quality of medical education here is world-class at a fraction of Indian private college costs.",
@@ -1648,10 +1648,10 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Priyanka Mishra',
+            'name': 'Dr. Priyanka',
             'title': 'Dr.',
-            'designation': 'Dnipro State Medical University, Batch 2018',
-            'university': 'Dnipro State Medical University',
+            'designation': 'Dnipro State, Batch 2018',
+            'university': 'Dnipro State',
             'country': 'Ukraine',
             'photo': '/images/dr/priya.jpg',
             'quote': "Intermost made my dream of studying medicine abroad come true. Their guidance from application to visa was impeccable. The university has excellent facilities and clinical exposure.",
@@ -1678,10 +1678,10 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Shubhangi Chaturvedi',
+            'name': 'Shubhangi',
             'title': '',
-            'designation': 'Georgian National University SEU, Batch 2025',
-            'university': 'Georgian National University SEU',
+            'designation': 'SEU, Batch 2025',
+            'university': 'SEU',
             'country': 'Georgia',
             'photo': '/images/dr/shubhangi.jpg',
             'quote': "Choosing SEU was a turning point in my career. Thankful for the transparent and smooth guidance I received through every step.",
@@ -1693,10 +1693,10 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Abinash Mohanty',
+            'name': 'Dr. Abinash',
             'title': 'Dr.',
-            'designation': 'DSMA Ukraine, Batch 2018',
-            'university': 'DSMA Ukraine',
+            'designation': 'DSMA, Batch 2018',
+            'university': 'DSMA',
             'country': 'Ukraine',
             'photo': '/images/dr/abinash.jpg',
             'quote': "My FMGE journey was successful thanks to solid guidance and preparation. Working as a GDMO now has been a fulfilling experience in public service.",
@@ -1708,10 +1708,10 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Lalit Chaudhary',
+            'name': 'Dr. Lalit',
             'title': 'Dr.',
-            'designation': 'Dnipropetrovsk State Medical University, Batch 2020',
-            'university': 'Dnipropetrovsk State Medical University',
+            'designation': 'Dnipro State, Batch 2020',
+            'university': 'Dnipro State',
             'country': 'Ukraine',
             'photo': '/images/dr/lalit.jpg',
             'quote': "Medical education in Ukraine shaped me into the professional I am today. I'm currently working as a surgery resident and pursuing specialization.",
@@ -1723,25 +1723,25 @@ def seed_testimonials():
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Sandeep Yadav',
+            'name': 'Dr. Sandeep',
             'title': 'Dr.',
-            'designation': 'Mari State University, Batch 2020',
-            'university': 'Mari State University',
+            'designation': 'Mari State, Batch 2021',
+            'university': 'Mari State',
             'country': 'Russia',
             'photo': '/images/dr/sandeep.jpg',
             'quote': "Studying in Russia gave me solid clinical exposure. I'm proud to now serve patients back home in Rajasthan as part of a reputed hospital.",
             'rating': 5,
-            'batch_year': '2020',
+            'batch_year': '2021',
             'is_active': True,
             'display_order': 8,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         },
         {
-            'name': 'Dr. Amit Kumar',
+            'name': 'Dr. Amit',
             'title': 'Dr.',
-            'designation': 'Andijan State Medical University, Batch 2024',
-            'university': 'Andijan State Medical University',
+            'designation': 'Andijan State, Batch 2024',
+            'university': 'Andijan State',
             'country': 'Uzbekistan',
             'photo': '/images/dr/amit.jpg',
             'quote': "The journey through Andijan State Medical University has been truly transformative. The support from Intermost ensured a smooth process throughout.",
