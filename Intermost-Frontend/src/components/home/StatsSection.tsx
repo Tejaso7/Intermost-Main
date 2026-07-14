@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useInView } from 'framer-motion';
 import CountUp from 'react-countup';
-import { Users, Building, Calendar, Award } from 'lucide-react';
+import { Users, Building, Calendar, Award, GraduationCap } from 'lucide-react';
 import { coreApi } from '@/lib/services';
 
 const stats = [
@@ -44,7 +44,8 @@ export default function StatsSection() {
     students_placed: 5500,
     partner_universities: 35,
     years_experience: 23,
-    visa_success_rate: 99
+    visa_success_rate: 99,
+    pioneer_students: 4725
   });
 
   useEffect(() => {
@@ -68,6 +69,13 @@ export default function StatsSection() {
       suffix: '+',
       label: 'Students Placed',
       description: 'Successfully admitted worldwide',
+    },
+    {
+      icon: GraduationCap,
+      value: siteStats.pioneer_students || 4725,
+      suffix: '+',
+      label: 'Pioneer Students',
+      description: 'Currently pursuing MBBS abroad',
     },
     {
       icon: Building,
@@ -121,7 +129,7 @@ export default function StatsSection() {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8">
           {dynamicStats.map((stat, index) => (
             <motion.div
               key={stat.label}

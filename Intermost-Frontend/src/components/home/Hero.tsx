@@ -35,7 +35,8 @@ export default function Hero() {
     students_placed: 5500,
     partner_universities: 35,
     years_experience: 23,
-    visa_success_rate: 99
+    visa_success_rate: 99,
+    pioneer_students: 4725
   });
   const [heroBgType, setHeroBgType] = useState<'image' | 'video'>('video');
   const [heroBgUrl, setHeroBgUrl] = useState('https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4');
@@ -259,10 +260,11 @@ export default function Hero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-xl"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 max-w-2xl"
             >
               {[
                 { value: `${siteStats.students_placed}+`, label: 'Students Placed' },
+                { value: `${siteStats.pioneer_students || 4725}+`, label: 'Pioneer Students' },
                 { value: `${siteStats.partner_universities}+`, label: 'Partner Colleges' },
                 { value: `${siteStats.years_experience}+`, label: 'Years Experience' },
                 { value: `${siteStats.visa_success_rate}%`, label: 'Visa Success' },

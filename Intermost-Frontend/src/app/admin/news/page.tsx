@@ -36,7 +36,15 @@ export default function NewsPage() {
   const fetchData = async () => {
     try {
       const newsData = await newsApi.getAll({ is_active: 'all' });
-      setNews(Array.isArray(newsData) ? newsData : []);
+      const sorted = Array.isArray(newsData)
+        ? [...newsData].sort((a, b) => {
+            const orderA = a.display_order ?? 0;
+            const orderB = b.display_order ?? 0;
+            if (orderA !== orderB) return orderA - orderB;
+            return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+          })
+        : [];
+      setNews(sorted);
     } catch (error) {
       console.error('Error fetching news:', error);
       toast.error('Failed to load news');

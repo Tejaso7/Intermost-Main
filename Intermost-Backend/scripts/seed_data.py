@@ -1377,7 +1377,8 @@ def seed_site_settings():
             'students_placed': 5500,
             'partner_universities': 35,
             'years_experience': 21,
-            'visa_success_rate': 99
+            'visa_success_rate': 99,
+            'pioneer_students': 4725
         },
         'about_images': ['/images/about.jpg'],
         'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)],

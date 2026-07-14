@@ -386,6 +386,7 @@ export interface SiteSettings {
     partner_universities: number;
     years_experience: number;
     visa_success_rate: number;
+    pioneer_students: number;
   };
   hero_bg_type?: 'image' | 'video';
   hero_bg_url?: string;

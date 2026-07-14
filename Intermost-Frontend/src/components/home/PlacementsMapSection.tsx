@@ -22,7 +22,7 @@ const destinations: MapDestination[] = [
     id: 'russia',
     name: 'Russia',
     slug: 'russia',
-    coords: { x: 380, y: 70 },
+    coords: { x: 580, y: 140 },
     placements: '3,800+ Students Placed',
     avgFee: '$3,800 - $6,000 / Year',
     visaRate: '100% Guaranteed',
@@ -33,7 +33,7 @@ const destinations: MapDestination[] = [
     id: 'georgia',
     name: 'Georgia',
     slug: 'georgia',
-    coords: { x: 260, y: 150 },
+    coords: { x: 598, y: 215 },
     placements: '950+ Students Placed',
     avgFee: '$5,000 - $8,000 / Year',
     visaRate: '99.8% Success Rate',
@@ -44,7 +44,7 @@ const destinations: MapDestination[] = [
     id: 'uzbekistan',
     name: 'Uzbekistan',
     slug: 'uzbekistan',
-    coords: { x: 420, y: 190 },
+    coords: { x: 645, y: 226 },
     placements: '1,400+ Students Placed',
     avgFee: '$3,300 - $4,500 / Year',
     visaRate: '100% Success Rate',
@@ -55,7 +55,7 @@ const destinations: MapDestination[] = [
     id: 'kazakhstan',
     name: 'Kazakhstan',
     slug: 'kazakhstan',
-    coords: { x: 450, y: 140 },
+    coords: { x: 660, y: 195 },
     placements: '1,100+ Students Placed',
     avgFee: '$3,500 - $5,000 / Year',
     visaRate: '100% Success Rate',
@@ -66,7 +66,7 @@ const destinations: MapDestination[] = [
     id: 'nepal',
     name: 'Nepal',
     slug: 'nepal',
-    coords: { x: 530, y: 280 },
+    coords: { x: 706, y: 350 },
     placements: '800+ Students Placed',
     avgFee: '₹55 - ₹65 Lakhs (Total)',
     visaRate: '99.5% Success Rate',
@@ -77,7 +77,7 @@ const destinations: MapDestination[] = [
     id: 'tajikistan',
     name: 'Tajikistan',
     slug: 'tajikistan',
-    coords: { x: 400, y: 220 },
+    coords: { x: 649, y: 240 },
     placements: '450+ Students Placed',
     avgFee: '$3,500 / Year',
     visaRate: '100% Success Rate',
@@ -114,103 +114,105 @@ export default function PlacementsMapSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left panel: Interactive SVG Map */}
+          {/* Left panel: Interactive World Map */}
           <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[32px] p-6 shadow-2xl relative min-h-[380px] sm:min-h-[440px] flex items-center justify-center overflow-hidden">
-            <svg
-              viewBox="0 0 650 380"
-              className="w-full h-full text-gray-700/30 select-none pointer-events-none absolute inset-0 z-0"
-              style={{ strokeWidth: 1.5 }}
-            >
-              {/* Fake grid lines */}
-              <defs>
-                <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="0.5" />
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-
-              {/* Eurasia continent outlines (simplified visual path representation) */}
-              <path
-                d="M 50 200 C 90 120, 220 80, 290 80 C 360 80, 480 60, 580 80 C 640 100, 600 200, 560 250 C 510 300, 390 280, 330 330 C 270 380, 150 340, 100 280 Z"
-                fill="rgba(255,255,255,0.015)"
-                stroke="rgba(255,255,255,0.05)"
-                strokeWidth="1.5"
+            <div className="relative w-full h-full aspect-[1000/600]">
+              <img
+                src="/images/world-map.svg"
+                alt="World Map"
+                className="w-full h-full object-contain opacity-35 select-none pointer-events-none absolute inset-0 z-0"
               />
-              
-              {/* Flight Paths from India (Source: 440, 280) */}
-              {destinations.map((dest) => (
-                <g key={`path-${dest.id}`}>
-                  {/* Dotted path curve */}
-                  <path
-                    d={`M 440 280 Q ${(440 + dest.coords.x) / 2} ${(280 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
-                    fill="none"
-                    stroke={selectedDest.id === dest.id ? '#0d9488' : 'rgba(255,255,255,0.1)'}
-                    strokeWidth={selectedDest.id === dest.id ? 2 : 1}
-                    strokeDasharray="4 4"
-                    className="transition-colors duration-300"
-                  />
-                  {/* Animated dot indicator flying along path */}
-                  <circle r="3" fill="#2dd4bf" className="pointer-events-none">
-                    <animateMotion
-                      dur="3s"
-                      repeatCount="indefinite"
-                      path={`M 440 280 Q ${(440 + dest.coords.x) / 2} ${(280 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
+
+              <svg
+                viewBox="0 0 1000 600"
+                className="w-full h-full select-none pointer-events-none absolute inset-0 z-10"
+              >
+                {/* Fake grid lines */}
+                <defs>
+                  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5" />
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+
+                {/* Flight Paths from India (Source: 688, 362) */}
+                {destinations.map((dest) => (
+                  <g key={`path-${dest.id}`}>
+                    {/* Dotted path curve */}
+                    <path
+                      d={`M 688 362 Q ${(688 + dest.coords.x) / 2} ${(362 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
+                      fill="none"
+                      stroke={selectedDest.id === dest.id ? '#0d9488' : 'rgba(255,255,255,0.1)'}
+                      strokeWidth={selectedDest.id === dest.id ? 2 : 1}
+                      strokeDasharray="4 4"
+                      className="transition-colors duration-300"
                     />
-                  </circle>
-                </g>
-              ))}
+                    {/* Animated dot indicator flying along path */}
+                    <circle r="3" fill="#2dd4bf" className="pointer-events-none">
+                      <animateMotion
+                        dur="3s"
+                        repeatCount="indefinite"
+                        path={`M 688 362 Q ${(688 + dest.coords.x) / 2} ${(362 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
+                      />
+                    </circle>
+                  </g>
+                ))}
 
-              {/* India Source Pin (Delhi/Mumbai area representation) */}
-              <circle cx="440" cy="280" r="7" fill="#0d9488" className="animate-pulse" />
-              <circle cx="440" cy="280" r="3" fill="#5eead4" />
-            </svg>
+                {/* India Source Pin */}
+                <circle cx="688" cy="362" r="7" fill="#0d9488" className="animate-pulse" />
+                <circle cx="688" cy="362" r="3" fill="#5eead4" />
+              </svg>
 
-            {/* Interactive buttons absolute positioning */}
-            <div className="absolute inset-0 z-10 pointer-events-auto">
-              {/* India Label */}
-              <div className="absolute top-[285px] left-[445px] flex items-center gap-1.5 pointer-events-none">
-                <span className="w-2 h-2 rounded-full bg-teal-400" />
-                <span className="text-[10px] font-bold text-teal-300 uppercase tracking-widest bg-black/60 px-1.5 py-0.5 rounded">
-                  India (Source)
-                </span>
-              </div>
+              {/* Interactive buttons absolute positioning */}
+              <div className="absolute inset-0 z-20 pointer-events-auto">
+                {/* India Label */}
+                <div 
+                  className="absolute flex items-center gap-1.5 pointer-events-none"
+                  style={{ left: '69.3%', top: '61.5%' }}
+                >
+                  <span className="w-2 h-2 rounded-full bg-teal-400" />
+                  <span className="text-[10px] font-bold text-teal-300 uppercase tracking-widest bg-black/60 px-1.5 py-0.5 rounded">
+                    India
+                  </span>
+                </div>
 
-              {/* Destination Hotspots */}
-              {destinations.map((dest) => {
-                const isSelected = selectedDest.id === dest.id;
-                return (
-                  <button
-                    key={`node-${dest.id}`}
-                    onClick={() => setSelectedDest(dest)}
-                    style={{ left: `${dest.coords.x}px`, top: `${dest.coords.y}px` }}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-                  >
-                    {/* Ripple rings */}
-                    <span
-                      className={`absolute inset-0 -m-3.5 rounded-full animate-ping opacity-60 ${
-                        isSelected ? 'bg-primary-500' : 'bg-gray-450 group-hover:bg-primary-500/40'
-                      }`}
-                      style={{ animationDuration: '2s' }}
-                    />
-                    
-                    {/* Inner pin button */}
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shadow-lg ${
-                        isSelected
-                          ? 'bg-primary text-white scale-125 border border-teal-300'
-                          : 'bg-gray-800 text-gray-300 border border-gray-650 hover:bg-gray-700 hover:text-white'
-                      }`}
+                {/* Destination Hotspots */}
+                {destinations.map((dest) => {
+                  const isSelected = selectedDest.id === dest.id;
+                  return (
+                    <button
+                      key={`node-${dest.id}`}
+                      onClick={() => setSelectedDest(dest)}
+                      style={{ left: `${dest.coords.x / 10}%`, top: `${dest.coords.y / 6}%` }}
+                      className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
                     >
-                      <MapPin className="w-3.5 h-3.5" />
-                    </div>
+                      {/* Ripple rings */}
+                      <span
+                        className={`absolute inset-0 -m-3.5 rounded-full animate-ping opacity-60 ${
+                          isSelected ? 'bg-primary-500' : 'bg-gray-450 group-hover:bg-primary-500/40'
+                        }`}
+                        style={{ animationDuration: '2s' }}
+                      />
+                      
+                      {/* Inner pin button */}
+                      <div
+                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                          isSelected
+                            ? 'bg-primary text-white scale-125 border border-teal-300'
+                            : 'bg-gray-800 text-gray-300 border border-gray-650 hover:bg-gray-700 hover:text-white'
+                        }`}
+                      >
+                        <MapPin className="w-3.5 h-3.5" />
+                      </div>
 
-                    {/* Hover text preview label */}
-                    <span className="absolute left-1/2 -translate-x-1/2 bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-gray-800 text-white font-extrabold text-[9px] uppercase tracking-wider py-1 px-2.5 rounded shadow-sm whitespace-nowrap z-20">
-                      {dest.name}
-                    </span>
-                  </button>
-                );
-              })}
+                      {/* Hover text preview label */}
+                      <span className="absolute left-1/2 -translate-x-1/2 bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-gray-800 text-white font-extrabold text-[9px] uppercase tracking-wider py-1 px-2.5 rounded shadow-sm whitespace-nowrap z-20">
+                        {dest.name}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -233,7 +235,7 @@ export default function PlacementsMapSection() {
                   <div className="flex items-center justify-between border-b border-white/10 pb-4">
                     <div>
                       <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                        MBBS in {selectedDest.name}
+                        MBBS Abroad - {selectedDest.name}
                       </h3>
                       <p className="text-xs text-primary-400 font-semibold tracking-wider uppercase mt-1">
                         Placement Profile

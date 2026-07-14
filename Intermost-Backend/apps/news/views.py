@@ -42,7 +42,7 @@ class NewsListCreateView(APIView):
             
         news_items = list(
             collection.find(query)
-            .sort('date', -1)
+            .sort([('display_order', 1), ('date', -1)])
             .limit(limit)
         )
         

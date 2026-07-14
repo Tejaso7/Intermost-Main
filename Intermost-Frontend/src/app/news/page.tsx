@@ -56,7 +56,13 @@ export default function NewsPage() {
       try {
         const data = await newsApi.getAll({ is_active: true });
         if (data && data.length > 0) {
-          setNews(data);
+          const sorted = [...data].sort((a, b) => {
+            const orderA = a.display_order ?? 0;
+            const orderB = b.display_order ?? 0;
+            if (orderA !== orderB) return orderA - orderB;
+            return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+          });
+          setNews(sorted);
         }
       } catch (error) {
         console.error('Error fetching news:', error);

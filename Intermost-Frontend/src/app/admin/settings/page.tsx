@@ -45,6 +45,7 @@ interface SiteSettings {
     partner_universities: number | '';
     years_experience: number | '';
     visa_success_rate: number | '';
+    pioneer_students: number | '';
   };
   hero_bg_type?: 'image' | 'video';
   hero_bg_url?: string;
@@ -81,6 +82,7 @@ export default function SettingsPage() {
       partner_universities: 35,
       years_experience: 23,
       visa_success_rate: 99,
+      pioneer_students: 4725,
     },
     hero_bg_type: 'image',
     hero_bg_url: '/images/countries/russia.jpg',
@@ -196,6 +198,7 @@ export default function SettingsPage() {
         partner_universities: settings.stats?.partner_universities || 0,
         years_experience: settings.stats?.years_experience || 0,
         visa_success_rate: settings.stats?.visa_success_rate || 0,
+        pioneer_students: settings.stats?.pioneer_students || 0,
       }
     };
 
@@ -667,7 +670,7 @@ export default function SettingsPage() {
                 <Globe className="w-5 h-5 mr-2 text-primary-600" />
                 KPI Statistics
               </h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Students Placed <span className="text-red-500">*</span>
@@ -721,6 +724,20 @@ export default function SettingsPage() {
                     required
                     name="stats.visa_success_rate"
                     value={settings.stats?.visa_success_rate ?? ''}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Pioneer Students <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    required
+                    name="stats.pioneer_students"
+                    value={settings.stats?.pioneer_students ?? ''}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   />

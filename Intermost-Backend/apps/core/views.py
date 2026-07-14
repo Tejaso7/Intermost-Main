@@ -197,7 +197,8 @@ class SiteSettingsView(APIView):
                 'students_placed': 5500,
                 'partner_universities': 35,
                 'years_experience': 23,
-                'visa_success_rate': 99
+                'visa_success_rate': 99,
+                'pioneer_students': 4725
             },
             'hero_bg_type': 'video',
             'hero_bg_url': 'https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4',
