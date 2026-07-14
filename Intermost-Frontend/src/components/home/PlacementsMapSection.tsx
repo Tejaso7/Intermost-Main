@@ -21,12 +21,12 @@ interface MapDestination {
 const destinations: MapDestination[] = [
   {
     id: 'russia',
-    name: 'Russia',
+    name: 'Globally',
     slug: 'russia',
     coords: { x: 580, y: 140 },
     placements: '3,800+ Students Placed',
     avgFee: '$3,800 - $6,000 / Year',
-    visaRate: '100% Guaranteed',
+    visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Orenburg State Medical University', 'Kazan Federal University', 'Bashkir State Medical University'],
   },
@@ -37,7 +37,7 @@ const destinations: MapDestination[] = [
     coords: { x: 598, y: 215 },
     placements: '950+ Students Placed',
     avgFee: '$5,000 - $8,000 / Year',
-    visaRate: '99.8% Success Rate',
+    visaRate: '99% Success Rate',
     language: 'English & Georgian Dual Option',
     universities: ['Tbilisi State Medical University', 'East European University'],
   },
@@ -48,7 +48,7 @@ const destinations: MapDestination[] = [
     coords: { x: 645, y: 226 },
     placements: '1,400+ Students Placed',
     avgFee: '$3,300 - $4,500 / Year',
-    visaRate: '100% Success Rate',
+    visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Tashkent Medical Academy', 'Samarkand State Medical University'],
   },
@@ -59,7 +59,7 @@ const destinations: MapDestination[] = [
     coords: { x: 660, y: 195 },
     placements: '1,100+ Students Placed',
     avgFee: '$3,500 - $5,000 / Year',
-    visaRate: '100% Success Rate',
+    visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Asfendiyarov Kazakh National Medical University', 'Semey Medical University'],
   },
@@ -70,7 +70,7 @@ const destinations: MapDestination[] = [
     coords: { x: 706, y: 350 },
     placements: '800+ Students Placed',
     avgFee: '₹55 - ₹65 Lakhs (Total)',
-    visaRate: '99.5% Success Rate',
+    visaRate: '99% Success Rate',
     language: 'English / Hindi Friendly',
     universities: ['Tribhuvan University', 'Kathmandu University'],
   },
@@ -81,11 +81,20 @@ const destinations: MapDestination[] = [
     coords: { x: 649, y: 240 },
     placements: '450+ Students Placed',
     avgFee: '$3,500 / Year',
-    visaRate: '100% Success Rate',
+    visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Tajik State Medical University'],
   },
 ];
+
+const flagUrls: Record<string, string> = {
+  russia: 'https://flagcdn.com/w40/ru.png',
+  georgia: 'https://flagcdn.com/w40/ge.png',
+  uzbekistan: 'https://flagcdn.com/w40/uz.png',
+  kazakhstan: 'https://flagcdn.com/w40/kz.png',
+  nepal: 'https://flagcdn.com/w40/np.png',
+  tajikistan: 'https://flagcdn.com/w40/tj.png',
+};
 
 export default function PlacementsMapSection() {
   const [selectedDest, setSelectedDest] = useState<MapDestination>(destinations[0]);
@@ -98,11 +107,13 @@ export default function PlacementsMapSection() {
     const fetchSettings = async () => {
       try {
         const settings = await coreApi.getSettings();
-        if (settings?.stats) {
-          setSiteStats(settings.stats);
+        if (settings && settings.stats && settings.stats.students_placed) {
+          setSiteStats({
+            students_placed: settings.stats.students_placed,
+          });
         }
       } catch (error) {
-        console.debug('Failed to fetch stats for PlacementsMap, using defaults', error);
+        console.error('Error fetching site settings:', error);
       }
     };
     fetchSettings();
@@ -162,7 +173,13 @@ export default function PlacementsMapSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           {/* Left panel: Interactive World Map */}
           <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[32px] p-6 shadow-2xl relative min-h-[380px] sm:min-h-[440px] flex items-center justify-center overflow-hidden">
-            <div className="relative w-full h-full aspect-[1000/600]">
+            <div 
+              className="relative w-full h-full aspect-[1000/600] transition-transform duration-500"
+              style={{
+                transform: 'scale(1.9) translate(-14%, 8%)',
+                transformOrigin: 'center center',
+              }}
+            >
               <img
                 src="/images/world-map.svg"
                 alt="World Map"
@@ -214,9 +231,11 @@ export default function PlacementsMapSection() {
                 {/* India Label */}
                 <div 
                   className="absolute flex items-center gap-1.5 pointer-events-none"
-                  style={{ left: '69.3%', top: '61.5%' }}
+                  style={{ left: '68.8%', top: '60.3%' }}
                 >
-                  <span className="w-2 h-2 rounded-full bg-teal-400" />
+                  <div className="w-5 h-5 rounded-full overflow-hidden border border-white/20">
+                    <img src="https://flagcdn.com/w40/in.png" alt="India flag" className="w-full h-full object-cover" />
+                  </div>
                   <span className="text-[10px] font-bold text-teal-300 uppercase tracking-widest bg-black/60 px-1.5 py-0.5 rounded">
                     India
                   </span>
@@ -240,15 +259,19 @@ export default function PlacementsMapSection() {
                         style={{ animationDuration: '2s' }}
                       />
                       
-                      {/* Inner pin button */}
+                      {/* Inner flag button */}
                       <div
-                        className={`w-6 h-6 rounded-full flex items-center justify-center transition-all shadow-lg ${
+                        className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center transition-all shadow-lg border-2 bg-gray-900 ${
                           isSelected
-                            ? 'bg-primary text-white scale-125 border border-teal-300'
-                            : 'bg-gray-800 text-gray-300 border border-gray-650 hover:bg-gray-700 hover:text-white'
+                            ? 'scale-125 border-primary-400'
+                            : 'border-white/20 hover:scale-110 hover:border-white/50'
                         }`}
                       >
-                        <MapPin className="w-3.5 h-3.5" />
+                        <img
+                          src={flagUrls[dest.id] || `/flags/${dest.id}.png`}
+                          alt={`${dest.name} flag`}
+                          className="w-full h-full object-cover select-none pointer-events-none"
+                        />
                       </div>
 
                       {/* Hover text preview label */}
