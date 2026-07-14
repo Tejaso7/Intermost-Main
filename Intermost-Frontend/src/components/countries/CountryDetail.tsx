@@ -108,13 +108,12 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
           >
             {/* Flag */}
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-12 rounded-lg overflow-hidden shadow-lg mr-4">
+              <div className="w-16 h-12 rounded-lg overflow-hidden shadow-lg mr-4 bg-white/10 relative">
                 <Image
-                  src={getCountryFlag(country.code)}
+                  src={country.flag_url || getCountryFlag(country.code)}
                   alt={`${country.name} flag`}
-                  width={64}
-                  height={48}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
                   unoptimized
                 />
               </div>
