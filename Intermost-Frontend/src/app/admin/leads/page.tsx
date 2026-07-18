@@ -54,6 +54,405 @@ const statusIcons = {
   closed: XCircle,
 };
 
+const EMAIL_TEMPLATES: Record<string, { name: string; subject: string; body: string }> = {
+  general: {
+    name: "General Welcome & Study Abroad Consultation",
+    subject: "Unlock Your Global Medical Career - MBBS Abroad Opportunities! 🩺",
+    body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study MBBS Abroad with Intermost</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f4f5f7;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #eef2f6;">
+          <!-- Header Banner -->
+          <tr>
+            <td align="center" bgcolor="#0d9488" style="padding: 40px 20px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
+                    INTERMOST
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 14px; color: #ccfbf1; margin-top: 8px; font-weight: 500; padding-top: 8px;">
+                    Your Gateway to International Medical Education
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 40px 30px; color: #334155; font-size: 15px; line-height: 1.6;">
+              <p style="margin-top: 0; font-size: 16px; font-weight: 600;">Dear student,</p>
+              <p>Choosing the right destination and university for your medical education is one of the most critical decisions of your life. At <strong>Intermost</strong>, we make that journey smooth, transparent, and successful.</p>
+              
+              <p>We are delighted to invite you for a <strong>Free Study Abroad Consultation Session</strong> with our expert counselors. We will help you analyze the best options based on your NEET score, budget, and career goals.</p>
+
+              <!-- Features list -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; background-color: #f0fdfa; border-radius: 12px; padding: 20px; border-left: 4px solid #0d9488;">
+                <tr>
+                  <td style="padding-bottom: 12px; font-weight: 700; color: #0d9488; font-size: 14px;">Why Choose Intermost?</td>
+                </tr>
+                <tr>
+                  <td style="font-size: 13px; color: #0f766e; line-height: 1.5;">
+                    • 100% MCI/NMC Screening Test Oriented Coaching<br>
+                    • Direct Admission in WHO & UNESCO Approved State Universities<br>
+                    • Full Student Support from Admission to Degree Completion<br>
+                    • English Medium Programs with Affordable Fee Structures
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin-bottom: 25px;">To kickstart your international MBBS career, download our complete catalog and explore universities in top countries:</p>
+
+              <!-- CTA Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://intermost.in" target="_blank" style="background-color: #0d9488; color: #ffffff; display: inline-block; padding: 14px 32px; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2);">
+                      Schedule Free Counselling Session
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Brochure Quick Links -->
+          <tr>
+            <td bgcolor="#f8fafc" style="padding: 30px; border-top: 1px solid #f1f5f9; text-align: center;">
+              <p style="margin-top: 0; font-size: 12px; font-weight: 700; color: #64748b; uppercase; letter-spacing: 0.5px;">Download Country Brochures</p>
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 15px;">
+                <tr>
+                  <td align="center">
+                    <a href="https://intermost.in/brochures/russia.pdf" target="_blank" style="color: #0d9488; text-decoration: none; font-size: 13px; font-weight: 600; padding: 5px 10px;">Russia 🇷🇺</a>
+                    <span style="color: #cbd5e1; padding: 0 5px;">|</span>
+                    <a href="https://intermost.in/brochures/georgia.pdf" target="_blank" style="color: #0d9488; text-decoration: none; font-size: 13px; font-weight: 600; padding: 5px 10px;">Georgia 🇬🇪</a>
+                    <span style="color: #cbd5e1; padding: 0 5px;">|</span>
+                    <a href="https://intermost.in/brochures/uzbekistan.pdf" target="_blank" style="color: #0d9488; text-decoration: none; font-size: 13px; font-weight: 600; padding: 5px 10px;">Uzbekistan 🇺🇿</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td bgcolor="#0f172a" style="padding: 40px 30px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.6;">
+              <p style="margin-top: 0; font-weight: 700; color: #ffffff;">INTERMOST EDUCATION CONSULTANCY</p>
+              <p style="margin: 5px 0;">New Delhi | Mumbai | Nagpur | Buldana</p>
+              <p style="margin: 5px 0;">Need immediate assistance? Call us: <a href="tel:+919876543210" style="color: #38bdf8; text-decoration: none;">+91 98765 43210</a></p>
+              <p style="margin-top: 20px; font-size: 10px; color: #64748b;">
+                You are receiving this email because you registered or inquired about MBBS programs. <br>
+                <a href="#" style="color: #64748b; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #64748b; text-decoration: underline;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  },
+  russia: {
+    name: "MBBS in Russia - Top State Medical Universities",
+    subject: "Study MBBS in Russia: Low Fees, Top State Universities, Admissions Open! 🇷🇺",
+    body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study MBBS in Russia</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f4f5f7;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #eef2f6;">
+          <!-- Header Banner -->
+          <tr>
+            <td align="center" bgcolor="#0d9488" style="padding: 40px 20px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
+                    MBBS IN RUSSIA
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 14px; color: #ccfbf1; margin-top: 8px; font-weight: 500; padding-top: 8px;">
+                    Affordable, Direct, and Quality Education with Intermost
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 40px 30px; color: #334155; font-size: 15px; line-height: 1.6;">
+              <p style="margin-top: 0; font-size: 16px; font-weight: 600;">Hello student,</p>
+              <p>Russia has been the number one destination for Indian medical students for over three decades. Russian State Medical Universities are globally acclaimed and offer world-class infrastructure and high-quality clinics.</p>
+              
+              <p>With <strong>Intermost</strong>, you get direct guaranteed admission to the top Russian State Medical Universities recognized by the WHO and NMC.</p>
+
+              <!-- Top Universities Box -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; background-color: #f0fdfa; border-radius: 12px; padding: 20px; border-left: 4px solid #0d9488;">
+                <tr>
+                  <td style="padding-bottom: 12px; font-weight: 700; color: #0d9488; font-size: 14px;">Top Russian State Universities Available:</td>
+                </tr>
+                <tr>
+                  <td style="font-size: 13px; color: #0f766e; line-height: 1.6;">
+                    • <strong>Crimea Federal University</strong> - Top preference for Indian students<br>
+                    • <strong>Kazan Federal University</strong> - Modern research state infrastructure<br>
+                    • <strong>Bashkir State Medical University</strong> - Historic campus & large Indian community<br>
+                    • <strong>Orenburg State Medical University</strong> - Low cost and high FMGE pass rate
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Benefits -->
+              <h3 style="font-size: 16px; color: #0f172a; margin-top: 25px; margin-bottom: 10px; font-weight: 700;">Key Benefits:</h3>
+              <ul style="padding-left: 20px; margin: 0 0 25px 0; font-size: 14px; color: #475569;">
+                <li style="margin-bottom: 6px;">Total package starts at just <strong>INR 18 Lakhs</strong> (inclusive of tuition fee, hostel, and food).</li>
+                <li style="margin-bottom: 6px;">Fully English medium instruction for the entire 6 years.</li>
+                <li style="margin-bottom: 6px;">Extensive NMC Screening Test coaching on-campus by Indian professors.</li>
+              </ul>
+
+              <!-- CTA Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://intermost.in/brochures/russia.pdf" target="_blank" style="background-color: #0d9488; color: #ffffff; display: inline-block; padding: 14px 32px; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2);">
+                      Download Russia Brochure (PDF)
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td bgcolor="#0f172a" style="padding: 40px 30px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.6;">
+              <p style="margin-top: 0; font-weight: 700; color: #ffffff;">INTERMOST EDUCATION CONSULTANCY</p>
+              <p style="margin: 5px 0;">Official Partner for Top Russian State Medical Universities</p>
+              <p style="margin: 5px 0;">Need help? Call us: <a href="tel:+919876543210" style="color: #38bdf8; text-decoration: none;">+91 98765 43210</a></p>
+              <p style="margin-top: 20px; font-size: 10px; color: #64748b;">
+                You are receiving this email because you registered or inquired about MBBS programs. <br>
+                <a href="#" style="color: #64748b; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #64748b; text-decoration: underline;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  },
+  georgia: {
+    name: "MBBS in Georgia - European Standard Medical Education",
+    subject: "Pursue MBBS in Georgia: European Standards, Globally Recognized! 🇬🇪",
+    body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study MBBS in Georgia</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f4f5f7;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #eef2f6;">
+          <!-- Header Banner -->
+          <tr>
+            <td align="center" bgcolor="#0d9488" style="padding: 40px 20px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
+                    MBBS IN GEORGIA
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 14px; color: #ccfbf1; margin-top: 8px; font-weight: 500; padding-top: 8px;">
+                    Your Direct Pathway to a European Medical License
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 40px 30px; color: #334155; font-size: 15px; line-height: 1.6;">
+              <p style="margin-top: 0; font-size: 16px; font-weight: 600;">Hi student,</p>
+              <p>Georgia has rapidly emerged as the premium destination for Indian medical students seeking European education standards. Georgian medical degrees are recognized worldwide, including by the UK (PLAB), USA (USMLE), and India (NMC).</p>
+              
+              <p>With <strong>Intermost</strong>, you get direct entry into top-tier medical universities in Tbilisi, the beautiful capital city of Georgia.</p>
+
+              <!-- Top Universities Box -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; background-color: #f0fdfa; border-radius: 12px; padding: 20px; border-left: 4px solid #0d9488;">
+                <tr>
+                  <td style="padding-bottom: 12px; font-weight: 700; color: #0d9488; font-size: 14px;">Premium Universities in Georgia:</td>
+                </tr>
+                <tr>
+                  <td style="font-size: 13px; color: #0f766e; line-height: 1.6;">
+                    • <strong>Tbilisi State Medical University</strong> - Oldest and most prestigious<br>
+                    • <strong>European University</strong> - Highly modern hospital & state labs<br>
+                    • <strong>East European University</strong> - European Union curriculum alignments<br>
+                    • <strong>Caucasus International University</strong> - Excellent clinical practice
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Benefits -->
+              <h3 style="font-size: 16px; color: #0f172a; margin-top: 25px; margin-bottom: 10px; font-weight: 700;">Why Georgia?</h3>
+              <ul style="padding-left: 20px; margin: 0 0 25px 0; font-size: 14px; color: #475569;">
+                <li style="margin-bottom: 6px;">Adheres completely to the European Credit Transfer System (ECTS).</li>
+                <li style="margin-bottom: 6px;">World-safe country status (Georgia ranks in the top 10 safest countries globally).</li>
+                <li style="margin-bottom: 6px;">English medium instruction with highly experienced international faculty.</li>
+              </ul>
+
+              <!-- CTA Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://intermost.in/brochures/georgia.pdf" target="_blank" style="background-color: #0d9488; color: #ffffff; display: inline-block; padding: 14px 32px; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2);">
+                      Download Georgia Brochure (PDF)
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td bgcolor="#0f172a" style="padding: 40px 30px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.6;">
+              <p style="margin-top: 0; font-weight: 700; color: #ffffff;">INTERMOST EDUCATION CONSULTANCY</p>
+              <p style="margin: 5px 0;">Official Admission Partner for Georgia Medical Universities</p>
+              <p style="margin: 5px 0;">Questions? Call our specialists: <a href="tel:+919876543210" style="color: #38bdf8; text-decoration: none;">+91 98765 43210</a></p>
+              <p style="margin-top: 20px; font-size: 10px; color: #64748b;">
+                You are receiving this email because you registered or inquired about MBBS programs. <br>
+                <a href="#" style="color: #64748b; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #64748b; text-decoration: underline;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  },
+  uzbekistan: {
+    name: "MBBS in Uzbekistan - Quality & Affordable Medical Programs",
+    subject: "Affordable MBBS in Uzbekistan: Low Budget, Modern Facilities! 🇺🇿",
+    body: `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Study MBBS in Uzbekistan</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f5f7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f4f5f7;">
+    <tr>
+      <td align="center" style="padding: 40px 0;">
+        <table border="0" cellpadding="0" cellspacing="0" width="600" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); border: 1px solid #eef2f6;">
+          <!-- Header Banner -->
+          <tr>
+            <td align="center" bgcolor="#0d9488" style="padding: 40px 20px;">
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center" style="font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">
+                    MBBS IN UZBEKISTAN
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 14px; color: #ccfbf1; margin-top: 8px; font-weight: 500; padding-top: 8px;">
+                    Quality Central Asian Medical Universities with Intermost
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 40px 30px; color: #334155; font-size: 15px; line-height: 1.6;">
+              <p style="margin-top: 0; font-size: 16px; font-weight: 600;">Dear student,</p>
+              <p>Uzbekistan has quickly become a top choice for Indian students looking for the most affordable medical program without compromising on educational quality. All state universities in Uzbekistan are government-owned and recognized by WHO & NMC.</p>
+              
+              <p>With <strong>Intermost</strong>, you receive complete local support, Indian food facilities, and safe hostel accommodation throughout your study in Uzbekistan.</p>
+
+              <!-- Top Universities Box -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="margin: 25px 0; background-color: #f0fdfa; border-radius: 12px; padding: 20px; border-left: 4px solid #0d9488;">
+                <tr>
+                  <td style="padding-bottom: 12px; font-weight: 700; color: #0d9488; font-size: 14px;">Top Uzbekistan Universities:</td>
+                </tr>
+                <tr>
+                  <td style="font-size: 13px; color: #0f766e; line-height: 1.6;">
+                    • <strong>Tashkent Medical Academy</strong> - Capital state university<br>
+                    • <strong>Samarkand State Medical University</strong> - World-class campus facilities<br>
+                    • <strong>Bukhara State Medical Institute</strong> - High clinical exposure and Indian hostels<br>
+                    • <strong>Andijan State Medical Institute</strong> - Extremely affordable tuition fees
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Benefits -->
+              <h3 style="font-size: 16px; color: #0f172a; margin-top: 25px; margin-bottom: 10px; font-weight: 700;">Uzbekistan Highlights:</h3>
+              <ul style="padding-left: 20px; margin: 0 0 25px 0; font-size: 14px; color: #475569;">
+                <li style="margin-bottom: 6px;">Fees start at just <strong>USD 3,200/Year</strong> (Approx INR 2.6 Lakhs).</li>
+                <li style="margin-bottom: 6px;">Close proximity to India (Only a 3-hour flight from New Delhi!).</li>
+                <li style="margin-bottom: 6px;">100% English medium programs compliant with NMC regulations.</li>
+              </ul>
+
+              <!-- CTA Button -->
+              <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                  <td align="center">
+                    <a href="https://intermost.in/brochures/uzbekistan.pdf" target="_blank" style="background-color: #0d9488; color: #ffffff; display: inline-block; padding: 14px 32px; font-weight: 700; font-size: 14px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2);">
+                      Download Uzbekistan Brochure (PDF)
+                    </a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td bgcolor="#0f172a" style="padding: 40px 30px; color: #94a3b8; font-size: 12px; text-align: center; line-height: 1.6;">
+              <p style="margin-top: 0; font-weight: 700; color: #ffffff;">INTERMOST EDUCATION CONSULTANCY</p>
+              <p style="margin: 5px 0;">Official Central Asian Admissions Department</p>
+              <p style="margin: 5px 0;">Need immediate details? Call us: <a href="tel:+919876543210" style="color: #38bdf8; text-decoration: none;">+91 98765 43210</a></p>
+              <p style="margin-top: 20px; font-size: 10px; color: #64748b;">
+                You are receiving this email because you registered or inquired about MBBS programs. <br>
+                <a href="#" style="color: #64748b; text-decoration: underline;">Unsubscribe</a> | <a href="#" style="color: #64748b; text-decoration: underline;">Privacy Policy</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+  }
+};
+
 export default function LeadsPage() {
   const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips' | 'coldcalling'>('explore');
 
@@ -109,15 +508,31 @@ export default function LeadsPage() {
   const [coldLeadsAssignedFilter, setColdLeadsAssignedFilter] = useState('all');
   const [selectedColdLeadIds, setSelectedColdLeadIds] = useState<string[]>([]);
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [assignConfig, setAssignConfig] = useState({ usernames: [] as string[], method: 'manual' as 'manual' | 'random', total_count: 0 });
+  const [assignConfig, setAssignConfig] = useState({ usernames: [] as string[], method: 'manual' as 'manual' | 'random', total_count: 0, city: '' });
   const [isAssigning, setIsAssigning] = useState(false);
 
   // Excel / CSV Import states for Cold Calling
   const coldFileInputRef = useRef<HTMLInputElement>(null);
   const [importedColdData, setImportedColdData] = useState<any[]>([]);
-  const [columnColdMapping, setColumnColdMapping] = useState({ name: '', phone: '', email: '' });
+  const [columnColdMapping, setColumnColdMapping] = useState({
+    refno: '',
+    firstname: '',
+    lastname: '',
+    email: '',
+    phone: '',
+    alternatephone: '',
+    parentno: '',
+    streetaddress: '',
+    city: '',
+    state: '',
+    postalcode: '',
+    remarks: '',
+  });
   const [coldHeaders, setColdHeaders] = useState<string[]>([]);
   const [importingCold, setImportingCold] = useState(false);
+  const [coldLeadsCities, setColdLeadsCities] = useState<string[]>([]);
+  const [coldLeadsCityFilter, setColdLeadsCityFilter] = useState('all');
+  const [selectedColdLead, setSelectedColdLead] = useState<any>(null);
 
   const fetchApkUsers = async () => {
     setLoadingApkUsers(true);
@@ -139,12 +554,12 @@ export default function LeadsPage() {
     }
     try {
       await apkApi.createUser(newApkUser);
-      toast.success('APK User created successfully');
+      toast.success('APK Agent created successfully');
       setNewApkUser({ name: '', username: '', password: '' });
       setShowAddUserModal(false);
       fetchApkUsers();
-    } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Failed to create APK user');
+    } catch (err) {
+      toast.error('Failed to create APK user');
     }
   };
 
@@ -168,6 +583,9 @@ export default function LeadsPage() {
       if (coldLeadsAssignedFilter !== 'all') {
         params.assigned_to = coldLeadsAssignedFilter;
       }
+      if (coldLeadsCityFilter !== 'all') {
+        params.city = coldLeadsCityFilter;
+      }
       const data = await apkApi.getColdLeads(params);
       setColdLeads(data.results || []);
       setColdLeadsTotalPages(data.total_pages || 1);
@@ -176,6 +594,36 @@ export default function LeadsPage() {
       toast.error('Failed to load cold leads');
     } finally {
       setLoadingColdLeads(false);
+    }
+  };
+
+  const fetchColdLeadsCities = async () => {
+    try {
+      const cities = await apkApi.getColdLeadsCities();
+      setColdLeadsCities(cities || []);
+    } catch (err) {
+      console.error('Failed to load cold leads cities', err);
+    }
+  };
+
+  const [isClearingCold, setIsClearingCold] = useState(false);
+  const handleClearColdLeads = async () => {
+    if (!window.confirm("WARNING: Are you sure you want to delete ALL cold calling leads from the database? This action CANNOT be undone.")) {
+      return;
+    }
+    setIsClearingCold(true);
+    try {
+      await apkApi.clearColdLeads();
+      toast.success("Database cleared successfully!");
+      setColdLeads([]);
+      setColdLeadsTotalCount(0);
+      setColdLeadsTotalPages(1);
+      setColdLeadsCities([]);
+      setColdLeadsCityFilter('all');
+    } catch (err) {
+      toast.error("Failed to clear database");
+    } finally {
+      setIsClearingCold(false);
     }
   };
 
@@ -204,12 +652,34 @@ export default function LeadsPage() {
         setImportedColdData(objects);
 
         // Auto-detect columns mapping
-        const newMapping = { name: '', phone: '', email: '' };
+        const newMapping = {
+          refno: '',
+          firstname: '',
+          lastname: '',
+          email: '',
+          phone: '',
+          alternatephone: '',
+          parentno: '',
+          streetaddress: '',
+          city: '',
+          state: '',
+          postalcode: '',
+          remarks: '',
+        };
         rawHeaders.forEach((h: string) => {
           const lower = h.toLowerCase().replace(/[\s_-]/g, '');
-          if (['name', 'fullname', 'studentname', 'name'].includes(lower)) newMapping.name = h;
+          if (['refno', 'refnumber', 'reference', 'referenceno', 'id', 'studentidd'].includes(lower)) newMapping.refno = h;
+          if (['firstname', 'first', 'fname', 'first_name'].includes(lower)) newMapping.firstname = h;
+          if (['lastname', 'last', 'lname', 'last_name'].includes(lower)) newMapping.lastname = h;
           if (['email', 'emailid', 'emailaddress', 'mail'].includes(lower)) newMapping.email = h;
           if (['phone', 'phonenumber', 'mobile', 'mobilenumber', 'contact', 'phone_number'].includes(lower)) newMapping.phone = h;
+          if (['alternatephone', 'alternate', 'altphone', 'alternatephone', 'alternative'].includes(lower)) newMapping.alternatephone = h;
+          if (['parentno', 'parentnumber', 'parentphone', 'parentcontact', 'parent'].includes(lower)) newMapping.parentno = h;
+          if (['streetaddress', 'address', 'street', 'location'].includes(lower)) newMapping.streetaddress = h;
+          if (['city', 'district'].includes(lower)) newMapping.city = h;
+          if (['state', 'region'].includes(lower)) newMapping.state = h;
+          if (['postalcode', 'zip', 'zipcode', 'pincode', 'postal'].includes(lower)) newMapping.postalcode = h;
+          if (['remarks', 'remark', 'notes', 'note', 'comment', 'comments', 'details'].includes(lower)) newMapping.remarks = h;
         });
         setColumnColdMapping(newMapping);
         toast.success(`Parsed ${objects.length} rows successfully!`);
@@ -221,17 +691,26 @@ export default function LeadsPage() {
   };
 
   const executeColdImport = async () => {
-    if (!columnColdMapping.name || !columnColdMapping.phone) {
-      toast.error("Name and Phone columns must be mapped!");
+    if (!columnColdMapping.phone) {
+      toast.error("Phone column must be mapped!");
       return;
     }
 
     setImportingCold(true);
     try {
       const cleanedLeads = importedColdData.map((row) => ({
-        name: String(row[columnColdMapping.name] || ''),
-        phone: String(row[columnColdMapping.phone] || ''),
+        refno: columnColdMapping.refno ? String(row[columnColdMapping.refno] || '') : '',
+        firstname: columnColdMapping.firstname ? String(row[columnColdMapping.firstname] || '') : '',
+        lastname: columnColdMapping.lastname ? String(row[columnColdMapping.lastname] || '') : '',
         email: columnColdMapping.email ? String(row[columnColdMapping.email] || '') : '',
+        phone: String(row[columnColdMapping.phone] || ''),
+        alternatephone: columnColdMapping.alternatephone ? String(row[columnColdMapping.alternatephone] || '') : '',
+        parentno: columnColdMapping.parentno ? String(row[columnColdMapping.parentno] || '') : '',
+        streetaddress: columnColdMapping.streetaddress ? String(row[columnColdMapping.streetaddress] || '') : '',
+        city: columnColdMapping.city ? String(row[columnColdMapping.city] || '') : '',
+        state: columnColdMapping.state ? String(row[columnColdMapping.state] || '') : '',
+        postalcode: columnColdMapping.postalcode ? String(row[columnColdMapping.postalcode] || '') : '',
+        remarks: columnColdMapping.remarks ? String(row[columnColdMapping.remarks] || '') : '',
       }));
 
       await apkApi.importColdLeads(cleanedLeads);
@@ -239,6 +718,7 @@ export default function LeadsPage() {
       setImportedColdData([]);
       if (coldFileInputRef.current) coldFileInputRef.current.value = '';
       fetchColdLeads(1);
+      fetchColdLeadsCities();
     } catch (error) {
       toast.error("Failed to upload cold leads to backend");
     } finally {
@@ -261,6 +741,9 @@ export default function LeadsPage() {
 
       if (assignConfig.method === 'random' && assignConfig.total_count > 0) {
         payload.total_count = assignConfig.total_count;
+        if (assignConfig.city && assignConfig.city !== 'all') {
+          payload.city = assignConfig.city;
+        }
       } else {
         if (selectedColdLeadIds.length === 0) {
           toast.error('Please select leads to assign or use random method with a count');
@@ -274,7 +757,7 @@ export default function LeadsPage() {
       toast.success('Leads assigned successfully!');
       setSelectedColdLeadIds([]);
       setShowAssignModal(false);
-      setAssignConfig({ usernames: [], method: 'manual', total_count: 0 });
+      setAssignConfig({ usernames: [], method: 'manual', total_count: 0, city: '' });
       fetchColdLeads(coldLeadsPage);
     } catch (err) {
       toast.error('Failed to assign leads');
@@ -443,6 +926,7 @@ export default function LeadsPage() {
       fetchDrips(dripsSearchQuery, dripsStatusFilter, dripsPage);
     } else if (activeTab === 'coldcalling') {
       fetchApkUsers();
+      fetchColdLeadsCities();
       fetchColdLeads(coldLeadsPage);
     }
   }, [activeTab, page, statusFilter, contactsPage, dripsPage, coldLeadsPage]);
@@ -456,7 +940,7 @@ export default function LeadsPage() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [coldLeadsSearch, coldLeadsStatusFilter, coldLeadsAssignedFilter]);
+  }, [coldLeadsSearch, coldLeadsStatusFilter, coldLeadsAssignedFilter, coldLeadsCityFilter]);
 
   // Debounced search for Contacts Database tab
   useEffect(() => {
@@ -775,6 +1259,16 @@ export default function LeadsPage() {
   };
 
   // --- Campaign Dispatching ---
+  const handleApplyTemplate = (templateKey: string) => {
+    if (!templateKey) return;
+    const template = EMAIL_TEMPLATES[templateKey];
+    if (template) {
+      setCampaignSubject(template.subject);
+      setCampaignBody(template.body);
+      toast.success(`${template.name} template applied!`);
+    }
+  };
+
   const handleSendCampaign = async () => {
     if (selectedLeadIds.length === 0) {
       toast.error("Please select at least one lead from the Explore tab first!");
@@ -1426,6 +1920,23 @@ export default function LeadsPage() {
               {/* Editor Pane */}
               <div className="flex flex-col bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden p-5 shadow-sm h-full overflow-y-auto">
                 <div className="space-y-4 flex-1">
+                  {/* Select Template Dropdown */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                      Select Email Template
+                    </label>
+                    <select
+                      onChange={(e) => handleApplyTemplate(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-50 dark:bg-gray-900 border border-gray-255 dark:border-gray-750 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-700 dark:text-gray-300 font-semibold"
+                    >
+                      <option value="">Select a pre-designed template</option>
+                      <option value="general">General Welcome & Study Abroad Consultation</option>
+                      <option value="russia">MBBS in Russia - Top State Medical Universities</option>
+                      <option value="georgia">MBBS in Georgia - European Standard Medical Education</option>
+                      <option value="uzbekistan">MBBS in Uzbekistan - Quality & Affordable Medical Programs</option>
+                    </select>
+                  </div>
+
                   {/* Subject Input */}
                   <div className="space-y-1.5">
                     <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
@@ -2438,7 +2949,7 @@ export default function LeadsPage() {
               </div>
               <button
                 onClick={() => {
-                  setAssignConfig({ usernames: [], method: 'random', total_count: 50 });
+                  setAssignConfig({ usernames: [], method: 'random', total_count: 50, city: '' });
                   setShowAssignModal(true);
                 }}
                 className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 shadow-sm transition-colors"
@@ -2494,7 +3005,7 @@ export default function LeadsPage() {
                   Cold Calling Leads Database
                 </h3>
 
-                {/* Import section */}
+                {/* Import and Clear section */}
                 <div className="flex items-center gap-2">
                   <input
                     type="file"
@@ -2504,8 +3015,16 @@ export default function LeadsPage() {
                     className="hidden"
                   />
                   <button
+                    onClick={handleClearColdLeads}
+                    disabled={isClearingCold}
+                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 dark:bg-red-955/20 dark:hover:bg-red-955/40 dark:text-red-400 rounded-xl text-xs font-bold border border-red-200 dark:border-red-900 flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Clear Database
+                  </button>
+                  <button
                     onClick={() => coldFileInputRef.current?.click()}
-                    className="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-250 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5"
+                    className="px-3.5 py-2 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl text-xs font-bold hover:bg-gray-200 border border-gray-200 dark:border-gray-700 flex items-center gap-1.5 transition-colors"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     Select Excel File
@@ -2519,24 +3038,35 @@ export default function LeadsPage() {
                   <p className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
                     Map Excel Columns ({importedColdData.length} records parsed)
                   </p>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
-                      <label className="text-[10px] font-bold text-gray-500 uppercase">Name Column</label>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">First Name Column</label>
                       <select
-                        value={columnColdMapping.name}
-                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, name: e.target.value })}
-                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                        value={columnColdMapping.firstname}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, firstname: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-800 dark:text-white"
                       >
                         <option value="">Select column</option>
                         {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="text-[10px] font-bold text-gray-500 uppercase">Phone Column</label>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Last Name Column</label>
+                      <select
+                        value={columnColdMapping.lastname}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, lastname: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-800 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Phone Column *</label>
                       <select
                         value={columnColdMapping.phone}
                         onChange={(e) => setColumnColdMapping({ ...columnColdMapping, phone: e.target.value })}
-                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-850 dark:text-white font-semibold"
                       >
                         <option value="">Select column</option>
                         {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
@@ -2547,7 +3077,95 @@ export default function LeadsPage() {
                       <select
                         value={columnColdMapping.email}
                         onChange={(e) => setColumnColdMapping({ ...columnColdMapping, email: e.target.value })}
-                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs"
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-800 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Ref No Column</label>
+                      <select
+                        value={columnColdMapping.refno}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, refno: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-800 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Alternate Phone</label>
+                      <select
+                        value={columnColdMapping.alternatephone}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, alternatephone: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-850 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Parent Number</label>
+                      <select
+                        value={columnColdMapping.parentno}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, parentno: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-850 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Street Address</label>
+                      <select
+                        value={columnColdMapping.streetaddress}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, streetaddress: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-855 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">City</label>
+                      <select
+                        value={columnColdMapping.city}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, city: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-855 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">State</label>
+                      <select
+                        value={columnColdMapping.state}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, state: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-855 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Postal Code</label>
+                      <select
+                        value={columnColdMapping.postalcode}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, postalcode: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-855 dark:text-white"
+                      >
+                        <option value="">Select column</option>
+                        {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-gray-500 uppercase">Remarks Column</label>
+                      <select
+                        value={columnColdMapping.remarks}
+                        onChange={(e) => setColumnColdMapping({ ...columnColdMapping, remarks: e.target.value })}
+                        className="w-full mt-1 px-2.5 py-1.5 bg-white dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-lg text-xs outline-none focus:ring-1 focus:ring-emerald-500 text-gray-855 dark:text-white"
                       >
                         <option value="">Select column</option>
                         {coldHeaders.map(h => <option key={h} value={h}>{h}</option>)}
@@ -2557,7 +3175,7 @@ export default function LeadsPage() {
                   <div className="flex justify-end gap-3 pt-2">
                     <button
                       onClick={() => setImportedColdData([])}
-                      className="px-3.5 py-1.5 bg-gray-105 hover:bg-gray-200 rounded-lg text-xs font-semibold text-gray-700"
+                      className="px-3.5 py-1.5 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 rounded-lg text-xs font-semibold"
                     >
                       Cancel
                     </button>
@@ -2580,7 +3198,7 @@ export default function LeadsPage() {
                     placeholder="Search cold leads..."
                     value={coldLeadsSearch}
                     onChange={(e) => setColdLeadsSearch(e.target.value)}
-                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs outline-none text-gray-900 dark:text-white"
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-xl text-xs outline-none text-gray-900 dark:text-white focus:ring-1 focus:ring-primary-500"
                   />
                   <select
                     value={coldLeadsStatusFilter}
@@ -2605,15 +3223,25 @@ export default function LeadsPage() {
                       <option key={u.username} value={u.username}>Assigned: {u.name}</option>
                     ))}
                   </select>
+                  <select
+                    value={coldLeadsCityFilter}
+                    onChange={(e) => setColdLeadsCityFilter(e.target.value)}
+                    className="px-3 py-1.5 bg-gray-50 dark:bg-gray-900 border border-gray-250 dark:border-gray-800 rounded-xl text-xs text-gray-700 dark:text-gray-300 font-semibold max-w-[150px] truncate"
+                  >
+                    <option value="all">All Cities</option>
+                    {coldLeadsCities.map(c => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  </select>
                 </div>
 
                 {selectedColdLeadIds.length > 0 && (
                   <button
                     onClick={() => {
-                      setAssignConfig({ usernames: [], method: 'manual', total_count: 0 });
+                      setAssignConfig({ usernames: [], method: 'manual', total_count: 0, city: '' });
                       setShowAssignModal(true);
                     }}
-                    className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 shadow-sm"
+                    className="px-3 py-1.5 bg-primary-600 text-white rounded-lg text-xs font-bold hover:bg-primary-700 shadow-sm transition-colors"
                   >
                     Assign Selected ({selectedColdLeadIds.length})
                   </button>
@@ -2639,21 +3267,23 @@ export default function LeadsPage() {
                         />
                       </th>
                       <th className="px-4 py-3">Lead Info</th>
+                      <th className="px-4 py-3">Contact Info</th>
+                      <th className="px-4 py-3">Location</th>
                       <th className="px-4 py-3">Agent Assigned</th>
                       <th className="px-4 py-3">Status</th>
-                      <th className="px-4 py-3">Calls Logs</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y text-xs">
                     {loadingColdLeads ? (
                       <tr>
-                        <td colSpan={5} className="text-center py-10">
+                        <td colSpan={7} className="text-center py-10">
                           <Loader2 className="w-6 h-6 animate-spin text-primary-600 mx-auto" />
                         </td>
                       </tr>
                     ) : coldLeads.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="text-center py-6 text-gray-500">No cold leads found.</td>
+                        <td colSpan={7} className="text-center py-6 text-gray-500">No cold leads found.</td>
                       </tr>
                     ) : (
                       coldLeads.map((l) => (
@@ -2663,52 +3293,61 @@ export default function LeadsPage() {
                               type="checkbox"
                               checked={selectedColdLeadIds.includes(l._id)}
                               onChange={() => {
-                                if (selectedColdLeadIds.includes(l._id)) {
-                                  setSelectedColdLeadIds(selectedColdLeadIds.filter(id => id !== l._id));
-                                } else {
-                                  setSelectedColdLeadIds([...selectedColdLeadIds, l._id]);
-                                }
+                                  if (selectedColdLeadIds.includes(l._id)) {
+                                    setSelectedColdLeadIds(selectedColdLeadIds.filter(id => id !== l._id));
+                                  } else {
+                                    setSelectedColdLeadIds([...selectedColdLeadIds, l._id]);
+                                  }
                               }}
                             />
                           </td>
                           <td className="px-4 py-3">
-                            <p className="font-bold text-gray-900 dark:text-white">{l.name}</p>
-                            <p className="text-gray-500">{l.phone}</p>
+                            <button
+                              onClick={() => setSelectedColdLead(l)}
+                              className="font-bold text-primary-600 hover:text-primary-750 dark:text-primary-400 text-left hover:underline text-xs"
+                            >
+                              {l.name}
+                            </button>
+                            <p className="text-gray-400 text-[10px] mt-0.5 font-medium">Ref: {l.refno || 'N/A'}</p>
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="font-semibold text-gray-700 dark:text-gray-300">{l.phone}</p>
+                            {l.email && <p className="text-gray-400 text-[10px] truncate max-w-[180px]">{l.email}</p>}
+                            {l.alternatephone && <p className="text-gray-400 text-[10px]">Alt: {l.alternatephone}</p>}
+                          </td>
+                          <td className="px-4 py-3">
+                            <p className="font-semibold text-gray-700 dark:text-gray-300">{l.city || 'N/A'}</p>
+                            {l.state && <p className="text-gray-400 text-[10px]">{l.state}</p>}
                           </td>
                           <td className="px-4 py-3">
                             {l.assigned_to ? (
-                              <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded text-[10px] font-bold">
+                              <span className="px-2 py-0.5 bg-blue-50 text-blue-750 rounded text-[10px] font-bold">
                                 @{l.assigned_to}
                               </span>
                             ) : (
-                              <span className="text-gray-400 italic">Unassigned</span>
+                              <span className="text-gray-450 italic">Unassigned</span>
                             )}
                           </td>
                           <td className="px-4 py-3 capitalize">
                             <span className={cn(
                               'px-2 py-0.5 rounded text-[10px] font-bold',
                               l.status === 'pending' && 'bg-gray-100 text-gray-600',
-                              l.status === 'picked' && 'bg-green-100 text-green-700',
-                              l.status === 'not_picked' && 'bg-red-100 text-red-700',
-                              l.status === 'busy' && 'bg-yellow-100 text-yellow-750',
-                              l.status === 'failed' && 'bg-red-200 text-red-800'
+                              l.status === 'picked' && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+                              l.status === 'not_picked' && 'bg-red-105 text-red-700 dark:bg-red-950/40 dark:text-red-400',
+                              l.status === 'busy' && 'bg-yellow-105 text-yellow-750 dark:bg-yellow-950/40 dark:text-yellow-450',
+                              l.status === 'failed' && 'bg-red-200 text-red-800 dark:bg-red-950/60 dark:text-red-400'
                             )}>
                               {l.status.replace(/_/g, ' ')}
                             </span>
                           </td>
-                          <td className="px-4 py-3">
-                            {l.call_logs && l.call_logs.length > 0 ? (
-                              <div className="space-y-1 max-h-[85px] overflow-y-auto">
-                                {l.call_logs.map((log: any, idx: number) => (
-                                  <div key={idx} className="text-[10px] text-gray-500 bg-gray-50 dark:bg-gray-900 p-1 rounded">
-                                    <span className="font-bold">@{log.caller}:</span> {log.status} ({log.duration}s)
-                                    {log.notes && <p className="italic font-normal">"{log.notes}"</p>}
-                                  </div>
-                                ))}
-                              </div>
-                            ) : (
-                              <span className="text-gray-400">No call logs</span>
-                            )}
+                          <td className="px-4 py-3 text-right">
+                            <button
+                              onClick={() => setSelectedColdLead(l)}
+                              className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-gray-500 transition-colors"
+                              title="View Lead Details"
+                            >
+                              <Info className="w-4 h-4" />
+                            </button>
                           </td>
                         </tr>
                       ))
@@ -2725,14 +3364,14 @@ export default function LeadsPage() {
                     <button
                       disabled={coldLeadsPage <= 1}
                       onClick={() => setColdLeadsPage(p => Math.max(1, p - 1))}
-                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50"
+                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50 font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       Previous
                     </button>
                     <button
                       disabled={coldLeadsPage >= coldLeadsTotalPages}
                       onClick={() => setColdLeadsPage(p => Math.min(coldLeadsTotalPages, p + 1))}
-                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50"
+                      className="px-2.5 py-1.5 bg-gray-50 border rounded-lg text-xs disabled:opacity-50 font-semibold text-gray-700 hover:bg-gray-100 transition-colors"
                     >
                       Next
                     </button>
@@ -3005,6 +3644,194 @@ export default function LeadsPage() {
                     </a>
                   </>
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cold Lead Details Modal */}
+      {selectedColdLead && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-xl w-full max-h-[90vh] overflow-y-auto border border-gray-150 dark:border-gray-800 shadow-2xl">
+            <div className="p-6 md:p-8 space-y-6 animate-fade-in">
+              <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <User className="w-5 h-5 text-emerald-500" />
+                    Cold Lead Information
+                  </h2>
+                  {selectedColdLead.refno && (
+                    <span className="mt-1 inline-block px-2.5 py-0.5 bg-gray-105 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded text-xs font-semibold">
+                      Ref No: {selectedColdLead.refno}
+                    </span>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedColdLead(null)}
+                  className="p-2 hover:bg-gray-105 dark:hover:bg-gray-800 rounded-lg text-gray-450 transition-colors"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                {/* Personal Info */}
+                <div className="space-y-4">
+                  <h4 className="font-bold text-xs text-gray-400 uppercase tracking-wider">Personal Information</h4>
+                  <div className="grid grid-cols-2 gap-4 bg-gray-50/50 dark:bg-gray-900/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div>
+                      <span className="text-[10px] text-gray-450 uppercase font-semibold">First Name</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.firstname || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-450 uppercase font-semibold">Last Name</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.lastname || '—'}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <span className="text-[10px] text-gray-450 uppercase font-semibold">Email Address</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5 break-all">{selectedColdLead.email || '—'}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact Numbers */}
+                <div className="space-y-4">
+                  <h4 className="font-bold text-xs text-gray-400 uppercase tracking-wider">Contact Numbers</h4>
+                  <div className="space-y-3 bg-gray-50/50 dark:bg-gray-900/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">Primary Phone</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
+                        {selectedColdLead.phone}
+                        <a href={`tel:${selectedColdLead.phone}`} className="p-1 text-primary-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors" title="Call Number">
+                          <Phone className="w-3.5 h-3.5" />
+                        </a>
+                      </p>
+                    </div>
+                    {selectedColdLead.alternatephone && (
+                      <div>
+                        <span className="text-[10px] text-gray-455 uppercase font-semibold">Alternate Phone</span>
+                        <p className="font-bold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
+                          {selectedColdLead.alternatephone}
+                          <a href={`tel:${selectedColdLead.alternatephone}`} className="p-1 text-primary-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors" title="Call Number">
+                            <Phone className="w-3.5 h-3.5" />
+                          </a>
+                        </p>
+                      </div>
+                    )}
+                    {selectedColdLead.parentno && (
+                      <div>
+                        <span className="text-[10px] text-gray-455 uppercase font-semibold">Parent Number</span>
+                        <p className="font-bold text-gray-900 dark:text-white mt-0.5 flex items-center gap-1.5">
+                          {selectedColdLead.parentno}
+                          <a href={`tel:${selectedColdLead.parentno}`} className="p-1 text-primary-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors" title="Call Number">
+                            <Phone className="w-3.5 h-3.5" />
+                          </a>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Location Info */}
+                <div className="col-span-1 md:col-span-2 space-y-4">
+                  <h4 className="font-bold text-xs text-gray-400 uppercase tracking-wider">Location & Address</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50/50 dark:bg-gray-900/40 p-3.5 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div className="col-span-2 md:col-span-4">
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">Street Address</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.streetaddress || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">City</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.city || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">State</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.state || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">Postal Code / Pincode</span>
+                      <p className="font-bold text-gray-900 dark:text-white mt-0.5">{selectedColdLead.postalcode || '—'}</p>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">Lead Status</span>
+                      <p className="mt-0.5">
+                        <span className={cn(
+                          'px-2.5 py-0.5 rounded text-[10px] font-bold uppercase',
+                          selectedColdLead.status === 'pending' && 'bg-gray-100 text-gray-600',
+                          selectedColdLead.status === 'picked' && 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400',
+                          selectedColdLead.status === 'not_picked' && 'bg-red-100 text-red-700 dark:bg-red-955/40 dark:text-red-400',
+                          selectedColdLead.status === 'busy' && 'bg-yellow-105 text-yellow-750 dark:bg-yellow-950/45 dark:text-yellow-400',
+                          selectedColdLead.status === 'failed' && 'bg-red-200 text-red-800 dark:bg-red-950/60 dark:text-red-400'
+                        )}>
+                          {selectedColdLead.status.replace(/_/g, ' ')}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Remarks & Logs */}
+                <div className="col-span-1 md:col-span-2 space-y-4">
+                  <h4 className="font-bold text-xs text-gray-400 uppercase tracking-wider">Remarks & Call History</h4>
+                  <div className="space-y-4 bg-gray-50/50 dark:bg-gray-900/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold">Import Remarks</span>
+                      <p className="font-medium text-gray-850 dark:text-white mt-1 p-2.5 bg-white dark:bg-gray-900 rounded-lg border border-gray-100 dark:border-gray-800 text-xs leading-relaxed whitespace-pre-line">
+                        {selectedColdLead.remarks || 'No remarks provided during import.'}
+                      </p>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold block mb-2">Caller Agent Assignment</span>
+                      {selectedColdLead.assigned_to ? (
+                        <div className="inline-flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-955/20 text-blue-800 dark:text-blue-300 border border-blue-100 dark:border-blue-900 rounded-xl text-xs font-semibold">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>Assigned to caller: @{selectedColdLead.assigned_to}</span>
+                          {selectedColdLead.assigned_at && (
+                            <span className="text-[10px] text-gray-450 font-normal">on {formatDate(selectedColdLead.assigned_at)}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-450 italic">This lead is currently unassigned.</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-gray-455 uppercase font-semibold block mb-2">Auto-Dialer Call Logs</span>
+                      {selectedColdLead.call_logs && selectedColdLead.call_logs.length > 0 ? (
+                        <div className="space-y-2.5 max-h-[200px] overflow-y-auto">
+                          {selectedColdLead.call_logs.map((log: any, idx: number) => (
+                            <div key={idx} className="p-3 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-1.5">
+                              <div className="flex items-center justify-between border-b border-gray-50 dark:border-gray-800 pb-1">
+                                <span className="font-bold text-xs text-gray-900 dark:text-white">Caller: @{log.caller}</span>
+                                <span className="text-[9px] text-gray-400 font-semibold">{formatDate(log.called_at)}</span>
+                              </div>
+                              <div className="flex gap-4 text-[10px] font-bold">
+                                <span>Status: <span className="text-primary-500 uppercase">{log.status}</span></span>
+                                <span>Duration: <span className="text-gray-600 dark:text-gray-300">{log.duration}s</span></span>
+                              </div>
+                              {log.notes && (
+                                <p className="italic text-gray-500 text-xs font-medium">"{log.notes}"</p>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-455 italic">No calls have been recorded for this lead yet.</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex justify-end">
+                <button
+                  onClick={() => setSelectedColdLead(null)}
+                  className="px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-350 rounded-xl font-bold transition-colors"
+                >
+                  Close
+                </button>
               </div>
             </div>
           </div>

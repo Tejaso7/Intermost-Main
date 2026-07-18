@@ -737,7 +737,7 @@ export const apkApi = {
     const response = await api.delete('/inquiries/apk/users/', { params: { username } });
     return response.data;
   },
-  getColdLeads: async (params?: { status?: string; assigned_to?: string; search?: string; page?: number; limit?: number }) => {
+  getColdLeads: async (params?: { status?: string; assigned_to?: string; search?: string; page?: number; limit?: number; city?: string }) => {
     const response = await api.get<any>('/inquiries/cold-leads/', { params });
     return response.data;
   },
@@ -745,8 +745,16 @@ export const apkApi = {
     const response = await api.post('/inquiries/cold-leads/import/', { leads });
     return response.data;
   },
-  assignColdLeads: async (payload: { lead_ids?: string[]; total_count?: number; usernames: string[]; method: 'manual' | 'random' }) => {
+  assignColdLeads: async (payload: { lead_ids?: string[]; total_count?: number; usernames: string[]; method: 'manual' | 'random'; city?: string }) => {
     const response = await api.post('/inquiries/cold-leads/assign/', payload);
     return response.data;
+  },
+  clearColdLeads: async () => {
+    const response = await api.post('/inquiries/cold-leads/clear/');
+    return response.data;
+  },
+  getColdLeadsCities: async () => {
+    const response = await api.get<{ cities: string[] }>('/inquiries/cold-leads/cities/');
+    return response.data.cities || [];
   },
 };

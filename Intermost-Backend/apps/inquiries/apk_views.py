@@ -212,17 +212,22 @@ class ColdLeadsView(APIView):
         status_filter = request.query_params.get('status', None)
         assigned_to = request.query_params.get('assigned_to', None)
         search = request.query_params.get('search', None)
+        city = request.query_params.get('city', None)
         
         query = {}
         if status_filter:
             query['status'] = status_filter
         if assigned_to:
             query['assigned_to'] = assigned_to if assigned_to != 'unassigned' else None
+        if city:
+            query['city'] = city
         if search:
             query['$or'] = [
                 {'name': {'$regex': search, '$options': 'i'}},
                 {'phone': {'$regex': search, '$options': 'i'}},
                 {'email': {'$regex': search, '$options': 'i'}},
+                {'city': {'$regex': search, '$options': 'i'}},
+                {'refno': {'$regex': search, '$options': 'i'}},
             ]
             
         page = int(request.query_params.get('page', 1))
@@ -258,17 +263,53 @@ class ColdLeadsImportView(APIView):
         imported_count = 0
         
         for lead in leads:
+            refno = str(lead.get('refno', '')).strip()
+            firstname = lead.get('firstname', '').strip()
+            lastname = lead.get('lastname', '').strip()
+            
+            # Combine firstname and lastname for name, fallback to firstname or refno
             name = lead.get('name', '').strip()
+            if not name:
+                name = f"{firstname} {lastname}".strip()
+            if not name:
+                name = f"Lead {refno}" if refno else "Unknown Lead"
+                
             phone = lead.get('phone', '').strip()
+            if not phone:
+                phone = lead.get('phonenumber', '').strip()
+                
             email = lead.get('email', '').strip().lower() if lead.get('email') else ''
+            
+            # Additional fields
+            alternatephone = lead.get('alternatephone', '').strip()
+            parentno = lead.get('parentno', '').strip()
+            streetaddress = lead.get('streetaddress', '').strip()
+            city = lead.get('city', '').strip()
+            # Normalize city to uppercase to avoid casing inconsistencies in search/grouping
+            if city:
+                city = city.upper()
+                
+            state = lead.get('state', '').strip()
+            postalcode = lead.get('postalcode', '').strip()
+            remarks = lead.get('remarks', '').strip()
             
             if not name or not phone:
                 continue
                 
             cold_lead = {
+                'refno': refno,
+                'firstname': firstname,
+                'lastname': lastname,
                 'name': name,
                 'phone': phone,
                 'email': email,
+                'alternatephone': alternatephone,
+                'parentno': parentno,
+                'streetaddress': streetaddress,
+                'city': city,
+                'state': state,
+                'postalcode': postalcode,
+                'remarks': remarks,
                 'status': 'pending',
                 'assigned_to': None,
                 'assigned_at': None,
@@ -295,6 +336,7 @@ class ColdLeadsAssignView(APIView):
         total_count = request.data.get('total_count', 0)
         usernames = request.data.get('usernames', [])
         method = request.data.get('method', 'manual') # manual, random
+        city = request.data.get('city', None)
         
         if not usernames:
             return Response({'error': 'At least one username must be provided'}, status=status.HTTP_400_BAD_REQUEST)
@@ -308,9 +350,16 @@ class ColdLeadsAssignView(APIView):
                 target_ids = [ObjectId(lid) for lid in lead_ids]
             except InvalidId:
                 return Response({'error': 'Invalid lead ID(s) format'}, status=status.HTTP_400_BAD_REQUEST)
-        elif total_count > 0:
-            # Fetch unassigned pending leads
-            unassigned = list(leads_col.find({'assigned_to': None, 'status': 'pending'}).limit(total_count))
+        else:
+            # Fetch unassigned pending leads, optionally filtered by city
+            assign_query = {'assigned_to': None, 'status': 'pending'}
+            if city:
+                assign_query['city'] = city.strip().upper()
+                
+            if total_count > 0:
+                unassigned = list(leads_col.find(assign_query).limit(total_count))
+            else:
+                unassigned = list(leads_col.find(assign_query))
             target_ids = [l['_id'] for l in unassigned]
             
         if not target_ids:
@@ -330,9 +379,7 @@ class ColdLeadsAssignView(APIView):
             assigned_count = len(target_ids)
         else:
             # Distribute target_ids randomly / round-robin among selected usernames
-            import random
             for idx, lid in enumerate(target_ids):
-                # Simple round-robin distribution
                 user = usernames[idx % len(usernames)]
                 leads_col.update_one(
                     {'_id': lid},
@@ -346,4 +393,29 @@ class ColdLeadsAssignView(APIView):
         return Response({
             'message': 'Leads assigned successfully',
             'assigned': assigned_count
+        }, status=status.HTTP_200_OK)
+
+
+class ColdLeadsCitiesView(APIView):
+    """Admin endpoint to fetch unique cities for cold calling leads."""
+    permission_classes = [IsAdminUser]
+    
+    def get(self, request):
+        leads_col = get_collection('cold_leads')
+        cities = leads_col.distinct('city')
+        # Filter out empty or None values
+        cities = [c for c in cities if c]
+        return Response({'cities': sorted(cities)}, status=status.HTTP_200_OK)
+
+
+class ColdLeadsClearView(APIView):
+    """Admin endpoint to clear all cold calling leads."""
+    permission_classes = [IsAdminUser]
+    
+    def post(self, request):
+        leads_col = get_collection('cold_leads')
+        result = leads_col.delete_many({})
+        return Response({
+            'message': 'All cold calling leads cleared successfully',
+            'deleted_count': result.deleted_count
         }, status=status.HTTP_200_OK)

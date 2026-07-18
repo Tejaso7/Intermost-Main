@@ -21,4 +21,6 @@ urlpatterns = [
     path('cold-leads/', apk_views.ColdLeadsView.as_view(), name='cold-leads-admin'),
     path('cold-leads/import/', apk_views.ColdLeadsImportView.as_view(), name='cold-leads-import-admin'),
     path('cold-leads/assign/', apk_views.ColdLeadsAssignView.as_view(), name='cold-leads-assign-admin'),
+    path('cold-leads/cities/', apk_views.ColdLeadsCitiesView.as_view(), name='cold-leads-cities-admin'),
+    path('cold-leads/clear/', apk_views.ColdLeadsClearView.as_view(), name='cold-leads-clear-admin'),
 ]
