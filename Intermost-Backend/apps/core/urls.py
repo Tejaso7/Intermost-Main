@@ -17,9 +17,12 @@ urlpatterns = [
     path('db-health/', views.db_health_check, name='db-health-check'),
     
     # Authentication
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/login/', views.AdminLoginView.as_view(), name='admin_login'),
+    path('auth/verify-otp/', views.AdminVerifyOTPView.as_view(), name='admin_verify_otp'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('auth/config-send-otp/', views.ConfigSendOTPView.as_view(), name='config_send_otp'),
+    path('auth/config-verify-otp/', views.ConfigVerifyOTPView.as_view(), name='config_verify_otp'),
     path('auth/register/', views.RegisterView.as_view(), name='register'),
     path('auth/profile/', views.ProfileView.as_view(), name='profile'),
     

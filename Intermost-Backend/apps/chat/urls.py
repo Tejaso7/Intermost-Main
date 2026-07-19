@@ -23,4 +23,8 @@ urlpatterns = [
     path('runtime-rag/upload/', views.RuntimeRAGUploadView.as_view(), name='runtime-rag-upload'),
     path('runtime-rag/ask/', views.RuntimeRAGAskView.as_view(), name='runtime-rag-ask'),
     path('runtime-rag/close/', views.RuntimeRAGCloseView.as_view(), name='runtime-rag-close'),
+    
+    # Chat conversation logs viewer (Admin only)
+    path('conversations/', views.ChatConversationListView.as_view(), name='chat-conversations'),
+    path('conversations/<str:session_id>/', views.ChatConversationDetailView.as_view(), name='chat-conversation-detail'),
 ]

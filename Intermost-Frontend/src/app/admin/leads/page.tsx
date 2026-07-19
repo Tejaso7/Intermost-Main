@@ -32,7 +32,7 @@ import {
   MessageCircle,
   Save
 } from 'lucide-react';
-import { inquiriesApi, messagesApi, dripsApi, apkApi, type WhatsAppContact, type LeadDripRecord } from '@/lib/services';
+import { inquiriesApi, messagesApi, dripsApi, apkApi, chatConversationsApi, type WhatsAppContact, type LeadDripRecord, type ChatConversation } from '@/lib/services';
 import type { Inquiry } from '@/lib/api';
 import { formatDate, cn } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -454,17 +454,24 @@ const EMAIL_TEMPLATES: Record<string, { name: string; subject: string; body: str
 };
 
 export default function LeadsPage() {
-  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips' | 'coldcalling'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'import' | 'campaign' | 'whatsapp' | 'contacts' | 'config' | 'drips' | 'coldcalling' | 'chatbot'>('explore');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const tab = params.get('tab');
-      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config', 'drips', 'coldcalling'].includes(tab)) {
+      if (tab && ['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'config', 'drips', 'coldcalling', 'chatbot'].includes(tab)) {
         setActiveTab(tab as any);
       }
     }
   }, []);
+
+  // Chatbot Logs Tab States
+  const [chatConversations, setChatConversations] = useState<ChatConversation[]>([]);
+  const [loadingChatConversations, setLoadingChatConversations] = useState(false);
+  const [selectedConversation, setSelectedConversation] = useState<any | null>(null);
+  const [loadingConversationDetail, setLoadingConversationDetail] = useState(false);
+  const [chatSearchQuery, setChatSearchQuery] = useState('');
 
   // Contacts Database Tab States
   const [contacts, setContacts] = useState<WhatsAppContact[]>([]);
@@ -913,6 +920,44 @@ export default function LeadsPage() {
     }
   };
 
+  const fetchChatConversations = async () => {
+    setLoadingChatConversations(true);
+    try {
+      const data = await chatConversationsApi.getAll();
+      setChatConversations(data.conversations || []);
+    } catch (error) {
+      toast.error('Failed to load student chatbot logs');
+    } finally {
+      setLoadingChatConversations(false);
+    }
+  };
+
+  const handleViewChatDetail = async (sessionId: string) => {
+    setLoadingConversationDetail(true);
+    try {
+      const data = await chatConversationsApi.getById(sessionId);
+      setSelectedConversation(data);
+    } catch (error) {
+      toast.error('Failed to retrieve chat transcript details');
+    } finally {
+      setLoadingConversationDetail(false);
+    }
+  };
+
+  const handleDeleteConversation = async (sessionId: string) => {
+    if (!confirm('Are you sure you want to delete this chat conversation log?')) return;
+    try {
+      await chatConversationsApi.delete(sessionId);
+      toast.success('Conversation log deleted successfully');
+      setChatConversations(prev => prev.filter(c => c.session_id !== sessionId));
+      if (selectedConversation?.session_id === sessionId) {
+        setSelectedConversation(null);
+      }
+    } catch (error) {
+      toast.error('Failed to delete conversation log');
+    }
+  };
+
   // Load database items based on selected tab
   useEffect(() => {
     if (activeTab === 'explore') {
@@ -928,6 +973,8 @@ export default function LeadsPage() {
       fetchApkUsers();
       fetchColdLeadsCities();
       fetchColdLeads(coldLeadsPage);
+    } else if (activeTab === 'chatbot') {
+      fetchChatConversations();
     }
   }, [activeTab, page, statusFilter, contactsPage, dripsPage, coldLeadsPage]);
 
@@ -1343,6 +1390,17 @@ export default function LeadsPage() {
       lead.phone.includes(searchQuery)
   );
 
+  const filteredChatConversations = chatConversations.filter(c => {
+    const query = chatSearchQuery.toLowerCase();
+    return (
+      c.session_id.toLowerCase().includes(query) ||
+      (c.last_message || '').toLowerCase().includes(query) ||
+      (c.lead_data?.name || '').toLowerCase().includes(query) ||
+      (c.lead_data?.phone || '').toLowerCase().includes(query) ||
+      (c.lead_data?.email || '').toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1359,7 +1417,7 @@ export default function LeadsPage() {
 
         {/* Tab Buttons */}
         <div className="flex flex-wrap bg-gray-200 dark:bg-gray-800 p-1.5 rounded-xl border border-gray-300 dark:border-gray-700 gap-1">
-          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'drips', 'coldcalling', 'config'] as const).map((tab) => (
+          {(['explore', 'import', 'campaign', 'whatsapp', 'contacts', 'drips', 'coldcalling', 'chatbot', 'config'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -1384,7 +1442,9 @@ export default function LeadsPage() {
                           ? 'Drip Nurturing'
                           : tab === 'coldcalling'
                             ? 'Cold Calling (APK)'
-                            : 'WhatsApp Config'}
+                            : tab === 'chatbot'
+                              ? 'Chatbot Logs'
+                              : 'WhatsApp Config'}
             </button>
           ))}
         </div>
@@ -3646,6 +3706,229 @@ export default function LeadsPage() {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Chatbot Logs Tab */}
+      {activeTab === 'chatbot' && (
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 animate-fade-in">
+          {/* List of Conversations (Left Column) */}
+          <div className="lg:col-span-5 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-5 shadow-sm space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-primary-500" />
+                Active Chatbot Sessions
+              </h2>
+              <span className="px-2.5 py-0.5 bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 rounded-full text-xs font-bold">
+                {filteredChatConversations.length} Sessions
+              </span>
+            </div>
+
+            {/* Search filter */}
+            <div className="relative">
+              <Search className="absolute left-3 top-2.5 w-4.5 h-4.5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search sessions, names, or messages..."
+                value={chatSearchQuery}
+                onChange={(e) => setChatSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-gray-800 rounded-xl bg-gray-50/50 dark:bg-gray-950 text-sm focus:ring-2 focus:ring-primary-500 outline-none text-gray-900 dark:text-white font-medium"
+              />
+            </div>
+
+            {/* List */}
+            <div className="space-y-2.5 max-h-[600px] overflow-y-auto pr-1 scrollbar-modern">
+              {loadingChatConversations ? (
+                <div className="py-12 flex flex-col items-center justify-center text-gray-400 space-y-2">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+                  <span className="text-xs font-semibold">Loading chatbot sessions...</span>
+                </div>
+              ) : filteredChatConversations.length === 0 ? (
+                <div className="py-16 text-center text-gray-405">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30 text-gray-400" />
+                  <p className="text-sm font-semibold">No chatbot logs found</p>
+                  <p className="text-xs text-gray-500 mt-1">Chat sessions will appear here as users interact with the bot.</p>
+                </div>
+              ) : (
+                filteredChatConversations.map((conv) => {
+                  const isSelected = selectedConversation?.session_id === conv.session_id;
+                  
+                  return (
+                    <div
+                      key={conv.session_id}
+                      onClick={() => handleViewChatDetail(conv.session_id)}
+                      className={cn(
+                        'p-4 rounded-xl border transition-all duration-200 cursor-pointer relative group flex flex-col gap-2',
+                        isSelected
+                          ? 'bg-primary-50/50 dark:bg-primary-950/20 border-primary-300 dark:border-primary-800'
+                          : 'bg-white dark:bg-gray-900 border-gray-150 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700'
+                      )}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0">
+                          {conv.lead_captured && conv.lead_data?.name ? (
+                            <span className="text-sm font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                              {conv.lead_data.name}
+                            </span>
+                          ) : (
+                            <span className="text-sm font-bold text-gray-500 dark:text-gray-450 italic">
+                              Anonymous visitor
+                            </span>
+                          )}
+                          <span className="text-[10px] font-mono text-gray-400 block truncate mt-0.5">
+                            ID: {conv.session_id.substring(0, 18)}...
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          {conv.lead_captured && (
+                            <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-450 border border-emerald-100 dark:border-emerald-900 rounded text-[9px] font-extrabold uppercase">
+                              Lead
+                            </span>
+                          )}
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteConversation(conv.session_id);
+                            }}
+                            className="p-1 hover:bg-red-50 dark:hover:bg-red-950/40 text-gray-400 hover:text-red-500 rounded transition-colors opacity-0 group-hover:opacity-100"
+                          >
+                            <Trash2 className="w-4.5 h-4.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {conv.last_message && (
+                        <p className="text-xs text-gray-500 dark:text-gray-400 truncate font-medium">
+                          {conv.last_message}
+                        </p>
+                      )}
+
+                      <div className="flex justify-between items-center text-[10px] text-gray-450 font-bold border-t border-gray-50 dark:border-gray-800 pt-2 mt-1">
+                        <span>{conv.messages_count} messages</span>
+                        <span>{conv.updated_at ? formatDate(conv.updated_at) : '—'}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Transcript details box (Right Column) */}
+          <div className="lg:col-span-7 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm flex flex-col h-[670px]">
+            {loadingConversationDetail ? (
+              <div className="flex-1 flex flex-col items-center justify-center text-gray-400 space-y-2">
+                <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+                <span className="text-xs font-semibold">Retrieving message transcripts...</span>
+              </div>
+            ) : selectedConversation ? (
+              <div className="flex flex-col h-full space-y-4">
+                {/* Transcript Header */}
+                <div className="flex justify-between items-start pb-4 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                      {selectedConversation.lead_captured && selectedConversation.lead_data?.name
+                        ? `Session: ${selectedConversation.lead_data.name}`
+                        : 'Session Transcript'}
+                    </h3>
+                    <p className="text-xs font-mono text-gray-400 mt-1">
+                      Session ID: {selectedConversation.session_id}
+                    </p>
+                  </div>
+                  
+                  {selectedConversation.lead_captured && selectedConversation.lead_data?.phone && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => {
+                          setSelectedLeadIds([]);
+                          toast("Opening email compiler...");
+                          setActiveTab('campaign');
+                        }}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 rounded-xl"
+                        title="Email Contact"
+                      >
+                        <Mail className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => {
+                          toast("Opening WhatsApp compiler...");
+                          setActiveTab('whatsapp');
+                        }}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 rounded-xl"
+                        title="WhatsApp Contact"
+                      >
+                        <MessageSquare className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Lead Captured Card */}
+                {selectedConversation.lead_captured && selectedConversation.lead_data && (
+                  <div className="p-4 bg-emerald-50/50 dark:bg-emerald-950/15 border border-emerald-100 dark:border-emerald-900/50 rounded-2xl flex-shrink-0 grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                      <span className="text-gray-450 font-bold uppercase tracking-wider block">Lead Name</span>
+                      <span className="font-extrabold text-gray-900 dark:text-white block mt-0.5">{selectedConversation.lead_data.name || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-455 font-bold uppercase tracking-wider block">Phone</span>
+                      <span className="font-extrabold text-gray-900 dark:text-white block mt-0.5">{selectedConversation.lead_data.phone || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-455 font-bold uppercase tracking-wider block">Email</span>
+                      <span className="font-extrabold text-gray-900 dark:text-white block mt-0.5 truncate">{selectedConversation.lead_data.email || '—'}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-455 font-bold uppercase tracking-wider block">Preference</span>
+                      <span className="font-extrabold text-gray-900 dark:text-white block mt-0.5 capitalize">{selectedConversation.lead_data.preferred_country || '—'}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Messages Transcript Scroll Area */}
+                <div className="flex-1 overflow-y-auto p-4 bg-gray-50 dark:bg-gray-950 rounded-2xl space-y-4 scrollbar-modern border border-gray-100 dark:border-gray-800">
+                  {selectedConversation.messages?.map((msg: any) => {
+                    const isUser = msg.role === 'user';
+                    
+                    return (
+                      <div
+                        key={msg.id}
+                        className={cn(
+                          'flex flex-col max-w-[80%]',
+                          isUser ? 'ml-auto items-end' : 'mr-auto items-start'
+                        )}
+                      >
+                        <span className="text-[10px] text-gray-400 font-bold mb-1 px-1">
+                          {isUser ? 'Student' : 'Tejas AI Advisor'}
+                        </span>
+                        <div
+                          className={cn(
+                            'p-3.5 rounded-[20px] text-sm leading-relaxed shadow-sm',
+                            isUser
+                              ? 'bg-primary-600 text-white rounded-tr-sm'
+                              : 'bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 border border-gray-150 dark:border-gray-800 rounded-tl-sm'
+                          )}
+                        >
+                          <p className="whitespace-pre-wrap break-words">{msg.content}</p>
+                        </div>
+                        <span className="text-[9px] text-gray-400 mt-1 px-1 font-mono">
+                          {msg.timestamp ? formatDate(msg.timestamp) : ''}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center text-gray-405">
+                <MessageSquare className="w-16 h-16 opacity-20 mb-3 text-gray-400" />
+                <p className="text-sm font-semibold">No session selected</p>
+                <p className="text-xs text-gray-550 mt-1">Select a conversation from the left to view the live counselor transcript.</p>
+              </div>
+            )}
           </div>
         </div>
       )}

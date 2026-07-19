@@ -100,11 +100,21 @@ const countryCoordinates: Record<string, { lat: number; lng: number; color: stri
   'Vietnam': { lat: 58, lng: 68, color: '#14b8a6' },
 };
 
+const mapLonToX = (lon: number) => {
+  return 5 + ((lon + 180) / 360) * 90;
+};
+
+const mapLatToY = (lat: number) => {
+  const clampedLat = Math.min(80, Math.max(-60, lat));
+  return 10 + (1 - (clampedLat + 60) / 140) * 80;
+};
+
 export default function AnalyticsPage() {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [visitorStats, setVisitorStats] = useState<VisitorStats | null>(null);
-  const [locationStats, setLocationStats] = useState<LocationStats | null>(null);
-  const [deviceStats, setDeviceStats] = useState<DeviceStats | null>(null);
+  const [pageviewStats, setPageviewStats] = useState<any>(null);
+  const [locationStats, setLocationStats] = useState<any>(null);
+  const [deviceStats, setDeviceStats] = useState<any>(null);
   const [topPages, setTopPages] = useState<TopPages | null>(null);
   const [realtime, setRealtime] = useState<RealtimeData | null>(null);
   const [trends, setTrends] = useState<Trends | null>(null);
@@ -123,18 +133,23 @@ export default function AnalyticsPage() {
 
   const fetchData = async () => {
     try {
-      const [summaryData, visitorData, locationData, deviceData, pagesData, realtimeData, trendsData] = await Promise.all([
-        analyticsApi.getSummary().catch(() => null),
-        analyticsApi.getVisitorStats(timeRange).catch(() => null),
-        analyticsApi.getLocationStats(timeRange).catch(() => null),
-        analyticsApi.getDeviceStats(timeRange).catch(() => null),
-        analyticsApi.getTopPages(timeRange, 10).catch(() => null),
+      const sourceParam = selectedSource !== 'all' ? selectedSource : undefined;
+      const deviceParam = selectedDevice !== 'all' ? selectedDevice : undefined;
+
+      const [summaryData, visitorData, pageviewData, locationData, deviceData, pagesData, realtimeData, trendsData] = await Promise.all([
+        analyticsApi.getSummary(sourceParam, deviceParam).catch(() => null),
+        analyticsApi.getVisitorStats(timeRange, sourceParam, deviceParam).catch(() => null),
+        analyticsApi.getPageviewStats(timeRange, sourceParam, deviceParam).catch(() => null),
+        analyticsApi.getLocationStats(timeRange, sourceParam, deviceParam).catch(() => null),
+        analyticsApi.getDeviceStats(timeRange, sourceParam, deviceParam).catch(() => null),
+        analyticsApi.getTopPages(timeRange, 10, sourceParam, deviceParam).catch(() => null),
         analyticsApi.getRealtimeVisitors().catch(() => null),
         analyticsApi.getTrends().catch(() => null),
       ]);
 
       setSummary(summaryData);
       setVisitorStats(visitorData);
+      setPageviewStats(pageviewData);
       setLocationStats(locationData);
       setDeviceStats(deviceData);
       setTopPages(pagesData);
@@ -163,7 +178,7 @@ export default function AnalyticsPage() {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [timeRange]);
+  }, [timeRange, selectedSource, selectedDevice]);
 
   const handleRefresh = () => {
     setRefreshing(true);
@@ -192,11 +207,20 @@ export default function AnalyticsPage() {
         date: dateStr,
         pageviews: existing ? existing.pageviews : baseViews,
         visitors: existing ? existing.visitors : baseVisitors,
+        isReal: !!existing,
       });
     }
     
-    // Apply filters locally for interactive feel
+    // Apply filters locally for interactive feel ONLY on fallback simulated data
     return baseData.map(item => {
+      if (item.isReal) {
+        return {
+          date: item.date,
+          pageviews: item.pageviews,
+          visitors: item.visitors,
+        };
+      }
+
       let viewsMultiplier = 1.0;
       let visitorsMultiplier = 1.0;
       
@@ -223,7 +247,7 @@ export default function AnalyticsPage() {
       }
       
       return {
-        ...item,
+        date: item.date,
         pageviews: Math.max(2, Math.round(item.pageviews * viewsMultiplier)),
         visitors: Math.max(1, Math.round(item.visitors * visitorsMultiplier)),
       };
@@ -722,45 +746,83 @@ export default function AnalyticsPage() {
                   {/* Decorative dot matrix simulating world layout */}
                   <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#9ca3af_1.5px,transparent_1.5px)] [background-size:16px_16px] pointer-events-none" />
                   
-                  {/* Countries map nodes */}
-                  {Object.entries(countryCoordinates).map(([name, coords]) => {
-                    const countryStat = locationStats?.by_country?.find(c => c.country.toLowerCase() === name.toLowerCase()) || { visitors: 35 + Math.round(Math.random() * 80) };
-                    const isHovered = activeMapCountry === name;
+                  {/* Real-time geolocated pins */}
+                  {locationStats?.locations && locationStats.locations.length > 0 ? (
+                    locationStats.locations.map((loc: any, index: number) => {
+                      const x = mapLonToX(loc.lon);
+                      const y = mapLatToY(loc.lat);
+                      const isHovered = activeMapCountry === `loc-${index}`;
 
-                    return (
-                      <div
-                        key={name}
-                        className="absolute cursor-pointer transition-all duration-300"
-                        style={{
-                          left: `${coords.lat}%`,
-                          top: `${coords.lng}%`,
-                        }}
-                        onMouseEnter={() => setActiveMapCountry(name)}
-                        onMouseLeave={() => setActiveMapCountry(null)}
-                      >
-                        {/* Ripple Effect ring */}
+                      return (
                         <div
-                          className="w-8 h-8 rounded-full absolute -top-4 -left-4 animate-ping opacity-25"
-                          style={{ backgroundColor: coords.color }}
-                        />
-                        <div
-                          className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-900 shadow-md relative z-10"
-                          style={{ backgroundColor: coords.color }}
-                        />
+                          key={index}
+                          className="absolute cursor-pointer transition-all duration-300"
+                          style={{
+                            left: `${x}%`,
+                            top: `${y}%`,
+                          }}
+                          onMouseEnter={() => setActiveMapCountry(`loc-${index}`)}
+                          onMouseLeave={() => setActiveMapCountry(null)}
+                        >
+                          {/* Ripple Effect ring */}
+                          <div className="w-6 h-6 rounded-full absolute -top-3 -left-3 animate-ping opacity-25 bg-primary-500" />
+                          <div className="w-3 h-3 rounded-full border-2 border-white dark:border-gray-900 shadow-md relative z-10 bg-primary-500" />
 
-                        {/* Floating Country Info Card */}
-                        {isHovered && (
-                          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white rounded-xl p-3 border border-gray-800 shadow-2xl z-30 space-y-1 text-xs whitespace-nowrap">
-                            <p className="font-extrabold flex items-center gap-1.5">
-                              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: coords.color }} />
-                              {name}
-                            </p>
-                            <p className="text-gray-400">Unique Leads: <span className="text-white font-bold">{countryStat.visitors}</span></p>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                          {/* Floating Info Card */}
+                          {isHovered && (
+                            <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white rounded-xl p-3 border border-gray-800 shadow-2xl z-30 space-y-1 text-xs whitespace-nowrap">
+                              <p className="font-extrabold flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full bg-primary-400" />
+                                {loc.city || 'Unknown City'}, {loc.country}
+                              </p>
+                              <p className="text-gray-400">Total Visits: <span className="text-white font-bold">{loc.count}</span></p>
+                              <p className="text-[10px] text-gray-500 font-mono">Coords: {loc.lat.toFixed(2)}, {loc.lon.toFixed(2)}</p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    /* Fallback countries map nodes */
+                    Object.entries(countryCoordinates).map(([name, coords]) => {
+                      const countryStat = locationStats?.by_country?.find((c: any) => c.country.toLowerCase() === name.toLowerCase()) || { visitors: 35 + Math.round(Math.random() * 80) };
+                      const isHovered = activeMapCountry === name;
+
+                      return (
+                        <div
+                          key={name}
+                          className="absolute cursor-pointer transition-all duration-300"
+                          style={{
+                            left: `${coords.lat}%`,
+                            top: `${coords.lng}%`,
+                          }}
+                          onMouseEnter={() => setActiveMapCountry(name)}
+                          onMouseLeave={() => setActiveMapCountry(null)}
+                        >
+                          {/* Ripple Effect ring */}
+                          <div
+                            className="w-8 h-8 rounded-full absolute -top-4 -left-4 animate-ping opacity-25"
+                            style={{ backgroundColor: coords.color }}
+                          />
+                          <div
+                            className="w-4 h-4 rounded-full border-2 border-white dark:border-gray-900 shadow-md relative z-10"
+                            style={{ backgroundColor: coords.color }}
+                          />
+
+                          {/* Floating Country Info Card */}
+                          {isHovered && (
+                            <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white rounded-xl p-3 border border-gray-800 shadow-2xl z-30 space-y-1 text-xs whitespace-nowrap">
+                              <p className="font-extrabold flex items-center gap-1.5">
+                                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: coords.color }} />
+                                {name}
+                              </p>
+                              <p className="text-gray-400">Unique Leads: <span className="text-white font-bold">{countryStat.visitors}</span></p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
 
                   <div className="absolute bottom-3 left-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-200 dark:border-gray-800 text-[10px] text-gray-500 font-bold">
                     Hover map nodes to check regional lead statistics
@@ -814,6 +876,44 @@ export default function AnalyticsPage() {
               <Award className="w-6 h-6 text-indigo-500 mx-auto mb-2" />
               <h4 className="text-xs font-bold text-gray-400 uppercase">User Stickiness</h4>
               <p className="text-2xl font-black text-gray-900 dark:text-white mt-1">68.2%</p>
+            </div>
+          </div>
+
+          {/* Left Side: Daily Active Hours Bar Chart */}
+          <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
+              <span>Daily Active Hours (Peak Traffic)</span>
+              <Clock className="w-4.5 h-4.5 text-primary-500" />
+            </h3>
+            
+            <div className="h-48 flex items-end justify-between space-x-1 pt-6 px-2 border-b border-gray-100 dark:border-gray-800 relative">
+              {/* Hour columns */}
+              {(() => {
+                const hourly = pageviewStats?.hourly || Array.from({ length: 24 }, (_, i) => ({ hour: i, pageviews: 5 + Math.round(Math.random() * 40) }));
+                const maxViews = Math.max(...hourly.map((h: any) => h.pageviews), 1);
+                
+                return hourly.map((item: any, index: number) => {
+                  const heightPct = (item.pageviews / maxViews) * 85;
+                  const formattedHour = item.hour === 0 ? '12am' : item.hour === 12 ? '12pm' : item.hour > 12 ? `${item.hour - 12}pm` : `${item.hour}am`;
+                  
+                  return (
+                    <div key={index} className="flex-1 flex flex-col items-center group relative cursor-pointer">
+                      <div
+                        className="w-full bg-gradient-to-t from-primary-500 to-primary-400 dark:from-primary-600 dark:to-primary-500 rounded-t-sm transition-all group-hover:from-primary-600 group-hover:to-primary-500"
+                        style={{ height: `${Math.max(heightPct, 3)}%` }}
+                      />
+                      <span className="text-[8px] font-bold text-gray-400 mt-2 rotate-45 transform origin-left whitespace-nowrap hidden sm:inline">
+                        {item.hour % 4 === 0 ? formattedHour : ''}
+                      </span>
+                      
+                      {/* Tooltip */}
+                      <div className="absolute bottom-full mb-1 bg-gray-950 text-white text-[9px] px-2 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity font-mono pointer-events-none whitespace-nowrap z-20">
+                        {formattedHour}: {item.pageviews} views
+                      </div>
+                    </div>
+                  );
+                });
+              })()}
             </div>
           </div>
         </div>
@@ -874,7 +974,7 @@ export default function AnalyticsPage() {
                 { country: 'Georgia', visitors: 610 },
                 { country: 'Uzbekistan', visitors: 450 },
                 { country: 'Nepal', visitors: 280 }
-              ]).slice(0, 5).map((loc, idx) => {
+              ]).slice(0, 5).map((loc: any, idx: number) => {
                 const maxVal = locationStats?.by_country?.[0]?.visitors || 1420;
                 const width = (loc.visitors / maxVal) * 100;
                 
@@ -896,6 +996,101 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
+          {/* Traffic Channels Donut Chart */}
+          <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
+              <span>Traffic Channels</span>
+              <Share2 className="w-4.5 h-4.5 text-primary-500" />
+            </h3>
+            
+            {(() => {
+              const referrers = deviceStats?.by_referrer || [
+                { channel: 'direct', count: 420 },
+                { channel: 'whatsapp', count: 280 },
+                { channel: 'search', count: 180 },
+                { channel: 'email', count: 90 },
+                { channel: 'other', count: 40 },
+              ];
+              
+              const total = referrers.reduce((sum: number, r: any) => sum + r.count, 0) || 1;
+              
+              const colors: Record<string, { stroke: string; bg: string }> = {
+                direct: { stroke: '#4f46e5', bg: 'bg-indigo-500' },
+                whatsapp: { stroke: '#10b981', bg: 'bg-emerald-500' },
+                search: { stroke: '#3b82f6', bg: 'bg-blue-500' },
+                email: { stroke: '#f59e0b', bg: 'bg-amber-500' },
+                other: { stroke: '#6b7280', bg: 'bg-gray-500' },
+              };
+
+              let accumulatedPercent = 0;
+              const radius = 35;
+              const circumference = 2 * Math.PI * radius;
+              
+              return (
+                <div className="flex items-center gap-6">
+                  {/* SVG Donut */}
+                  <div className="relative w-32 h-32 flex-shrink-0">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r={radius}
+                        className="stroke-gray-100 dark:stroke-gray-800"
+                        strokeWidth="10"
+                        fill="transparent"
+                      />
+                      {referrers.map((item: any, idx: number) => {
+                        const pct = (item.count / total) * 100;
+                        const strokeDasharray = `${(pct / 100) * circumference} ${circumference}`;
+                        const strokeDashoffset = `${- (accumulatedPercent / 100) * circumference}`;
+                        accumulatedPercent += pct;
+                        
+                        const colorInfo = colors[item.channel] || colors.other;
+                        
+                        return (
+                          <circle
+                            key={idx}
+                            cx="50"
+                            cy="50"
+                            r={radius}
+                            stroke={colorInfo.stroke}
+                            strokeWidth="10"
+                            strokeDasharray={strokeDasharray}
+                            strokeDashoffset={strokeDashoffset}
+                            strokeLinecap="round"
+                            fill="transparent"
+                            className="transition-all duration-500 cursor-pointer hover:opacity-80"
+                          />
+                        );
+                      })}
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-[10px] font-bold text-gray-400 uppercase">Leads</span>
+                      <span className="text-base font-black text-gray-900 dark:text-white">{total.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  
+                  {/* Legend */}
+                  <div className="flex-grow space-y-2">
+                    {referrers.map((item: any, idx: number) => {
+                      const pct = Math.round((item.count / total) * 100);
+                      const colorInfo = colors[item.channel] || colors.other;
+                      return (
+                        <div key={idx} className="flex items-center justify-between text-xs font-semibold">
+                          <span className="flex items-center gap-2 font-bold capitalize text-gray-650 dark:text-gray-400">
+                            <span className={`w-2.5 h-2.5 rounded-full ${colorInfo.bg}`} />
+                            {item.channel}
+                          </span>
+                          <span className="font-extrabold text-gray-900 dark:text-white">{pct}%</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+
           {/* Device Platforms */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm font-semibold">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
@@ -908,8 +1103,8 @@ export default function AnalyticsPage() {
                 { device: 'mobile', count: 68 },
                 { device: 'desktop', count: 28 },
                 { device: 'tablet', count: 4 }
-              ]).map((device, idx) => {
-                const total = (deviceStats?.by_device || [{ count: 68 }, { count: 28 }, { count: 4 }]).reduce((sum, d) => sum + d.count, 0);
+              ]).map((device: any, idx: number) => {
+                const total = (deviceStats?.by_device || [{ count: 68 }, { count: 28 }, { count: 4 }]).reduce((sum: number, d: any) => sum + d.count, 0);
                 const pct = Math.round((device.count / total) * 100);
                 const Icon = getDeviceIcon(device.device);
 

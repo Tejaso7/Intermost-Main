@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { chatAPI, runtimeRagAPI, ChatMessage, Country } from '@/lib/api';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles, Paperclip, FileText, Loader2 } from 'lucide-react';
 import { countriesApi } from '@/lib/services';
 
@@ -19,6 +19,7 @@ interface LeadFormState {
 
 export default function StudentChatWidget() {
   const pathname = usePathname();
+  const dragControls = useDragControls();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputValue, setInputValue] = useState('');
@@ -268,7 +269,14 @@ export default function StudentChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <motion.div
+      drag
+      dragControls={dragControls}
+      dragListener={false}
+      dragMomentum={false}
+      className="fixed z-50 flex flex-col items-end"
+      style={{ bottom: '24px', right: '24px', touchAction: 'none' }}
+    >
       {/* Chat Window */}
       <AnimatePresence>
         {isOpen && (
@@ -277,10 +285,13 @@ export default function StudentChatWidget() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="w-[360px] sm:w-[400px] h-[550px] bg-white/95 backdrop-blur-xl rounded-[28px] shadow-2xl border border-gray-100 flex flex-col overflow-hidden mb-4"
+            className="w-[360px] sm:w-[400px] h-[550px] bg-white/95 backdrop-blur-xl rounded-[28px] shadow-2xl border border-gray-150 flex flex-col overflow-hidden mb-4"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 text-white p-5 flex items-center justify-between border-b border-white/10 relative">
+            <div
+              onPointerDown={(e) => dragControls.start(e)}
+              className="bg-gradient-to-r from-primary-600 via-primary-700 to-secondary-600 text-white p-5 flex items-center justify-between border-b border-white/10 relative cursor-grab active:cursor-grabbing select-none"
+            >
               <div className="flex items-center gap-3">
                 <div className="relative">
                   <div className="w-11 h-11 bg-white/15 rounded-2xl flex items-center justify-center border border-white/20 backdrop-blur-md">
@@ -553,7 +564,10 @@ export default function StudentChatWidget() {
       </AnimatePresence>
 
       {/* Toggle Button */}
-      <div className="relative">
+      <div
+        onPointerDown={(e) => !isOpen && dragControls.start(e)}
+        className={`relative ${!isOpen ? 'cursor-grab active:cursor-grabbing' : ''}`}
+      >
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={`w-14 h-14 rounded-full flex items-center justify-center shadow-xl hover:shadow-2xl transition-all duration-300 transform active:scale-90 ${
@@ -576,6 +590,6 @@ export default function StudentChatWidget() {
           </span>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

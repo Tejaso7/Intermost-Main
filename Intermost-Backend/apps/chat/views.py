@@ -218,10 +218,47 @@ class StudentChatView(APIView):
                 )
             
             if not GEMINI_API_KEY:
-                return Response(
-                    {'error': 'AI service not configured'},
-                    status=status.HTTP_503_SERVICE_UNAVAILABLE
+                # Fallback educational counseling response when Gemini is not configured
+                fallback_msg = (
+                    "Hello! I am Tejas, your Intermost Education Counselor. Thank you for your inquiry about studying MBBS abroad! "
+                    "To provide you with personalized admission options, fee structures, and college brochures for NMC-approved medical universities "
+                    "in Russia, Georgia, Kazakhstan, or Uzbekistan, could you please share your WhatsApp number or email address? "
+                    "Alternatively, you can contact our counselor support team directly at +91 9876543210. How can I help you today?"
                 )
+                
+                # Get conversation and append messages
+                conversation = get_or_create_conversation(session_id, is_admin=False)
+                
+                # Add user message
+                conversation['messages'].append({
+                    'role': 'user',
+                    'content': message,
+                    'timestamp': datetime.utcnow()
+                })
+                
+                # Add assistant message
+                conversation['messages'].append({
+                    'role': 'assistant',
+                    'content': fallback_msg,
+                    'timestamp': datetime.utcnow()
+                })
+                
+                # Save conversation
+                conversations = get_collection('chat_conversations')
+                conversations.update_one(
+                    {'session_id': session_id},
+                    {
+                        '$set': {
+                            'messages': conversation['messages'],
+                            'updated_at': datetime.utcnow()
+                        }
+                    }
+                )
+                
+                return Response({
+                    'response': fallback_msg,
+                    'session_id': session_id
+                })
             
             # Get conversation and context
             conversation = get_or_create_conversation(session_id, is_admin=False)
@@ -845,3 +882,77 @@ class RuntimeRAGCloseView(APIView):
         except Exception as e:
             logger.error(f"Error in RuntimeRAGCloseView: {e}")
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ChatConversationListView(APIView):
+    """
+    List student chatbot conversations (Admin only).
+    """
+    permission_classes = [IsAuthenticated]  # Admin staff must be logged in
+
+    def get(self, request):
+        if not request.user or not request.user.is_staff:
+            return Response({'detail': 'Administrative credentials required.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        conversations = get_collection('chat_conversations')
+        raw_convs = list(conversations.find({'is_admin': {'$ne': True}}).sort('updated_at', -1))
+        
+        results = []
+        for c in raw_convs:
+            msgs = c.get('messages', [])
+            last_msg = msgs[-1]['content'] if msgs else ""
+            
+            results.append({
+                'session_id': c.get('session_id'),
+                'messages_count': len(msgs),
+                'last_message': last_msg,
+                'lead_captured': c.get('lead_captured', False),
+                'lead_data': c.get('lead_data', {}),
+                'created_at': c.get('created_at', c.get('updated_at')).isoformat() if isinstance(c.get('created_at'), datetime) else None,
+                'updated_at': c.get('updated_at').isoformat() if isinstance(c.get('updated_at'), datetime) else None
+            })
+            
+        return Response({'conversations': results})
+
+
+class ChatConversationDetailView(APIView):
+    """
+    Retrieve or delete a single student chatbot conversation transcript (Admin only).
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, session_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'detail': 'Administrative credentials required.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        conversations = get_collection('chat_conversations')
+        conv = conversations.find_one({'session_id': session_id})
+        if not conv:
+            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+            
+        msgs = conv.get('messages', [])
+        formatted_msgs = []
+        for m in msgs:
+            formatted_msgs.append({
+                'id': m.get('id'),
+                'role': m.get('role'),
+                'content': m.get('content'),
+                'timestamp': m.get('timestamp').isoformat() if isinstance(m.get('timestamp'), datetime) else m.get('timestamp')
+            })
+            
+        return Response({
+            'session_id': session_id,
+            'lead_captured': conv.get('lead_captured', False),
+            'lead_data': conv.get('lead_data', {}),
+            'messages': formatted_msgs
+        })
+
+    def delete(self, request, session_id):
+        if not request.user or not request.user.is_staff:
+            return Response({'detail': 'Administrative credentials required.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        conversations = get_collection('chat_conversations')
+        res = conversations.delete_one({'session_id': session_id})
+        if res.deleted_count == 0:
+            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': True, 'message': 'Conversation deleted successfully'})

@@ -16,6 +16,44 @@ import requests
 from apps.mongodb import get_collection
 
 
+def build_filter_query(request):
+    """Construct MongoDB matching filter query based on time range, channel source, and platform device."""
+    query = {}
+    
+    # Days range
+    days = int(request.GET.get('days', 30))
+    start_date = datetime.utcnow() - timedelta(days=days)
+    query['timestamp'] = {'$gte': start_date}
+    
+    # Channel/Source Filter
+    source = request.GET.get('source', 'all')
+    if source == 'direct':
+        query['referrer'] = ''
+        query['page_url'] = {'$not': {'$regex': 'utm_source', '$options': 'i'}}
+    elif source == 'whatsapp':
+        query['$or'] = [
+            {'referrer': {'$regex': 'whatsapp|wa\\.me', '$options': 'i'}},
+            {'page_url': {'$regex': 'utm_source=whatsapp', '$options': 'i'}}
+        ]
+    elif source == 'search':
+        query['$or'] = [
+            {'referrer': {'$regex': 'google|bing|yahoo|baidu|yandex', '$options': 'i'}},
+            {'page_url': {'$regex': 'utm_source=search', '$options': 'i'}}
+        ]
+    elif source == 'email':
+        query['$or'] = [
+            {'referrer': {'$regex': 'mail|outlook|gmail', '$options': 'i'}},
+            {'page_url': {'$regex': 'utm_source=email|utm_medium=email', '$options': 'i'}}
+        ]
+        
+    # Device Filter
+    device = request.GET.get('device', 'all')
+    if device in ('desktop', 'mobile', 'tablet'):
+        query['device.device_type'] = device
+        
+    return query
+
+
 def get_client_ip(request):
     """Get client IP address from request"""
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -210,8 +248,6 @@ def get_analytics_summary(request):
     """Get analytics summary for the dashboard"""
     try:
         pageviews = get_collection('pageviews')
-        visitors = get_collection('visitors')
-        daily_stats = get_collection('daily_stats')
         
         now = datetime.utcnow()
         today = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -219,25 +255,51 @@ def get_analytics_summary(request):
         week_ago = today - timedelta(days=7)
         month_ago = today - timedelta(days=30)
         
+        # Base query (filters by channel/device)
+        base_query = {}
+        source = request.GET.get('source', 'all')
+        if source == 'direct':
+            base_query['referrer'] = ''
+            base_query['page_url'] = {'$not': {'$regex': 'utm_source', '$options': 'i'}}
+        elif source == 'whatsapp':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'whatsapp|wa\\.me', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=whatsapp', '$options': 'i'}}
+            ]
+        elif source == 'search':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'google|bing|yahoo|baidu|yandex', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=search', '$options': 'i'}}
+            ]
+        elif source == 'email':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'mail|outlook|gmail', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=email|utm_medium=email', '$options': 'i'}}
+            ]
+            
+        device = request.GET.get('device', 'all')
+        if device in ('desktop', 'mobile', 'tablet'):
+            base_query['device.device_type'] = device
+
         # Get today's stats
-        today_pageviews = pageviews.count_documents({'date': today})
-        today_visitors = len(list(pageviews.distinct('visitor_id', {'date': today})))
+        today_pageviews = pageviews.count_documents({**base_query, 'date': today})
+        today_visitors = len(list(pageviews.distinct('visitor_id', {**base_query, 'date': today})))
         
         # Get yesterday's stats for comparison
-        yesterday_pageviews = pageviews.count_documents({'date': yesterday})
-        yesterday_visitors = len(list(pageviews.distinct('visitor_id', {'date': yesterday})))
+        yesterday_pageviews = pageviews.count_documents({**base_query, 'date': yesterday})
+        yesterday_visitors = len(list(pageviews.distinct('visitor_id', {**base_query, 'date': yesterday})))
         
         # Get total stats
-        total_pageviews = pageviews.count_documents({})
-        total_visitors = visitors.count_documents({})
+        total_pageviews = pageviews.count_documents(base_query)
+        total_visitors = len(list(pageviews.distinct('visitor_id', base_query)))
         
         # Get this week's stats
-        week_pageviews = pageviews.count_documents({'date': {'$gte': week_ago}})
-        week_visitors = len(list(pageviews.distinct('visitor_id', {'date': {'$gte': week_ago}})))
+        week_pageviews = pageviews.count_documents({**base_query, 'date': {'$gte': week_ago}})
+        week_visitors = len(list(pageviews.distinct('visitor_id', {**base_query, 'date': {'$gte': week_ago}})))
         
         # Get this month's stats
-        month_pageviews = pageviews.count_documents({'date': {'$gte': month_ago}})
-        month_visitors = len(list(pageviews.distinct('visitor_id', {'date': {'$gte': month_ago}})))
+        month_pageviews = pageviews.count_documents({**base_query, 'date': {'$gte': month_ago}})
+        month_visitors = len(list(pageviews.distinct('visitor_id', {**base_query, 'date': {'$gte': month_ago}})))
         
         # Calculate changes
         pageview_change = ((today_pageviews - yesterday_pageviews) / max(yesterday_pageviews, 1)) * 100
@@ -286,9 +348,11 @@ def get_visitor_stats(request):
         now = datetime.utcnow()
         start_date = now - timedelta(days=days)
         
+        filter_query = build_filter_query(request)
+        
         # Get daily visitor counts
         pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$timestamp'}},
                 'visitors': {'$addToSet': '$visitor_id'},
@@ -306,8 +370,13 @@ def get_visitor_stats(request):
         daily_data = list(pageviews.aggregate(pipeline))
         
         # Get new vs returning visitors
-        new_visitors = visitors.count_documents({'first_seen': {'$gte': start_date}})
-        total_active = len(list(pageviews.distinct('visitor_id', {'timestamp': {'$gte': start_date}})))
+        visitor_query = {'first_seen': {'$gte': start_date}}
+        device = request.GET.get('device', 'all')
+        if device in ('desktop', 'mobile', 'tablet'):
+            visitor_query['device.device_type'] = device
+            
+        new_visitors = visitors.count_documents(visitor_query)
+        total_active = len(list(pageviews.distinct('visitor_id', filter_query)))
         returning_visitors = max(0, total_active - new_visitors)
         
         return Response({
@@ -333,10 +402,35 @@ def get_pageview_stats(request):
         now = datetime.utcnow()
         start_date = now - timedelta(days=days)
         
+        # Base filters
+        base_query = {}
+        source = request.GET.get('source', 'all')
+        if source == 'direct':
+            base_query['referrer'] = ''
+            base_query['page_url'] = {'$not': {'$regex': 'utm_source', '$options': 'i'}}
+        elif source == 'whatsapp':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'whatsapp|wa\\.me', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=whatsapp', '$options': 'i'}}
+            ]
+        elif source == 'search':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'google|bing|yahoo|baidu|yandex', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=search', '$options': 'i'}}
+            ]
+        elif source == 'email':
+            base_query['$or'] = [
+                {'referrer': {'$regex': 'mail|outlook|gmail', '$options': 'i'}},
+                {'page_url': {'$regex': 'utm_source=email|utm_medium=email', '$options': 'i'}}
+            ]
+        device = request.GET.get('device', 'all')
+        if device in ('desktop', 'mobile', 'tablet'):
+            base_query['device.device_type'] = device
+
         # Get hourly distribution for today
         today = now.replace(hour=0, minute=0, second=0, microsecond=0)
         hourly_pipeline = [
-            {'$match': {'timestamp': {'$gte': today}}},
+            {'$match': {**base_query, 'timestamp': {'$gte': today}}},
             {'$group': {
                 '_id': {'$hour': '$timestamp'},
                 'count': {'$sum': 1}
@@ -350,8 +444,9 @@ def get_pageview_stats(request):
         hourly_formatted = [{'hour': i, 'pageviews': hours.get(i, 0)} for i in range(24)]
         
         # Get daily pageviews
+        filter_query = build_filter_query(request)
         daily_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': {'$dateToString': {'format': '%Y-%m-%d', 'date': '$timestamp'}},
                 'count': {'$sum': 1}
@@ -381,10 +476,11 @@ def get_location_stats(request):
         days = int(request.GET.get('days', 30))
         now = datetime.utcnow()
         start_date = now - timedelta(days=days)
+        filter_query = build_filter_query(request)
         
         # Get visitor counts by country
         country_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': '$location.country',
                 'visitors': {'$addToSet': '$visitor_id'},
@@ -404,7 +500,7 @@ def get_location_stats(request):
         
         # Get visitor counts by city
         city_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': {
                     'city': '$location.city',
@@ -428,7 +524,7 @@ def get_location_stats(request):
         
         # Get location coordinates for map
         locations_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}, 'location.lat': {'$ne': 0}}},
+            {'$match': {**filter_query, 'location.lat': {'$ne': 0}}},
             {'$group': {
                 '_id': {
                     'lat': '$location.lat',
@@ -471,11 +567,10 @@ def get_top_pages(request):
         
         days = int(request.GET.get('days', 30))
         limit = int(request.GET.get('limit', 10))
-        now = datetime.utcnow()
-        start_date = now - timedelta(days=days)
+        filter_query = build_filter_query(request)
         
         pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': '$page_url',
                 'views': {'$sum': 1},
@@ -510,10 +605,11 @@ def get_device_stats(request):
         days = int(request.GET.get('days', 30))
         now = datetime.utcnow()
         start_date = now - timedelta(days=days)
+        filter_query = build_filter_query(request)
         
         # Get device type distribution
         device_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': '$device.device_type',
                 'count': {'$sum': 1}
@@ -526,7 +622,7 @@ def get_device_stats(request):
         
         # Get browser distribution
         browser_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': '$device.browser',
                 'count': {'$sum': 1}
@@ -539,7 +635,7 @@ def get_device_stats(request):
         
         # Get OS distribution
         os_pipeline = [
-            {'$match': {'timestamp': {'$gte': start_date}}},
+            {'$match': filter_query},
             {'$group': {
                 '_id': '$device.os',
                 'count': {'$sum': 1}
@@ -550,15 +646,50 @@ def get_device_stats(request):
         by_os = [{'os': o['_id'] or 'Unknown', 'count': o['count']} 
                  for o in pageviews.aggregate(os_pipeline)]
         
+        # Get referrer distribution
+        referrer_pipeline = [
+            {'$match': filter_query},
+            {'$group': {
+                '_id': '$referrer',
+                'count': {'$sum': 1}
+            }},
+            {'$sort': {'count': -1}}
+        ]
+        raw_referrers = list(pageviews.aggregate(referrer_pipeline))
+        
+        referrers_grouped = {
+            'direct': 0,
+            'whatsapp': 0,
+            'search': 0,
+            'email': 0,
+            'other': 0
+        }
+        for r in raw_referrers:
+            ref = (r['_id'] or '').lower()
+            count = r['count']
+            if not ref:
+                referrers_grouped['direct'] += count
+            elif 'whatsapp' in ref or 'wa.me' in ref:
+                referrers_grouped['whatsapp'] += count
+            elif any(s in ref for s in ('google', 'bing', 'yahoo', 'baidu', 'yandex')):
+                referrers_grouped['search'] += count
+            elif any(e in ref for e in ('mail', 'outlook', 'gmail')):
+                referrers_grouped['email'] += count
+            else:
+                referrers_grouped['other'] += count
+                
+        by_referrer = [{'channel': k, 'count': v} for k, v in referrers_grouped.items()]
+        
         return Response({
             'by_device': by_device,
             'by_browser': by_browser,
             'by_os': by_os,
+            'by_referrer': by_referrer,
         })
     
     except Exception as e:
         print(f"Error getting device stats: {e}")
-        return Response({'by_device': [], 'by_browser': [], 'by_os': []})
+        return Response({'by_device': [], 'by_browser': [], 'by_os': [], 'by_referrer': []})
 
 
 @api_view(['GET'])

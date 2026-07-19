@@ -306,13 +306,25 @@ export const coreApi = {
     return response.data;
   },
 
-  getEnv: async () => {
-    const response = await api.get<{ content: string }>('/settings/env/');
+  getEnv: async (configToken?: string) => {
+    const headers = configToken ? { 'X-Config-Token': configToken } : undefined;
+    const response = await api.get<{ content: string }>('/settings/env/', { headers });
     return response.data;
   },
 
-  updateEnv: async (content: string) => {
-    const response = await api.post<{ message: string }>('/settings/env/', { content });
+  updateEnv: async (content: string, configToken?: string) => {
+    const headers = configToken ? { 'X-Config-Token': configToken } : undefined;
+    const response = await api.post<{ message: string }>('/settings/env/', { content }, { headers });
+    return response.data;
+  },
+
+  sendConfigOtp: async () => {
+    const response = await api.post<{ message: string }>('/auth/config-send-otp/');
+    return response.data;
+  },
+
+  verifyConfigOtp: async (otp: string) => {
+    const response = await api.post<{ config_token: string; message: string }>('/auth/config-verify-otp/', { otp });
     return response.data;
   },
 
@@ -357,33 +369,51 @@ export const analyticsApi = {
     return response.data;
   },
 
-  getSummary: async () => {
-    const response = await api.get('/analytics/summary/');
+  getSummary: async (source?: string, device?: string) => {
+    let url = '/analytics/summary/?';
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  getVisitorStats: async (days: number = 30) => {
-    const response = await api.get(`/analytics/visitors/?days=${days}`);
+  getVisitorStats: async (days: number = 30, source?: string, device?: string) => {
+    let url = `/analytics/visitors/?days=${days}&`;
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  getPageviewStats: async (days: number = 30) => {
-    const response = await api.get(`/analytics/pageviews/?days=${days}`);
+  getPageviewStats: async (days: number = 30, source?: string, device?: string) => {
+    let url = `/analytics/pageviews/?days=${days}&`;
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  getLocationStats: async (days: number = 30) => {
-    const response = await api.get(`/analytics/locations/?days=${days}`);
+  getLocationStats: async (days: number = 30, source?: string, device?: string) => {
+    let url = `/analytics/locations/?days=${days}&`;
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  getTopPages: async (days: number = 30, limit: number = 10) => {
-    const response = await api.get(`/analytics/pages/?days=${days}&limit=${limit}`);
+  getTopPages: async (days: number = 30, limit: number = 10, source?: string, device?: string) => {
+    let url = `/analytics/pages/?days=${days}&limit=${limit}&`;
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
-  getDeviceStats: async (days: number = 30) => {
-    const response = await api.get(`/analytics/devices/?days=${days}`);
+  getDeviceStats: async (days: number = 30, source?: string, device?: string) => {
+    let url = `/analytics/devices/?days=${days}&`;
+    if (source) url += `source=${source}&`;
+    if (device) url += `device=${device}&`;
+    const response = await api.get(url);
     return response.data;
   },
 
@@ -646,6 +676,36 @@ export const studentService = {
     source?: string;
   }) => {
     const response = await api.post<{ message: string }>('/chat/student/lead/', data);
+    return response.data;
+  },
+};
+
+export interface ChatConversation {
+  session_id: string;
+  messages_count: number;
+  last_message: string;
+  lead_captured: boolean;
+  lead_data: any;
+  created_at: string;
+  updated_at: string;
+}
+
+export const chatConversationsApi = {
+  getAll: async () => {
+    const response = await api.get<{ conversations: ChatConversation[] }>('/chat/conversations/');
+    return response.data;
+  },
+  getById: async (sessionId: string) => {
+    const response = await api.get<{
+      session_id: string;
+      lead_captured: boolean;
+      lead_data: any;
+      messages: Array<{ id: string; role: string; content: string; timestamp: string }>;
+    }>(`/chat/conversations/${sessionId}/`);
+    return response.data;
+  },
+  delete: async (sessionId: string) => {
+    const response = await api.delete<{ success: boolean; message: string }>(`/chat/conversations/${sessionId}/`);
     return response.data;
   },
 };

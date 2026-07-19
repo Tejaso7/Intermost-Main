@@ -10,7 +10,6 @@ import GlimpseGallerySection from '@/components/home/GlimpseGallerySection';
 import YouTubeShortsSection from '@/components/home/YouTubeShortsSection';
 import CTASection from '@/components/home/CTASection';
 import ContactSection from '@/components/home/ContactSection';
-import AICounselorWidget from '@/components/home/AICounselorWidget';
 
 export default function Home() {
   return (
@@ -27,7 +26,6 @@ export default function Home() {
       <YouTubeShortsSection />
       <CTASection />
       <ContactSection />
-      <AICounselorWidget />
     </>
   );
 }

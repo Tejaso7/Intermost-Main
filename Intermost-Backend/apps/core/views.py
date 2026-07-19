@@ -241,10 +241,19 @@ class StatsView(APIView):
 
 
 class EnvConfigView(APIView):
-    """API endpoint to get and update the .env file (Admin only)."""
+    """API endpoint to get and update the .env file (Admin only with second OTP verification)."""
     permission_classes = [IsAdminUser]
 
     def get(self, request):
+        config_token = request.headers.get('X-Config-Token')
+        if not config_token:
+            return Response({'error': 'OTP verification required to access configuration.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        token_collection = get_collection('admin_config_tokens')
+        t_record = token_collection.find_one({'token': config_token})
+        if not t_record:
+            return Response({'error': 'Invalid or expired config session. Please verify again.'}, status=status.HTTP_403_FORBIDDEN)
+
         from django.conf import settings as django_settings
         import os
         env_path = os.path.join(django_settings.BASE_DIR, '.env')
@@ -260,6 +269,15 @@ class EnvConfigView(APIView):
         return Response({'content': content})
 
     def post(self, request):
+        config_token = request.headers.get('X-Config-Token')
+        if not config_token:
+            return Response({'error': 'OTP verification required to save configuration.'}, status=status.HTTP_403_FORBIDDEN)
+            
+        token_collection = get_collection('admin_config_tokens')
+        t_record = token_collection.find_one({'token': config_token})
+        if not t_record:
+            return Response({'error': 'Invalid or expired config session. Please verify again.'}, status=status.HTTP_403_FORBIDDEN)
+
         from django.conf import settings as django_settings
         import os
         import signal
@@ -844,4 +862,237 @@ class GlimpseDetailView(APIView):
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
             
         return Response({'message': 'Deleted successfully'}, status=status.HTTP_200_OK)
+
+
+class AdminLoginView(APIView):
+    """
+    Authenticate administrative user and send a login verification code (OTP) 
+    to the designated secure admin email tejusawant302@gmail.com.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        from django.contrib.auth import authenticate
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        if not username or not password:
+            return Response({'detail': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Authenticate standard credentials
+        user = authenticate(username=username, password=password)
+        if user is None or not user.is_staff:
+            return Response({'detail': 'No active administrative account found with the given credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Generate a 6-digit OTP
+        import random
+        import string
+        otp = ''.join(random.choices(string.digits, k=6))
+
+        # Save to MongoDB
+        otp_collection = get_collection('admin_login_otps')
+        # Create an index to auto-delete after 10 minutes (600 seconds)
+        otp_collection.create_index("created_at", expireAfterSeconds=600)
+        
+        # Overwrite any previous OTPs for this user
+        otp_collection.delete_many({'username': username})
+        
+        otp_collection.insert_one({
+            'username': username,
+            'otp': otp,
+            'created_at': datetime.utcnow()
+        })
+
+        # Send Email via configured SMTP
+        from django.core.mail import EmailMultiAlternatives
+        from django.conf import settings as django_settings
+        
+        subject = "Your Intermost Administrative Portal OTP"
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #0d9488; text-align: center;">Intermost Admin Verification</h2>
+            <hr style="border: 0; border-top: 1px solid #eee;" />
+            <p>Hello,</p>
+            <p>A sign-in attempt was made to the Intermost Administrative Portal for user <strong>@{username}</strong>.</p>
+            <p>Please use the following One-Time Password (OTP) to complete the verification:</p>
+            <div style="font-size: 32px; font-weight: bold; text-align: center; letter-spacing: 5px; margin: 30px 0; color: #111827;">
+                {otp}
+            </div>
+            <p style="color: #6b7280; font-size: 14px; text-align: center;">This OTP is valid for 10 minutes. If you did not make this request, please change your password immediately.</p>
+            <hr style="border: 0; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #9ca3af; text-align: center;">&copy; {datetime.now().year} Intermost Admin. All rights reserved.</p>
+        </div>
+        """
+        
+        try:
+            from_email = getattr(django_settings, 'DEFAULT_FROM_EMAIL', '') or getattr(django_settings, 'EMAIL_HOST_USER', '')
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=f"Your OTP code is: {otp}",
+                from_email=from_email,
+                to=["tejusawant302@gmail.com"]  # Direct request: tejusawant302@gmail.com
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            logger.info(f"Admin login OTP successfully sent to tejusawant302@gmail.com for admin: {username}")
+        except Exception as e:
+            logger.error(f"Failed to send login OTP to tejusawant302@gmail.com: {e}")
+            return Response({'error': 'Failed to send verification email. Please verify SMTP settings.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'otp_required': True,
+            'username': username,
+            'message': 'Verification code sent to administrative email.'
+        }, status=status.HTTP_200_OK)
+
+
+class AdminVerifyOTPView(APIView):
+    """
+    Verify OTP submitted by the admin, and return SimpleJWT access and refresh tokens.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        otp = request.data.get('otp', '').strip()
+
+        if not username or not otp:
+            return Response({'error': 'Username and OTP are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check in MongoDB
+        otp_collection = get_collection('admin_login_otps')
+        record = otp_collection.find_one({'username': username, 'otp': otp})
+
+        if not record:
+            return Response({'error': 'Invalid or expired OTP verification code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Remove the OTP record
+        otp_collection.delete_one({'_id': record['_id']})
+
+        # Fetch the admin user
+        try:
+            user = User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate tokens
+        from rest_framework_simplejwt.tokens import RefreshToken
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            'access': str(refresh.access_token),
+            'refresh': str(refresh),
+            'message': 'Verification successful. Welcome!'
+        }, status=status.HTTP_200_OK)
+
+
+class ConfigSendOTPView(APIView):
+    """
+    Send OTP to tejusawant302@gmail.com to authorize access to settings `.env` file.
+    """
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        user = request.user
+        
+        # Generate a 6-digit OTP
+        import random
+        import string
+        otp = ''.join(random.choices(string.digits, k=6))
+
+        # Save in MongoDB
+        otp_collection = get_collection('admin_config_otps')
+        otp_collection.create_index("created_at", expireAfterSeconds=600)
+        
+        # Clean previous config OTPs for this user
+        otp_collection.delete_many({'username': user.username})
+
+        otp_collection.insert_one({
+            'username': user.username,
+            'otp': otp,
+            'created_at': datetime.utcnow()
+        })
+
+        # Send Email via configured SMTP
+        from django.core.mail import EmailMultiAlternatives
+        from django.conf import settings as django_settings
+        
+        subject = "Your Intermost Config Editor Access OTP"
+        html_content = f"""
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px;">
+            <h2 style="color: #0d9488; text-align: center;">Intermost Security Verification</h2>
+            <hr style="border: 0; border-top: 1px solid #eee;" />
+            <p>Hello,</p>
+            <p>A request was made by admin <strong>@{user.username}</strong> to view or modify the server environment configuration (<strong>.env file</strong>).</p>
+            <p>Please use the following One-Time Password (OTP) to authorize this action:</p>
+            <div style="font-size: 32px; font-weight: bold; text-align: center; letter-spacing: 5px; margin: 30px 0; color: #e11d48;">
+                {otp}
+            </div>
+            <p style="color: #6b7280; font-size: 14px; text-align: center;">This OTP is valid for 10 minutes. If you did not request this, please contact your systems administrator immediately.</p>
+            <hr style="border: 0; border-top: 1px solid #eee;" />
+            <p style="font-size: 12px; color: #9ca3af; text-align: center;">&copy; {datetime.now().year} Intermost Admin. All rights reserved.</p>
+        </div>
+        """
+
+        try:
+            from_email = getattr(django_settings, 'DEFAULT_FROM_EMAIL', '') or getattr(django_settings, 'EMAIL_HOST_USER', '')
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=f"Your config access OTP is: {otp}",
+                from_email=from_email,
+                to=["tejusawant302@gmail.com"]  # Direct request: tejusawant302@gmail.com
+            )
+            msg.attach_alternative(html_content, "text/html")
+            msg.send()
+            logger.info(f"Config access OTP successfully sent to tejusawant302@gmail.com for admin: {user.username}")
+        except Exception as e:
+            logger.error(f"Failed to send config OTP to tejusawant302@gmail.com: {e}")
+            return Response({'error': 'Failed to send verification email. Please verify SMTP settings.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'message': 'Verification code sent to administrative email.'
+        }, status=status.HTTP_200_OK)
+
+
+class ConfigVerifyOTPView(APIView):
+    """
+    Verify the config OTP, and return a temporary config_token valid for 10 minutes.
+    """
+    permission_classes = [IsAdminUser]
+
+    def post(self, request):
+        user = request.user
+        otp = request.data.get('otp', '').strip()
+
+        if not otp:
+            return Response({'error': 'OTP is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check OTP in database
+        otp_collection = get_collection('admin_config_otps')
+        record = otp_collection.find_one({'username': user.username, 'otp': otp})
+
+        if not record:
+            return Response({'error': 'Invalid or expired OTP verification code.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Remove the OTP record
+        otp_collection.delete_one({'_id': record['_id']})
+
+        # Generate a temporary config token
+        import uuid
+        config_token = str(uuid.uuid4())
+        
+        token_collection = get_collection('admin_config_tokens')
+        # Create TTL index to auto-expire in 10 minutes (600 seconds)
+        token_collection.create_index("created_at", expireAfterSeconds=600)
+        
+        token_collection.insert_one({
+            'token': config_token,
+            'username': user.username,
+            'created_at': datetime.utcnow()
+        })
+
+        return Response({
+            'config_token': config_token,
+            'message': 'Access granted. Token valid for 10 minutes.'
+        }, status=status.HTTP_200_OK)
 

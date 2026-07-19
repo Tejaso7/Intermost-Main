@@ -63,6 +63,14 @@ export default function SettingsPage() {
   const [savingEnv, setSavingEnv] = useState(false);
   const [activeTab, setActiveTab] = useState<'website' | 'env'>('website');
   const [envContent, setEnvContent] = useState('');
+  
+  // Config OTP security states
+  const [configToken, setConfigToken] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [requestingOtp, setRequestingOtp] = useState(false);
+  const [configOtp, setConfigOtp] = useState('');
+  const [verifyingConfigOtp, setVerifyingConfigOtp] = useState(false);
+
   const [settings, setSettings] = useState<SiteSettings>({
     site_name: 'Intermost Study Abroad',
     site_description: 'Your Gateway to Global Medical Education',
@@ -125,15 +133,6 @@ export default function SettingsPage() {
         }
       } catch (error) {
         console.debug('Using default settings');
-      }
-
-      try {
-        const envData = await coreApi.getEnv();
-        if (envData && envData.content) {
-          setEnvContent(envData.content);
-        }
-      } catch (error) {
-        console.debug('No .env content found or unauthorised');
       } finally {
         setLoading(false);
       }
@@ -241,12 +240,55 @@ export default function SettingsPage() {
     }
   };
 
+  const loadEnv = async (token: string) => {
+    try {
+      const envData = await coreApi.getEnv(token);
+      if (envData && envData.content) {
+        setEnvContent(envData.content);
+      }
+    } catch (error) {
+      toast.error('Failed to load system environment configuration.');
+    }
+  };
+
+  const handleRequestConfigOtp = async () => {
+    setRequestingOtp(true);
+    try {
+      await coreApi.sendConfigOtp();
+      setOtpSent(true);
+      toast.success('Access code sent to tejusawant302@gmail.com');
+    } catch (error) {
+      toast.error('Failed to request access code.');
+    } finally {
+      setRequestingOtp(false);
+    }
+  };
+
+  const handleVerifyConfigOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!configOtp || configOtp.length !== 6) {
+      toast.error('Please enter a 6-digit access code');
+      return;
+    }
+    setVerifyingConfigOtp(true);
+    try {
+      const res = await coreApi.verifyConfigOtp(configOtp);
+      setConfigToken(res.config_token);
+      toast.success('Access granted!');
+      await loadEnv(res.config_token);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Verification failed. Please check the code.');
+    } finally {
+      setVerifyingConfigOtp(false);
+    }
+  };
+
   const handleSaveEnv = async (e: React.FormEvent) => {
     e.preventDefault();
     setSavingEnv(true);
 
     try {
-      await coreApi.updateEnv(envContent);
+      await coreApi.updateEnv(envContent, configToken);
       toast.success('Environment variables saved! Server reloading.');
     } catch (error) {
       console.error('Error saving environment config:', error);
@@ -862,6 +904,74 @@ export default function SettingsPage() {
             </button>
           </motion.div>
         </form>
+      ) : !configToken ? (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 max-w-md mx-auto text-center space-y-6"
+        >
+          <div className="w-16 h-16 bg-red-50 text-red-650 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+            <Sliders className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-gray-900">System Configuration Locked</h2>
+            <p className="text-sm text-gray-500 mt-2">
+              Viewing or modifying system credentials and environment variables requires administrative authentication.
+            </p>
+          </div>
+
+          {!otpSent ? (
+            <button
+              onClick={handleRequestConfigOtp}
+              disabled={requestingOtp}
+              className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {requestingOtp ? (
+                <div className="animate-spin rounded-full h-4 sm:h-5 w-4 sm:w-5 border-2 border-white border-t-transparent" />
+              ) : (
+                <span>Request Access Code</span>
+              )}
+            </button>
+          ) : (
+            <form onSubmit={handleVerifyConfigOtp} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-650 mb-2 uppercase tracking-wider text-center">
+                  Verification Code (OTP)
+                </label>
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={configOtp}
+                  onChange={(e) => setConfigOtp(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-center tracking-[0.5em] font-bold text-gray-800 focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                  placeholder="••••••"
+                  required
+                />
+              </div>
+              <p className="text-xs text-gray-400">
+                A 6-digit access code has been dispatched to <strong>tejusawant302@gmail.com</strong>.
+              </p>
+              <button
+                type="submit"
+                disabled={verifyingConfigOtp}
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {verifyingConfigOtp ? (
+                  <div className="animate-spin rounded-full h-4 sm:h-5 w-4 sm:w-5 border-2 border-white border-t-transparent" />
+                ) : (
+                  <span>Verify Access</span>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => setOtpSent(false)}
+                className="text-xs text-gray-500 hover:text-gray-700 font-semibold"
+              >
+                Resend Code
+              </button>
+            </form>
+          )}
+        </motion.div>
       ) : (
         <form onSubmit={handleSaveEnv} className="space-y-6">
           <motion.div
