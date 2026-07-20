@@ -72,6 +72,7 @@ services:
       - "443:443"
     volumes:
       - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
       - static_volume:/app/staticfiles:ro
       - media_volume:/app/media:ro
       - /var/log/nginx:/var/log/nginx
