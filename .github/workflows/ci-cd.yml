@@ -90,5 +90,6 @@ jobs:
         script: |
           cd ~/intermost
           git pull origin main
+          sudo systemctl stop nginx || true
+          sudo systemctl disable nginx || true
           docker compose -f docker-compose.prod.yml up -d --build
-          docker compose -f docker-compose.prod.yml restart nginx
