@@ -29,17 +29,20 @@ class MongoDBConnection:
     
     def connect(self):
         """Establish connection to MongoDB Atlas."""
-        if self._client is None:
+        if self._client is None or self._db is None:
             try:
                 mongodb_uri = getattr(settings, 'MONGODB_URI', os.environ.get('MONGODB_URI'))
                 mongodb_name = getattr(settings, 'MONGODB_NAME', os.environ.get('MONGODB_NAME', 'intermost_db'))
                 
+                if not mongodb_uri:
+                    raise ConnectionFailure("MONGODB_URI is not set in environment or settings")
+
                 # Only use TLS if not a local connection or if TLS is explicitly requested in URI
                 is_local = "localhost" in mongodb_uri or "127.0.0.1" in mongodb_uri or "@mongodb:" in mongodb_uri
                 client_kwargs = {
-                    'serverSelectionTimeoutMS': 30000,
-                    'connectTimeoutMS': 30000,
-                    'socketTimeoutMS': 30000,
+                    'serverSelectionTimeoutMS': 15000,
+                    'connectTimeoutMS': 15000,
+                    'socketTimeoutMS': 15000,
                     'maxPoolSize': 50,
                     'retryWrites': True,
                 }
@@ -48,18 +51,17 @@ class MongoDBConnection:
                     client_kwargs['tlsAllowInvalidCertificates'] = True
                     
                 self._client = MongoClient(mongodb_uri, **client_kwargs)
-
+                
                 # Verify connection
                 self._client.admin.command('ping')
                 self._db = self._client[mongodb_name]
                 logger.info(f"Successfully connected to MongoDB: {mongodb_name}")
                 
-            except (ConnectionFailure, ServerSelectionTimeoutError) as e:
-                logger.warning(f"Failed to connect to MongoDB on startup: {e}. Lazy connection will be retried on query execution.")
-                if self._client:
-                    self._db = self._client[mongodb_name]
-                else:
-                    raise
+            except Exception as e:
+                logger.error(f"MongoDB connection failed: {e}")
+                self._client = None
+                self._db = None
+                raise
                 
         return self._db
     
