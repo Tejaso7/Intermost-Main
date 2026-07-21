@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { chatAPI, ChatMessage } from '@/lib/api';
 import { MessageCircle, X, Send, Loader2, Sparkles } from 'lucide-react';
+import { generateUUID } from '@/lib/utils';
 
 interface AdminChatWidgetProps {
   className?: string;
@@ -23,7 +24,7 @@ export default function AdminChatWidget({ className = '' }: AdminChatWidgetProps
     if (storedSessionId) {
       setSessionId(storedSessionId);
     } else {
-      const newSessionId = crypto.randomUUID();
+      const newSessionId = generateUUID();
       setSessionId(newSessionId);
       localStorage.setItem('admin_chat_session', newSessionId);
     }
@@ -60,7 +61,7 @@ export default function AdminChatWidget({ className = '' }: AdminChatWidgetProps
     if (!message || isLoading) return;
 
     const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
@@ -79,7 +80,7 @@ export default function AdminChatWidget({ className = '' }: AdminChatWidgetProps
       }
 
       const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: response.message,
         timestamp: response.timestamp,
@@ -88,7 +89,7 @@ export default function AdminChatWidget({ className = '' }: AdminChatWidgetProps
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error: any) {
       const errorMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: error.response?.data?.error || 'Sorry, I encountered an error. Please try again.',
         timestamp: new Date().toISOString(),
@@ -108,7 +109,7 @@ export default function AdminChatWidget({ className = '' }: AdminChatWidgetProps
 
   const clearChat = () => {
     setMessages([]);
-    const newSessionId = crypto.randomUUID();
+    const newSessionId = generateUUID();
     setSessionId(newSessionId);
     localStorage.setItem('admin_chat_session', newSessionId);
   };

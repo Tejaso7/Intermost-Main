@@ -6,6 +6,7 @@ import { chatAPI, runtimeRagAPI, ChatMessage, Country } from '@/lib/api';
 import { motion, AnimatePresence, useDragControls } from 'framer-motion';
 import { MessageCircle, X, Send, GraduationCap, User, Phone, Mail, MapPin, Check, Sparkles, Paperclip, FileText, Loader2 } from 'lucide-react';
 import { countriesApi } from '@/lib/services';
+import { generateUUID } from '@/lib/utils';
 
 type ChatStep = 'chat' | 'lead_capture' | 'lead_complete';
 
@@ -50,7 +51,7 @@ export default function StudentChatWidget() {
     if (storedSessionId) {
       setSessionId(storedSessionId);
     } else {
-      const newSessionId = crypto.randomUUID();
+      const newSessionId = generateUUID();
       setSessionId(newSessionId);
       localStorage.setItem('student_chat_session', newSessionId);
     }
@@ -106,7 +107,7 @@ export default function StudentChatWidget() {
     if (!message || isLoading) return;
 
     const userMessage: ChatMessage = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       role: 'user',
       content: message,
       timestamp: new Date().toISOString(),
@@ -137,7 +138,7 @@ export default function StudentChatWidget() {
       }
 
       const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: assistantResponseText,
         timestamp: new Date().toISOString(),
@@ -146,7 +147,7 @@ export default function StudentChatWidget() {
       setMessages((prev) => [...prev, assistantMessage]);
     } catch (error: any) {
       const errorMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: error.response?.data?.error || 'I apologize for the inconvenience. Please try again or contact us directly at +91-9717717165.',
         timestamp: new Date().toISOString(),
@@ -176,7 +177,7 @@ export default function StudentChatWidget() {
       setBrochureName(selectedFile.name);
       
       const assistantMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: `I've successfully read through "${selectedFile.name}". Ask me any questions about it!`,
         timestamp: new Date().toISOString()
@@ -199,7 +200,7 @@ export default function StudentChatWidget() {
     }
     setIsBrochureMode(false);
     setBrochureName(null);
-    const newSessionId = crypto.randomUUID();
+    const newSessionId = generateUUID();
     setSessionId(newSessionId);
     localStorage.setItem('student_chat_session', newSessionId);
     setMessages([{
@@ -232,7 +233,7 @@ export default function StudentChatWidget() {
       
       // Add thank you message
       const thankYouMessage: ChatMessage = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         role: 'assistant',
         content: `Thank you, ${leadForm.name}! 🎉\n\nOur expert counselor will contact you shortly at ${leadForm.phone}.\n\nIn the meantime, feel free to ask me any questions about studying abroad!`,
         timestamp: new Date().toISOString(),

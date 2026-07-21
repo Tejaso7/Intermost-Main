@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Send, MessageSquare, X, Phone, Check, User, Sparkles } from 'lucide-react';
 import { studentService } from '@/lib/services';
+import { generateUUID } from '@/lib/utils';
 
 interface Message {
   id: string;
@@ -28,7 +29,7 @@ export default function AICounselorWidget() {
   useEffect(() => {
     let savedSession = localStorage.getItem('intermost_chat_session');
     if (!savedSession) {
-      savedSession = crypto.randomUUID();
+      savedSession = generateUUID();
       localStorage.setItem('intermost_chat_session', savedSession);
     }
     setSessionId(savedSession);
@@ -81,7 +82,7 @@ export default function AICounselorWidget() {
 
     // Add user message
     const userMsg: Message = {
-      id: crypto.randomUUID(),
+      id: generateUUID(),
       sender: 'user',
       text: userText
     };
@@ -94,7 +95,7 @@ export default function AICounselorWidget() {
       const botMsgText = response.response || response.message || "I'm having trouble retrieving details. Please call our counselor directly at +91 91583 74434.";
       
       const botMsg: Message = {
-        id: crypto.randomUUID(),
+        id: generateUUID(),
         sender: 'bot',
         text: botMsgText
       };
@@ -126,7 +127,7 @@ export default function AICounselorWidget() {
       setMessages((prev) => [
         ...prev,
         {
-          id: crypto.randomUUID(),
+          id: generateUUID(),
           sender: 'bot',
           text: "I apologize, our counseling servers are busy right now. Please call us directly at +91 91583 74434 or WhatsApp us!"
         }
@@ -174,7 +175,7 @@ export default function AICounselorWidget() {
 
   const clearChat = () => {
     if (window.confirm("Do you want to reset your chat conversation?")) {
-      const newSession = crypto.randomUUID();
+      const newSession = generateUUID();
       localStorage.setItem('intermost_chat_session', newSession);
       localStorage.removeItem(`intermost_chat_history_${sessionId}`);
       setSessionId(newSession);
