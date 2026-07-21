@@ -54,10 +54,15 @@ export default function AdminLoginPage() {
         }),
       });
 
-      const result = await response.json();
+      let result: any = {};
+      try {
+        result = await response.json();
+      } catch (e) {
+        throw new Error('Server returned an invalid response. Please check backend logs.');
+      }
 
       if (!response.ok) {
-        throw new Error(result.detail || 'Invalid credentials');
+        throw new Error(result.detail || result.error || 'Invalid credentials');
       }
 
       if (result.otp_required) {
