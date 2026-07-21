@@ -34,6 +34,11 @@ class MongoDBConnection:
                 mongodb_uri = getattr(settings, 'MONGODB_URI', os.environ.get('MONGODB_URI'))
                 mongodb_name = getattr(settings, 'MONGODB_NAME', os.environ.get('MONGODB_NAME', 'intermost_db'))
                 
+                if mongodb_uri:
+                    mongodb_uri = mongodb_uri.strip()
+                if mongodb_name:
+                    mongodb_name = mongodb_name.strip()
+                
                 if not mongodb_uri:
                     raise ConnectionFailure("MONGODB_URI is not set in environment or settings")
 
