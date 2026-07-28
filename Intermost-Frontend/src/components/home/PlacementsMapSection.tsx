@@ -28,7 +28,7 @@ const destinations: MapDestination[] = [
     avgFee: '$3,800 - $6,000 / Year',
     visaRate: '99% Success Rate',
     language: 'Fully English Medium',
-    universities: ['Orenburg State Medical University', 'Kazan Federal University', 'Bashkir State Medical University'],
+    universities: ['Orenburg State Medical University', 'Kazan Federal University', 'Voronezh State Medical University', 'Bashkir State Medical University'],
   },
   {
     id: 'georgia',
@@ -50,7 +50,7 @@ const destinations: MapDestination[] = [
     avgFee: '$3,300 - $4,500 / Year',
     visaRate: '99% Success Rate',
     language: 'Fully English Medium',
-    universities: ['Tashkent Medical Academy', 'Samarkand State Medical University'],
+    universities: ['Andijan State Medical University', 'Tashkent State Medical University', 'Samarkand State Medical Institute'],
   },
   {
     id: 'kazakhstan',
@@ -72,7 +72,7 @@ const destinations: MapDestination[] = [
     avgFee: '₹55 - ₹65 Lakhs (Total)',
     visaRate: '99% Success Rate',
     language: 'English / Hindi Friendly',
-    universities: ['Tribhuvan University', 'Kathmandu University'],
+    universities: ['Chitwan Medical College & Hospital', 'Kathmandu Medical College & Hospital', 'B&C Medical College Teaching Hospital & Research Center'],
   },
   {
     id: 'tajikistan',
