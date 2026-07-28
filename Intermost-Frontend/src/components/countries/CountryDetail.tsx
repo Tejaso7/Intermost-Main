@@ -244,7 +244,7 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
                   </span>
                 </div>
                 <div className="flex justify-between items-center pt-2">
-                  <span className="text-gray-900 font-semibold">Total Fee</span>
+                  <span className="text-gray-900 font-semibold">Total Tuition Fee</span>
                   <span className="font-bold text-primary-600 text-xl">
                     {country.pricing?.total_course_fee}
                   </span>
@@ -425,7 +425,7 @@ export default function CountryDetail({ country, colleges: propColleges }: Count
                         {/* Cost footer */}
                         <div className="pt-3.5 border-t border-gray-100 flex items-center justify-between">
                           <div>
-                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Course Fee</span>
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">Total Tuition Fee</span>
                             <span className="text-base font-extrabold text-primary-600">
                               {college.fees?.total_package || 'Contact Us'}
                             </span>

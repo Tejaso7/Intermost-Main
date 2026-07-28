@@ -203,9 +203,9 @@ export default function WhyChooseUs() {
               transition={{ delay: 0.4, duration: 0.5 }}
             >
               <div className="inline-block bg-white/10 backdrop-blur-md rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-white/20 shadow-xl">
-                <p className="text-white/80 text-sm sm:text-base md:text-lg mb-2 sm:mb-3">Total Course Fee Starting From</p>
-                <p className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-3">₹18 Lakhs</p>
-                <p className="text-white/80 text-xs sm:text-sm md:text-base">For complete 6-year program</p>
+                <p className="text-white/80 text-sm sm:text-base md:text-lg mb-2 sm:mb-3">Complete Tuition Fee Program</p>
+                <p className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 sm:mb-3">Starting from 18 Lakhs</p>
+                <p className="text-white/80 text-xs sm:text-sm md:text-base">Total 6 year tuition fee</p>
               </div>
             </motion.div>
           </div>

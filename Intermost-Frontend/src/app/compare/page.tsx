@@ -373,7 +373,7 @@ export default function CountryComparisonPage() {
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c1.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Tuition Fee:</span> <span className="font-bold text-slate-900">{c1.pricing.total_course_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c1.pricing.tuition_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c1.pricing.hostel_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c1.pricing.living_cost}</span></li>
@@ -471,7 +471,7 @@ export default function CountryComparisonPage() {
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c2.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Tuition Fee:</span> <span className="font-bold text-slate-900">{c2.pricing.total_course_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c2.pricing.tuition_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c2.pricing.hostel_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c2.pricing.living_cost}</span></li>
@@ -569,7 +569,7 @@ export default function CountryComparisonPage() {
                       <span>FEES & BUDGET</span>
                     </div>
                     <ul className="space-y-2 text-sm">
-                      <li className="flex justify-between"><span className="text-slate-500">Total Course Fee:</span> <span className="font-bold text-slate-900">{c3.pricing.total_course_fee}</span></li>
+                      <li className="flex justify-between"><span className="text-slate-500">Total Tuition Fee:</span> <span className="font-bold text-slate-900">{c3.pricing.total_course_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Tuition Fee:</span> <span className="text-slate-700">{c3.pricing.tuition_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Hostel Fee:</span> <span className="text-slate-700">{c3.pricing.hostel_fee}</span></li>
                       <li className="flex justify-between"><span className="text-slate-500">Avg. Living Cost:</span> <span className="text-slate-700">{c3.pricing.living_cost}</span></li>
