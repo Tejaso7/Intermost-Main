@@ -368,3 +368,108 @@
 .Toastify__toast {
   @apply rounded-xl;
 }
+
+.section-mesh-light {
+  position: relative;
+  background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 25%, #f8faf5 50%, #fff 75%, #f5f8ff 100%);
+}
+
+.section-mesh-dark {
+  position: relative;
+  background: linear-gradient(135deg, #0f172a 0%, #1a1a3e 30%, #0f2027 60%, #0d1117 100%);
+}
+
+.floating-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.15;
+  pointer-events: none;
+  animation: float-orb 20s ease-in-out infinite;
+}
+
+.floating-orb-primary {
+  background: radial-gradient(circle, #3b82f6, #2563eb);
+}
+
+.floating-orb-secondary {
+  background: radial-gradient(circle, #22c55e, #16a34a);
+}
+
+.floating-orb-purple {
+  background: radial-gradient(circle, #8b5cf6, #7c3aed);
+}
+
+@keyframes float-orb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.1); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(15px, -10px) scale(1.05); }
+}
+
+.card-glow {
+  position: relative;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.4s ease;
+}
+
+.card-glow:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.12), 0 0 0 1px rgba(59, 130, 246, 0.08);
+}
+
+.card-glow-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.4s ease;
+}
+
+.card-glow-dark:hover {
+  border-color: rgba(59, 130, 246, 0.25);
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.1);
+}
+
+.glow-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), rgba(34, 197, 94, 0.3), transparent);
+}
+
+@keyframes shimmer-slide {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.badge-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(59, 130, 246, 0.08) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer-slide 3s ease-in-out infinite;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #2563eb, #16a34a);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+.input-modern {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.input-modern:focus {
+  outline: none;
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 20px rgba(59, 130, 246, 0.08);
+  background: rgba(255, 255, 255, 0.9);
+}

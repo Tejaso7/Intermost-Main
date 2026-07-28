@@ -45,7 +45,9 @@ const trustFactors = [
 
 export default function RecognitionSection() {
   return (
-    <section className="py-16 bg-gray-50 overflow-hidden">
+    <section className="py-16 bg-gray-50 overflow-hidden relative">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(circle, #e2e8f0 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
       <div className="container-custom">
         {/* Section Header */}
         <motion.div
@@ -82,9 +84,9 @@ export default function RecognitionSection() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex-shrink-0 group"
+                  className="flex-shrink-0 group hover:scale-105 transition-transform duration-300"
                 >
-                  <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center border border-gray-100 group-hover:border-primary-200 group-hover:-translate-y-1">
+                  <div className="bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center rounded-xl group-hover:-translate-y-1">
                     <div className="relative w-20 h-20 mb-3 grayscale group-hover:grayscale-0 transition-all duration-300">
                       {item.logo ? (
                         <Image
@@ -111,9 +113,9 @@ export default function RecognitionSection() {
               {recognitions.map((item, index) => (
                 <div
                   key={`second-${index}`}
-                  className="flex-shrink-0 group"
+                  className="flex-shrink-0 group hover:scale-105 transition-transform duration-300"
                 >
-                  <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center border border-gray-100 group-hover:border-primary-200 group-hover:-translate-y-1">
+                  <div className="bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center rounded-xl group-hover:-translate-y-1">
                     <div className="relative w-20 h-20 mb-3 grayscale group-hover:grayscale-0 transition-all duration-300">
                       {item.logo ? (
                         <Image
@@ -147,10 +149,11 @@ export default function RecognitionSection() {
           {trustFactors.map((factor, index) => (
             <div
               key={index}
-              className="flex items-center space-x-3 bg-white px-6 py-3 rounded-full shadow-sm border border-gray-100"
+              className="flex items-center space-x-3 bg-white/70 backdrop-blur-md px-6 py-3 rounded-full shadow-sm border border-white/50 relative overflow-hidden group hover:shadow-md transition-all duration-300"
             >
-              <factor.icon className="w-5 h-5 text-green-500" />
-              <span className="text-gray-700 font-medium">{factor.text}</span>
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
+              <factor.icon className="w-5 h-5 text-green-500 relative z-10" />
+              <span className="text-gray-700 font-medium relative z-10">{factor.text}</span>
             </div>
           ))}
         </motion.div>
@@ -167,6 +170,9 @@ export default function RecognitionSection() {
         }
         .animate-marquee:hover {
           animation-play-state: paused;
+        }
+        @keyframes shimmer {
+          100% { transform: translateX(100%); }
         }
       `}</style>
     </section>

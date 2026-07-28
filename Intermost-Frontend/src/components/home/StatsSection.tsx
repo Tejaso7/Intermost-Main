@@ -102,6 +102,10 @@ export default function StatsSection() {
         }} />
       </div>
 
+      {/* Floating Orbs */}
+      <div className="absolute top-10 -left-20 w-72 h-72 bg-primary-400/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 -right-20 w-72 h-72 bg-secondary-400/10 rounded-full blur-3xl pointer-events-none" />
+
       <div className="container-custom relative z-10">
         {/* Section Header */}
         <motion.div
@@ -129,20 +133,21 @@ export default function StatsSection() {
               initial={{ opacity: 0, y: 20, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true }}
+              whileHover={{ y: -4, scale: 1.02 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="text-center group"
+              className="text-center group bg-white/60 backdrop-blur-xl border border-white/40 shadow-lg hover:shadow-xl hover:border-primary-200/50 transition-all duration-300 p-6 sm:p-8 rounded-3xl"
             >
               {/* Icon */}
               <motion.div 
-                className="w-12 sm:w-14 md:w-16 h-12 sm:h-14 md:h-16 mx-auto mb-3 sm:mb-4 bg-primary-100 rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:bg-primary-600 transition-colors"
+                className="w-12 sm:w-14 md:w-16 h-12 sm:h-14 md:h-16 mx-auto mb-3 sm:mb-4 bg-gradient-to-br from-primary-500 to-primary-600 shadow-lg shadow-primary-500/25 rounded-xl sm:rounded-2xl flex items-center justify-center transition-colors"
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 transition={{ duration: 0.3 }}
               >
-                <stat.icon className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-primary-600 group-hover:text-white transition-colors" />
+                <stat.icon className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-white transition-colors" />
               </motion.div>
 
               {/* Value */}
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-1 sm:mb-2">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold mb-1 sm:mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-primary-700">
                 {isInView ? (
                   <CountUp
                     end={stat.value}

@@ -165,7 +165,7 @@ export default function CountriesSection() {
                   <motion.div
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-500/30 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-2xl hover:shadow-primary-500/5 relative group/card"
+                    className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-300/40 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary-500/5 relative group/card"
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.3 }}
                   >
@@ -195,7 +195,7 @@ export default function CountriesSection() {
                       <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent group-hover/card:from-black/90 transition-all duration-300 z-10" />
 
                       {/* Flag */}
-                      <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden shadow-lg border border-white/20 z-20">
+                      <div className="absolute top-4 left-4 w-9 h-6.5 rounded-lg overflow-hidden ring-2 ring-white/80 shadow-sm z-20">
                         <Image
                           src={country.flag_url || getCountryFlag(country.code)}
                           alt={`${country.name} flag`}
@@ -206,7 +206,7 @@ export default function CountriesSection() {
 
                       {/* Featured Badge */}
                       {country.meta?.is_featured && (
-                        <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-md z-20">
+                        <span className="absolute top-4 right-4 px-3 py-1 bg-gradient-to-r from-primary-600 to-primary-700 text-white text-[10px] font-bold tracking-wider uppercase rounded-full shadow-lg shadow-primary-500/30 animate-pulse z-20">
                           Popular Choice
                         </span>
                       )}
@@ -223,19 +223,19 @@ export default function CountriesSection() {
                     <div className="p-5 flex-1 flex flex-col">
                       {/* Trust Badges */}
                       <div className="flex flex-wrap gap-1.5 mb-5">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50/70 border border-primary-100 rounded-full text-[10px] font-semibold text-primary-700">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-primary-50/70 border border-primary-100 rounded-full text-[10px] font-semibold text-primary-700 badge-shimmer">
                           <Check className="w-3 h-3" /> NMC Approved
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-50/70 border border-secondary-100 rounded-full text-[10px] font-semibold text-secondary-700">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-secondary-50/70 border border-secondary-100 rounded-full text-[10px] font-semibold text-secondary-700 badge-shimmer">
                           <Check className="w-3 h-3" /> WHO Listed
                         </span>
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50/70 border border-green-100 rounded-full text-[10px] font-semibold text-green-700">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-green-50/70 border border-green-100 rounded-full text-[10px] font-semibold text-green-700 badge-shimmer">
                           <Check className="w-3 h-3" /> 100% English
                         </span>
                       </div>
 
                       {/* Quick Stats */}
-                      <div className="grid grid-cols-3 gap-3 mb-5 bg-gray-50/70 p-3 rounded-2xl border border-gray-100">
+                      <div className="grid grid-cols-3 gap-3 mb-5 bg-white/80 backdrop-blur-sm border border-gray-100/50 p-3 rounded-lg">
                         <div className="text-center">
                           <Clock className="w-4 h-4 text-primary-500 mx-auto mb-1" />
                           <span className="text-[10px] text-gray-500 block">Duration</span>
@@ -291,7 +291,7 @@ export default function CountriesSection() {
           viewport={{ once: true }}
           className="text-center mt-10"
         >
-          <Link href="/countries" className="btn-primary">
+          <Link href="/countries" className="btn-primary hover:shadow-lg hover:shadow-primary-500/20 transition-all duration-300">
             View All Countries
             <ArrowRight className="ml-2 w-5 h-5" />
           </Link>

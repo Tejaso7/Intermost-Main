@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import LayoutWrapper from '@/components/layout/LayoutWrapper';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import ScrollEnhancements from '@/components/common/ScrollEnhancements';
 
 const inter = Inter({ 
   subsets: ['latin'], 
@@ -107,6 +108,7 @@ export default function RootLayout({
             },
           }}
         />
+        <ScrollEnhancements />
         <AnalyticsTracker />
         <LayoutWrapper>{children}</LayoutWrapper>
       </body>

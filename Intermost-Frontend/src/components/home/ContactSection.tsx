@@ -108,7 +108,10 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className="py-20 bg-white">
+    <section id="contact" className="py-20 bg-white relative overflow-hidden">
+      {/* Ambient background orbs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-primary-400/5 rounded-full blur-3xl pointer-events-none -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl pointer-events-none translate-x-1/2 translate-y-1/2" />
       <div className="container-custom">
         <div className="grid lg:grid-cols-2 gap-12 items-start">
           {/* Contact Info */}
@@ -132,10 +135,10 @@ export default function ContactSection() {
             <div className="space-y-4 mb-8">
               <a
                 href={`tel:${contact.phone1.replace(/\s/g, '')}`}
-                className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-primary-50 transition-colors group"
+                className="flex items-start p-4 bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 hover:-translate-y-1 transition-all duration-300 group rounded-xl"
               >
-                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary-600 transition-colors">
-                  <Phone className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors" />
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/20 rounded-xl flex items-center justify-center mr-4">
+                  <Phone className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Call Us</h4>
@@ -146,10 +149,10 @@ export default function ContactSection() {
 
               <a
                 href={`mailto:${contact.email}`}
-                className="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-primary-50 transition-colors group"
+                className="flex items-start p-4 bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 hover:-translate-y-1 transition-all duration-300 group rounded-xl"
               >
-                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4 group-hover:bg-primary-600 transition-colors">
-                  <Mail className="w-6 h-6 text-primary-600 group-hover:text-white transition-colors" />
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/20 rounded-xl flex items-center justify-center mr-4">
+                  <Mail className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Email Us</h4>
@@ -157,9 +160,9 @@ export default function ContactSection() {
                 </div>
               </a>
 
-              <div className="flex items-start p-4 bg-gray-50 rounded-xl">
-                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4">
-                  <MapPin className="w-6 h-6 text-primary-600" />
+              <div className="flex items-start p-4 bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 hover:-translate-y-1 transition-all duration-300 group rounded-xl">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/20 rounded-xl flex items-center justify-center mr-4">
+                  <MapPin className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Visit Us</h4>
@@ -169,9 +172,9 @@ export default function ContactSection() {
                 </div>
               </div>
 
-              <div className="flex items-start p-4 bg-gray-50 rounded-xl">
-                <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center mr-4">
-                  <Clock className="w-6 h-6 text-primary-600" />
+              <div className="flex items-start p-4 bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 hover:-translate-y-1 transition-all duration-300 group rounded-xl">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 shadow-md shadow-primary-500/20 rounded-xl flex items-center justify-center mr-4">
+                  <Clock className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900">Office Hours</h4>
@@ -190,8 +193,9 @@ export default function ContactSection() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="card p-8"
+            className="card p-8 relative overflow-hidden"
           >
+            <div className="absolute -top-20 -right-20 w-72 h-72 bg-primary-400/10 rounded-full blur-3xl pointer-events-none" />
             {isSubmitted ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -211,12 +215,12 @@ export default function ContactSection() {
                 </h3>
 
                 {/* Name */}
-                <div>
-                  <label className="label">Full Name *</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Full Name *</label>
                   <input
                     type="text"
                     {...register('name')}
-                    className={cn('input-field', errors.name && 'input-error')}
+                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.name && 'input-error')}
                     placeholder="Enter your full name"
                   />
                   {errors.name && (
@@ -225,12 +229,12 @@ export default function ContactSection() {
                 </div>
 
                 {/* Email */}
-                <div>
-                  <label className="label">Email Address *</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Email Address *</label>
                   <input
                     type="email"
                     {...register('email')}
-                    className={cn('input-field', errors.email && 'input-error')}
+                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.email && 'input-error')}
                     placeholder="Enter your email"
                   />
                   {errors.email && (
@@ -239,12 +243,12 @@ export default function ContactSection() {
                 </div>
 
                 {/* Phone */}
-                <div>
-                  <label className="label">Phone Number *</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Phone Number *</label>
                   <div className="flex">
                     <select
                       {...register('country_code')}
-                      className="input-field w-24 rounded-r-none"
+                      className="bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-l-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none w-24 border-r-0"
                     >
                       <option value="+91">+91</option>
                       <option value="+971">+971</option>
@@ -254,7 +258,7 @@ export default function ContactSection() {
                       type="tel"
                       {...register('phone')}
                       className={cn(
-                        'input-field flex-1 rounded-l-none border-l-0',
+                        'flex-1 bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-r-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none border-l-0',
                         errors.phone && 'input-error'
                       )}
                       placeholder="Enter your phone number"
@@ -266,11 +270,11 @@ export default function ContactSection() {
                 </div>
 
                 {/* Interested Country */}
-                <div>
-                  <label className="label">Interested Country</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Interested Country</label>
                   <select
                     {...register('interested_country')}
-                    className="input-field"
+                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none"
                   >
                     <option value="">Select a country</option>
                     {countries.map((country) => (
@@ -282,23 +286,23 @@ export default function ContactSection() {
                 </div>
 
                 {/* NEET Score */}
-                <div>
-                  <label className="label">NEET Score (Optional)</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">NEET Score (Optional)</label>
                   <input
                     type="text"
                     {...register('neet_score')}
-                    className="input-field"
+                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none"
                     placeholder="Enter your NEET score"
                   />
                 </div>
 
                 {/* Message */}
-                <div>
-                  <label className="label">Message (Optional)</label>
+                <div className="relative z-10">
+                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Message (Optional)</label>
                   <textarea
                     {...register('message')}
                     rows={3}
-                    className="input-field resize-none"
+                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none resize-none"
                     placeholder="Any specific questions or requirements?"
                   />
                 </div>
@@ -307,7 +311,7 @@ export default function ContactSection() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full"
+                  className="btn-primary w-full relative z-10 hover:shadow-lg hover:shadow-primary-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center">

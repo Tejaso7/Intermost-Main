@@ -49,11 +49,23 @@ export default function CTASection() {
           <div className="absolute inset-0 gradient-bg" />
           
           {/* Pattern Overlay */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='1' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E")`,
-            }}
+          <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }} />
+
+          {/* Floating Sparkles */}
+          <motion.div
+            animate={{ opacity: [0.3, 0.8, 0.3], scale: [0.8, 1.2, 0.8] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="absolute top-10 right-20 w-2 h-2 bg-white rounded-full pointer-events-none"
+          />
+          <motion.div
+            animate={{ opacity: [0.2, 0.6, 0.2], scale: [0.9, 1.3, 0.9] }}
+            transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+            className="absolute bottom-16 left-24 w-3 h-3 bg-white/80 rounded-full pointer-events-none blur-[1px]"
+          />
+          <motion.div
+            animate={{ opacity: [0.4, 0.9, 0.4], scale: [0.7, 1.1, 0.7] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 0.5 }}
+            className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-white rounded-full pointer-events-none"
           />
 
           {/* Content */}
@@ -99,7 +111,7 @@ export default function CTASection() {
             >
               <Link
                 href="/apply"
-                className="btn-white group"
+                className="btn-white group hover:shadow-xl hover:shadow-white/20 hover:scale-105 transition-all duration-300"
               >
                 Apply Now
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -107,7 +119,7 @@ export default function CTASection() {
               
               <button
                 onClick={handleWhatsApp}
-                className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-primary-600 transition-all duration-300"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-primary-600 hover:shadow-lg hover:shadow-green-400/25 hover:scale-105 transition-all duration-300"
               >
                 <MessageCircle className="mr-2 w-5 h-5" />
                 Chat on WhatsApp
@@ -115,7 +127,7 @@ export default function CTASection() {
               
               <a
                 href={`tel:${phoneNumber.replace(/\s/g, '')}`}
-                className="inline-flex items-center justify-center px-6 py-3 text-white font-semibold hover:text-white/80 transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 text-white font-semibold rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors"
               >
                 <Phone className="mr-2 w-5 h-5" />
                 {phoneNumber}

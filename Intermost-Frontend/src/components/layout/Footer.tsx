@@ -101,7 +101,10 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gray-900 text-gray-300">
+    <footer className="relative bg-gradient-to-b from-gray-900 via-[#0f1729] to-gray-950 text-gray-300 overflow-hidden">
+      {/* Floating Orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary-600/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-secondary-600/5 rounded-full blur-3xl pointer-events-none" />
       {/* Main Footer */}
       <div className="container-custom py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10">
@@ -125,13 +128,13 @@ export default function Footer() {
               Your trusted partner for MBBS education abroad. We help students achieve 
               their dreams of becoming doctors through quality education at affordable costs.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex space-x-4 relative z-10">
               {social.facebook && (
                 <a
                   href={social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-primary-600 transition-colors"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300"
                 >
                   <Facebook className="w-5 h-5" />
                 </a>
@@ -141,7 +144,7 @@ export default function Footer() {
                   href={social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-pink-600 transition-colors"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-pink-600 hover:shadow-lg hover:shadow-pink-600/25 transition-all duration-300"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
@@ -151,7 +154,7 @@ export default function Footer() {
                   href={social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-red-600 hover:shadow-lg hover:shadow-red-600/25 transition-all duration-300"
                 >
                   <Youtube className="w-5 h-5" />
                 </a>
@@ -167,8 +170,9 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-gray-400 hover:text-white hover:pl-2 transition-all duration-200"
+                    className="group flex items-center text-gray-400 hover:text-white transition-all duration-300 relative z-10"
                   >
+                    <span className="w-0 h-px bg-primary-500 mr-0 group-hover:w-4 group-hover:mr-2 transition-all duration-300" />
                     {link.name}
                   </Link>
                 </li>
@@ -215,21 +219,21 @@ export default function Footer() {
             <p className="text-gray-400 mb-4">
               Subscribe to get latest updates on MBBS admissions and offers.
             </p>
-            <form onSubmit={handleSubscribeSubmit} className="space-y-3">
+            <form onSubmit={handleSubscribeSubmit} className="space-y-3 relative z-10">
               <div className="relative">
                 <input
                   type="email"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all duration-300 text-white placeholder-gray-500"
                   required
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-600 rounded-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4 h-4 text-white" />
                 </button>
               </div>
             </form>
@@ -238,8 +242,9 @@ export default function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-800">
-        <div className="container-custom py-6">
+      <div className="relative mt-4">
+        <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-primary-500/30 to-transparent" />
+        <div className="container-custom py-6 relative z-10">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-500 text-sm text-center md:text-left">
               © {new Date().getFullYear()} Intermost Ventures LLP. All rights reserved.
