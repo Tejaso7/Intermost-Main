@@ -105,7 +105,7 @@ export interface Country {
     title: string;
     description: string;
     highlights: Array<{
-      icon: string;
+      icon?: string;
       title: string;
       description: string;
     }>;
