@@ -18,7 +18,7 @@ interface MatchResult {
 }
 
 export default function Hero() {
-  const [videoError, setVideoError] = useState(true);
+  const [videoError, setVideoError] = useState(false);
   const [isDownloadModalOpen, setIsDownloadModalOpen] = useState(false);
 
   // AI Matcher State
@@ -172,7 +172,6 @@ export default function Hero() {
             muted
             playsInline
             className="w-full h-full object-cover"
-            poster="/images/countries/russia.jpg"
             onError={() => setVideoError(true)}
             key={heroBgUrl} // Force re-render of video element when URL changes
           >
@@ -356,12 +355,12 @@ export default function Hero() {
                           required
                         >
                           <option className="bg-gray-900" value="">Select Country</option>
-                          <option className="bg-gray-900" value="Russia">Russia 🇷🇺</option>
-                          <option className="bg-gray-900" value="Georgia">Georgia 🇬🇪</option>
-                          <option className="bg-gray-900" value="Uzbekistan">Uzbekistan 🇺🇿</option>
-                          <option className="bg-gray-900" value="Kazakhstan">Kazakhstan kz</option>
-                          <option className="bg-gray-900" value="Nepal">Nepal 🇳🇵</option>
-                          <option className="bg-gray-900" value="Tajikistan">Tajikistan 🇹🇯</option>
+                          <option className="bg-gray-900" value="Russia">Russia</option>
+                          <option className="bg-gray-900" value="Georgia">Georgia</option>
+                          <option className="bg-gray-900" value="Uzbekistan">Uzbekistan</option>
+                          <option className="bg-gray-900" value="Kazakhstan">Kazakhstan</option>
+                          <option className="bg-gray-900" value="Nepal">Nepal</option>
+                          <option className="bg-gray-900" value="Tajikistan">Tajikistan</option>
                         </select>
                       </div>
 
