@@ -318,7 +318,7 @@ export default function PlacementsMapSection() {
                   {/* Highlights Grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">Alumni Count</p>
+                      <p className="text-[10px] font-bold text-gray-400 uppercase">Students Placed</p>
                       <p className="text-sm font-extrabold text-white mt-1">{getDynamicPlacements(selectedDest.id)}</p>
                     </div>
                     <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
