@@ -218,3 +218,14 @@ export function generateUUID(): string {
     return v.toString(16);
   });
 }
+
+/**
+ * AWS S3 CDN asset helper function for static assets
+ */
+export function getS3AssetUrl(path: string): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+  return `https://intermost-media-uploads.s3.ap-southeast-2.amazonaws.com/static/${cleanPath}`;
+}
