@@ -19,43 +19,53 @@ from apps.mongodb import get_collection
 
 logger = logging.getLogger(__name__)
 
-# Get API key and create client
-GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY == 'your-gemini-api-key':
-    GEMINI_API_KEY = ''
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
+def get_gemini_api_key() -> str:
+    """Dynamically get active GEMINI_API_KEY."""
+    key = getattr(settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
+    if not key or key == 'your-gemini-api-key':
+        return ''
+    return key
+
+
+def get_gemini_client():
+    """Get genai.Client instance dynamically."""
+    key = get_gemini_api_key()
+    if not key:
+        return None
+    try:
+        return genai.Client(api_key=key)
+    except Exception as e:
+        logger.error(f"Error creating Gemini client in RAG: {e}")
+        return None
 
 
 def get_embedding(text: str) -> Optional[List[float]]:
-    """Get embedding for a text using Gemini."""
-    if not client:
+    """Get embedding for a text using Gemini with fallback embedding models."""
+    client_obj = get_gemini_client()
+    if not client_obj:
         logger.error("Gemini client not initialized")
         return None
-    try:
-        result = client.models.embed_content(
-            model="gemini-embedding-exp-03-07",
-            contents=text
-        )
-        return result.embeddings[0].values
-    except Exception as e:
-        logger.error(f"Error generating embedding: {e}")
-        return None
+    
+    embedding_models = ["text-embedding-004", "gemini-embedding-exp-03-07"]
+    for model_name in embedding_models:
+        try:
+            result = client_obj.models.embed_content(
+                model=model_name,
+                contents=text
+            )
+            if result and hasattr(result, 'embeddings') and result.embeddings:
+                return result.embeddings[0].values
+        except Exception as e:
+            logger.warning(f"Error generating embedding with model '{model_name}': {e}")
+            continue
+
+    logger.error("Failed to generate embedding with all candidate models")
+    return None
 
 
 def get_query_embedding(text: str) -> Optional[List[float]]:
     """Get embedding for a query using Gemini."""
-    if not client:
-        logger.error("Gemini client not initialized")
-        return None
-    try:
-        result = client.models.embed_content(
-            model="gemini-embedding-exp-03-07",
-            contents=text
-        )
-        return result.embeddings[0].values
-    except Exception as e:
-        logger.error(f"Error generating query embedding: {e}")
-        return None
+    return get_embedding(text)
 
 
 def chunk_document(text: str, chunk_size: int = 1000, chunk_overlap: int = 200) -> List[str]:

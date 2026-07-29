@@ -22,32 +22,58 @@ from google import genai
 
 logger = logging.getLogger(__name__)
 
-# Initialize Gemini
-GEMINI_API_KEY = getattr(django_settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
-if GEMINI_API_KEY == 'your-gemini-api-key':
-    GEMINI_API_KEY = ''
+def get_gemini_api_key() -> str:
+    """Dynamically get active GEMINI_API_KEY."""
+    key = getattr(django_settings, 'GEMINI_API_KEY', '') or os.environ.get('GEMINI_API_KEY', '')
+    if not key or key == 'your-gemini-api-key':
+        return ''
+    return key
 
-# Create client
-client = genai.Client(api_key=GEMINI_API_KEY) if GEMINI_API_KEY else None
 
-# Use available model
-CHAT_MODEL = "gemini-2.0-flash"
+def get_gemini_client():
+    """Get genai.Client instance dynamically."""
+    key = get_gemini_api_key()
+    if not key:
+        return None
+    try:
+        return genai.Client(api_key=key)
+    except Exception as e:
+        logger.error(f"Error creating Gemini client: {e}")
+        return None
 
 
 def generate_response(prompt: str) -> str:
-    """Generate response using Google Gemini."""
-    if not client:
+    """Generate response using Google Gemini with dynamic model fallback."""
+    client_obj = get_gemini_client()
+    if not client_obj:
         raise ValueError("Google Gemini client is not initialized. Please configure GEMINI_API_KEY.")
     
-    try:
-        response = client.models.generate_content(
-            model=CHAT_MODEL,
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        logger.error(f"Gemini generation error: {e}")
-        raise e
+    # Candidate Flash / Lite models in priority order
+    candidate_models = [
+        "gemini-2.0-flash",
+        "gemini-1.5-flash",
+        "gemini-1.5-flash-8b",
+        "gemini-2.0-flash-lite",
+        "gemini-1.5-flash-lite"
+    ]
+    
+    last_error = None
+    for model_name in candidate_models:
+        try:
+            response = client_obj.models.generate_content(
+                model=model_name,
+                contents=prompt
+            )
+            if response and hasattr(response, 'text') and response.text:
+                return response.text
+        except Exception as e:
+            logger.warning(f"Gemini generation error with model '{model_name}': {e}")
+            last_error = e
+            continue
+
+    if last_error:
+        raise last_error
+    raise ValueError("All Gemini model candidates failed.")
 
 
 def serialize_doc(doc):
@@ -217,7 +243,7 @@ class StudentChatView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            if not GEMINI_API_KEY:
+            if not get_gemini_api_key():
                 # Fallback educational counseling response when Gemini is not configured
                 fallback_msg = (
                     "Hello! I am Tejas, your Intermost Education Counselor. Thank you for your inquiry about studying MBBS abroad! "
@@ -471,7 +497,7 @@ class AdminChatView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
-            if not GEMINI_API_KEY:
+            if not get_gemini_api_key():
                 return Response(
                     {'error': 'AI service not configured'},
                     status=status.HTTP_503_SERVICE_UNAVAILABLE
