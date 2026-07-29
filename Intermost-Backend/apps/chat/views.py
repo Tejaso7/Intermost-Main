@@ -48,13 +48,12 @@ def generate_response(prompt: str) -> str:
     if not client_obj:
         raise ValueError("Google Gemini client is not initialized. Please configure GEMINI_API_KEY.")
     
-    # Candidate Flash / Lite models in priority order
+    # Candidate Flash / Lite models in priority order (200 OK verified)
     candidate_models = [
+        "gemini-flash-latest",
+        "gemini-flash-lite-latest",
         "gemini-2.0-flash",
-        "gemini-1.5-flash",
-        "gemini-1.5-flash-8b",
-        "gemini-2.0-flash-lite",
-        "gemini-1.5-flash-lite"
+        "gemini-2.0-flash-lite"
     ]
     
     last_error = None
