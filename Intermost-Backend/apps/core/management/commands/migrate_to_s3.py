@@ -169,4 +169,37 @@ class Command(BaseCommand):
                     total_updated += 1
                     self.stdout.write(self.style.SUCCESS(f"  Updated document {doc.get('_id')}"))
 
-        self.stdout.write(self.style.SUCCESS(f"\n=== Migration Complete! Updated {total_updated} MongoDB documents ==="))
+        # RECURSIVE STATIC MEDIA SCANNER FOR JPG, PNG, WEBP, SVG, MP3, MP4, PDF
+        self.stdout.write(self.style.MIGRATE_HEADING("\n=== Scanning Static Public Media Assets (JPG, PNG, WEBP, SVG, MP3, MP4, PDF) ==="))
+        public_dir = Path(settings.BASE_DIR).parent / 'Intermost-Frontend' / 'public'
+        
+        static_count = 0
+        if public_dir.exists():
+            for filepath in public_dir.rglob('*'):
+                if filepath.is_file() and filepath.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp', '.svg', '.mp3', '.mp4', '.pdf', '.gif'):
+                    rel_path = filepath.relative_to(public_dir).as_posix()
+                    s3_key = f"static/{rel_path}"
+                    s3_url = f"https://{bucket_name}.s3.{region_name}.amazonaws.com/{s3_key}"
+
+                    content_type, _ = mimetypes.guess_type(str(filepath))
+                    if not content_type:
+                        content_type = 'application/octet-stream'
+
+                    if dry_run:
+                        self.stdout.write(self.style.WARNING(f"[DRY-RUN] Static asset: {rel_path} -> {s3_url}"))
+                        static_count += 1
+                    else:
+                        try:
+                            with open(filepath, 'rb') as f:
+                                s3_client.put_object(
+                                    Bucket=bucket_name,
+                                    Key=s3_key,
+                                    Body=f.read(),
+                                    ContentType=content_type
+                                )
+                            self.stdout.write(self.style.SUCCESS(f"Uploaded static: {s3_key}"))
+                            static_count += 1
+                        except Exception as e:
+                            self.stdout.write(self.style.ERROR(f"Failed uploading {rel_path}: {e}"))
+
+        self.stdout.write(self.style.SUCCESS(f"\n=== Migration Complete! Updated {total_updated} MongoDB docs & {static_count} static media assets ==="))
