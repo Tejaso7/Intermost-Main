@@ -32,7 +32,7 @@ export default function Hero() {
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   
   const [siteStats, setSiteStats] = useState({
-    students_placed: 5500,
+    students_placed: 5953,
     partner_universities: 35,
     years_experience: 23,
     visa_success_rate: 99,

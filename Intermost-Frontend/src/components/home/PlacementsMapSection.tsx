@@ -24,11 +24,16 @@ const destinations: MapDestination[] = [
     name: 'Globally',
     slug: 'russia',
     coords: { x: 580, y: 140 },
-    placements: '3,800+ Students Placed',
-    avgFee: '$3,800 - $6,000 / Year',
+    placements: '5,953+ Students Placed',
+    avgFee: '$3,800 / Year',
     visaRate: '99% Success Rate',
     language: 'Fully English Medium',
-    universities: ['Orenburg State Medical University', 'Kazan Federal University', 'Voronezh State Medical University', 'Bashkir State Medical University'],
+    universities: [
+      'Andijan State Medical University (Uzbekistan)',
+      'East European University (Georgia)',
+      'Chitwan Medical College & Hospital (Nepal)',
+      'Voronezh State Medical University (Russia)',
+    ],
   },
   {
     id: 'georgia',
@@ -36,10 +41,10 @@ const destinations: MapDestination[] = [
     slug: 'georgia',
     coords: { x: 598, y: 215 },
     placements: '950+ Students Placed',
-    avgFee: '$5,000 - $8,000 / Year',
+    avgFee: '$5,000 / Year',
     visaRate: '99% Success Rate',
     language: 'English & Georgian Dual Option',
-    universities: ['Tbilisi State Medical University', 'East European University'],
+    universities: ['East European University', 'Tbilisi State Medical University'],
   },
   {
     id: 'uzbekistan',
@@ -47,7 +52,7 @@ const destinations: MapDestination[] = [
     slug: 'uzbekistan',
     coords: { x: 645, y: 226 },
     placements: '1,400+ Students Placed',
-    avgFee: '$3,300 - $4,500 / Year',
+    avgFee: '$3,500 / Year',
     visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Andijan State Medical University', 'Tashkent State Medical University', 'Samarkand State Medical Institute'],
@@ -58,7 +63,7 @@ const destinations: MapDestination[] = [
     slug: 'kazakhstan',
     coords: { x: 660, y: 195 },
     placements: '1,100+ Students Placed',
-    avgFee: '$3,500 - $5,000 / Year',
+    avgFee: '$3,500 / Year',
     visaRate: '99% Success Rate',
     language: 'Fully English Medium',
     universities: ['Asfendiyarov Kazakh National Medical University', 'Semey Medical University'],
@@ -69,7 +74,7 @@ const destinations: MapDestination[] = [
     slug: 'nepal',
     coords: { x: 706, y: 350 },
     placements: '800+ Students Placed',
-    avgFee: '₹55 - ₹65 Lakhs (Total)',
+    avgFee: '₹55 Lakhs (Total)',
     visaRate: '99% Success Rate',
     language: 'English / Hindi Friendly',
     universities: ['Chitwan Medical College & Hospital', 'Kathmandu Medical College & Hospital', 'B&C Medical College Teaching Hospital & Research Center'],
@@ -100,7 +105,7 @@ export default function PlacementsMapSection() {
   const [selectedDest, setSelectedDest] = useState<MapDestination>(destinations[0]);
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [siteStats, setSiteStats] = useState({
-    students_placed: 5500,
+    students_placed: 5953,
   });
 
   useEffect(() => {
@@ -112,6 +117,11 @@ export default function PlacementsMapSection() {
             students_placed: settings.stats.students_placed,
           });
         }
+        if (settings && (settings as any).top_recommended_colleges && Array.isArray((settings as any).top_recommended_colleges) && (settings as any).top_recommended_colleges.length > 0) {
+          const customColleges = (settings as any).top_recommended_colleges;
+          destinations[0].universities = customColleges;
+          setSelectedDest(prev => prev.id === 'russia' ? { ...prev, universities: customColleges } : prev);
+        }
       } catch (error) {
         console.error('Error fetching site settings:', error);
       }
@@ -121,25 +131,25 @@ export default function PlacementsMapSection() {
 
   const getDynamicPlacements = (destId: string) => {
     const total = siteStats.students_placed;
+    if (destId === 'russia') {
+      return `${total.toLocaleString()}+ Students Placed`;
+    }
     let count = 0;
     switch (destId) {
-      case 'russia':
-        count = total - 1700;
-        break;
       case 'uzbekistan':
-        count = total - 4100;
+        count = Math.round(total * 0.25);
         break;
       case 'kazakhstan':
-        count = total - 4400;
+        count = Math.round(total * 0.20);
         break;
       case 'georgia':
-        count = total - 4550;
+        count = Math.round(total * 0.16);
         break;
       case 'nepal':
-        count = total - 4700;
+        count = Math.round(total * 0.14);
         break;
       case 'tajikistan':
-        count = total - 4900;
+        count = Math.round(total * 0.08);
         break;
       default:
         return destinations.find(d => d.id === destId)?.placements || '';

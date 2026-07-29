@@ -9,7 +9,7 @@ import { coreApi } from '@/lib/services';
 const stats = [
   {
     icon: Users,
-    value: 5500,
+    value: 5953,
     suffix: '+',
     label: 'Students Placed',
     description: 'Successfully admitted worldwide',
@@ -41,7 +41,7 @@ export default function StatsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
   const [siteStats, setSiteStats] = useState({
-    students_placed: 5500,
+    students_placed: 5953,
     partner_universities: 35,
     years_experience: 23,
     visa_success_rate: 99,

@@ -52,6 +52,7 @@ interface SiteSettings {
     visa_success_rate: number | '';
     pioneer_students: number | '';
   };
+  top_recommended_colleges?: string[];
   hero_bg_type?: 'image' | 'video';
   hero_bg_url?: string;
   about_images?: string[];
@@ -96,12 +97,18 @@ export default function SettingsPage() {
     google_analytics_id: '',
     facebook_pixel_id: '',
     stats: {
-      students_placed: 5500,
+      students_placed: 5953,
       partner_universities: 35,
       years_experience: 23,
       visa_success_rate: 99,
       pioneer_students: 4725,
     },
+    top_recommended_colleges: [
+      'Andijan State Medical University (Uzbekistan)',
+      'East European University (Georgia)',
+      'Chitwan Medical College & Hospital (Nepal)',
+      'Voronezh State Medical University (Russia)',
+    ],
     hero_bg_type: 'image',
     hero_bg_url: '/images/countries/russia.jpg',
     about_images: ['/images/about.jpg'],
@@ -875,8 +882,58 @@ export default function SettingsPage() {
                     value={settings.stats?.pioneer_students ?? ''}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
                 </div>
+              </div>
+            </motion.div>
+
+            {/* Top Recommended Colleges Showcase Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:col-span-2"
+            >
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 flex items-center">
+                    <Globe className="w-5 h-5 mr-2 text-primary-600" />
+                    Top Recommended Colleges Showcase (Placements Map)
+                  </h2>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Configure the top recommended medical universities displayed on the homepage Placements Map & overview.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddTopCollege}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50 px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Recommended College
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {(settings.top_recommended_colleges || []).map((colName, idx) => (
+                  <div key={idx} className="flex items-center gap-3">
+                    <span className="w-6 text-xs font-bold text-gray-400 text-center">{idx + 1}.</span>
+                    <input
+                      type="text"
+                      value={colName}
+                      onChange={(e) => handleUpdateTopCollege(idx, e.target.value)}
+                      placeholder="e.g. Voronezh State Medical University (Russia)"
+                      className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveTopCollege(idx)}
+                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      title="Remove College"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </div>
