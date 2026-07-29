@@ -324,40 +324,47 @@ RELEVANT KNOWLEDGE BASE INFORMATION:
 Use the above knowledge base information to provide accurate, detailed answers.
 """
             
+            # HARD GUARDRAIL: Refuse USA/UK/non-partner countries instantly with multilingual message
+            lower_msg = message.lower()
+            unsupported_keywords = ['usa', 'united states', 'america', ' u.s.', ' u.s ', 'uk', 'united kingdom', 'london', 'canada', 'australia', 'philippines', 'germany']
+            
+            if any(kw in lower_msg for kw in unsupported_keywords):
+                # Detect language
+                if any(m in message for m in ['मराठी', 'सांगा', 'फी', 'काय', 'आहे', 'प्रवेश']):
+                    out_msg = "इंटरमोस्ट येथे आम्ही फक्त रशिया, जॉर्जिया, उझबेकिस्तान, कझाकिस्तान, ताजिकिस्तान, नेपाळ आणि व्हिएतनाम मधील NMC आणि WHO मान्यताप्राप्त MBBS प्रवेशासाठी मार्गदर्शन करतो. आम्ही USA किंवा UK मध्ये प्रवेश प्रक्रिया करत नाही.\n\nजॉर्जिया किंवा रशिया मधील टॉप मेडिकल कॉलेजची माहिती हवी आहे का? कॉल/व्हॉट्सअ‍ॅप: **+91 90585 01818**"
+                elif any(h in lower_msg for h in ['batao', 'kitni', 'hai', 'bataiye', 'हिंदी', 'बताओ', 'फीस']):
+                    out_msg = "इंटरमोस्ट में हम केवल रूस, जॉर्जिया, उज्बेकिस्तान, कजाकिस्तान, तजाकिस्तान, नेपाल और वियतनाम में NMC और WHO मान्यता प्राप्त MBBS एडमिशन के लिए गाइड करते हैं। हम USA या UK का एडमिशन नहीं करवाते हैं।\n\nक्या आप जॉर्जिया या रूस के टॉप मेडिकल कॉलेज की फीस देखना चाहते हैं? कॉल/व्हाट्सएप करें: **+91 90585 01818**"
+                else:
+                    out_msg = "At Intermost, we specialize exclusively in NMC & WHO-approved MBBS admissions in **Russia, Georgia, Uzbekistan, Kazakhstan, Tajikistan, Nepal, and Vietnam**. We do not offer admissions for USA/UK.\n\nWould you like to check top budget-friendly medical universities in Georgia, Russia, or Uzbekistan? Call/WhatsApp: **+91 90585 01818**"
+
+                # Save to conversation history & return
+                conversation['history'].append({'role': 'user', 'content': message})
+                conversation['history'].append({'role': 'assistant', 'content': out_msg})
+                return Response({'response': out_msg, 'session_id': session_id})
+            
             # Get formatted chat history
             chat_history = format_chat_history(conversation)
             history_section = ""
             if chat_history:
-                history_section = f"""
-
-PREVIOUS CONVERSATION:
-{chat_history}
-"""
+                history_section = f"""\nPREVIOUS CONVERSATION:\n{chat_history}\n"""
             
-            # Build the full prompt
-            prompt = f"""You are Tejas, an expert education counselor for Intermost Study Abroad, helping students pursue MBBS abroad.
+            # Build the full prompt with strict rules
+            prompt = f"""You are Tejas, an expert AI education counselor for Intermost Study Abroad (Agra, India).
 
-ABOUT INTERMOST:
-- Premier study abroad consultancy based in India
-- Specializes in MBBS admissions in Russia, Kazakhstan, Uzbekistan, Georgia, Nepal, Tajikistan, and Vietnam
-- Provides end-to-end support: counseling, admission, visa, accommodation, and more
+CRITICAL RESPONSE RULES:
+1. SHORT & CRISP: Keep response under 50-70 words maximum! Use 2-3 short bullet points with bold key figures (e.g. **$3,800/yr**, **50% in PCB**). No long essays or intro text!
+2. STRICT MULTILINGUAL: Respond in the EXACT SAME LANGUAGE and SCRIPT used by the student:
+   - Marathi Query -> Respond in clean, natural Marathi (e.g. "जॉर्जिया मध्ये MBBS फी **$3,800/वर्ष** असून प्रवेश सोपा आहे...")
+   - Hindi / Hinglish Query -> Respond in Hindi / Hinglish.
+   - English Query -> Respond in English.
+3. EXCLUSIVE COUNTRIES: Only recommend Russia, Georgia, Uzbekistan, Kazakhstan, Tajikistan, Nepal, and Vietnam.
 {rag_section}
 AVAILABLE COUNTRIES: {countries_list}
-
-COLLEGES BY COUNTRY: {colleges_info}
-
-OUR SERVICES: {services_list}
-
-YOUR ROLE:
-1. Answer questions about studying abroad, MBBS programs, countries, and colleges
-2. Provide accurate information about fees, eligibility, and admission process  
-3. Be helpful, friendly, and encouraging
-4. When appropriate, encourage students to share their contact details
-5. Help students understand the benefits of studying abroad
+COLLEGES INFO: {colleges_info}
 {history_section}
-Student: {message}
+Student Message: {message}
 
-Respond helpfully and concisely:"""
+Respond in student's language, keeping it ultra-short and crisp:"""
 
             # Generate response using Gemini
             try:
