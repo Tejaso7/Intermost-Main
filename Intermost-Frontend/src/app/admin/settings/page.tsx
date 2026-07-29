@@ -305,6 +305,29 @@ export default function SettingsPage() {
     }
   };
 
+  const handleAddTopCollege = () => {
+    setSettings(prev => ({
+      ...prev,
+      top_recommended_colleges: [...(prev.top_recommended_colleges || []), '']
+    }));
+  };
+
+  const handleUpdateTopCollege = (index: number, val: string) => {
+    setSettings(prev => {
+      const list = [...(prev.top_recommended_colleges || [])];
+      list[index] = val;
+      return { ...prev, top_recommended_colleges: list };
+    });
+  };
+
+  const handleRemoveTopCollege = (index: number) => {
+    setSettings(prev => {
+      const list = [...(prev.top_recommended_colleges || [])];
+      list.splice(index, 1);
+      return { ...prev, top_recommended_colleges: list };
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
