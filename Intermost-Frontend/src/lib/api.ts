@@ -122,7 +122,7 @@ export interface Country {
     minimum_marks: string;
     neet_required: boolean;
     age_requirement: string;
-    other_requirements: string[];
+    other_requirements?: string[];
   };
   course_details: {
     duration: string;
