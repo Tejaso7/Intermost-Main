@@ -32,7 +32,7 @@ interface CountryForm {
   overview: {
     title: string;
     description: string;
-    highlights: Array<{ icon: string; title: string; description: string }>;
+    highlights: Array<{ icon?: string; title: string; description: string }>;
   };
   pricing: {
     tuition_fee: string;
