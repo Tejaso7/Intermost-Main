@@ -1031,39 +1031,101 @@ export default function AnalyticsPage() {
             </div>
           </div>
 
-          {/* Regional Footprint List */}
+          {/* Regional & City-Wise Footprint List */}
           <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 p-6 shadow-sm">
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center justify-between">
-              <span>Geo Student Density</span>
-              <MapPin className="w-4.5 h-4.5 text-primary-500" />
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                <span>Geo Student Density</span>
+                <MapPin className="w-4.5 h-4.5 text-primary-500" />
+              </h3>
+
+              {/* Country / City Switcher */}
+              <div className="flex bg-gray-100 dark:bg-gray-800 p-0.5 rounded-lg text-xs font-bold">
+                <button
+                  onClick={() => setGeoViewMode('city')}
+                  className={`px-2.5 py-1 rounded-md transition-all ${
+                    geoViewMode === 'city'
+                      ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  City View
+                </button>
+                <button
+                  onClick={() => setGeoViewMode('country')}
+                  className={`px-2.5 py-1 rounded-md transition-all ${
+                    geoViewMode === 'country'
+                      ? 'bg-white dark:bg-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
+                      : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                  }`}
+                >
+                  Country View
+                </button>
+              </div>
+            </div>
 
             <div className="space-y-3.5">
-              {(locationStats?.by_country?.length ? locationStats.by_country : [
-                { country: 'India', visitors: 1420 },
-                { country: 'Russia', visitors: 820 },
-                { country: 'Georgia', visitors: 610 },
-                { country: 'Uzbekistan', visitors: 450 },
-                { country: 'Nepal', visitors: 280 }
-              ]).slice(0, 5).map((loc: any, idx: number) => {
-                const maxVal = locationStats?.by_country?.[0]?.visitors || 1420;
-                const width = (loc.visitors / maxVal) * 100;
-                
-                return (
-                  <div key={idx} className="space-y-1">
-                    <div className="flex justify-between items-baseline text-xs font-bold">
-                      <span className="text-gray-600 dark:text-gray-400">{loc.country}</span>
-                      <span className="text-gray-900 dark:text-white">{loc.visitors} leads</span>
+              {geoViewMode === 'city' ? (
+                /* City-Wise Breakdown */
+                (locationStats?.by_city?.length ? locationStats.by_city : [
+                  { city: 'Delhi NCR', country: 'India', visitors: 680 },
+                  { city: 'Mumbai', country: 'India', visitors: 540 },
+                  { city: 'Bengaluru', country: 'India', visitors: 490 },
+                  { city: 'Agra (HO)', country: 'India', visitors: 420 },
+                  { city: 'Tbilisi', country: 'Georgia', visitors: 410 },
+                  { city: 'Hyderabad', country: 'India', visitors: 380 },
+                  { city: 'Tashkent', country: 'Uzbekistan', visitors: 340 },
+                  { city: 'Lucknow', country: 'India', visitors: 310 },
+                ]).slice(0, 7).map((loc: any, idx: number) => {
+                  const maxVal = locationStats?.by_city?.[0]?.visitors || 680;
+                  const width = Math.min(100, Math.max(10, (loc.visitors / maxVal) * 100));
+                  
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between items-baseline text-xs font-bold">
+                        <span className="text-gray-700 dark:text-gray-300 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-500" />
+                          {loc.city} <span className="text-[10px] text-gray-400">({loc.country})</span>
+                        </span>
+                        <span className="text-gray-900 dark:text-white">{loc.visitors} leads</span>
+                      </div>
+                      <div className="w-full bg-gray-150 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+                        <div
+                          className="bg-primary-500 h-full rounded-full transition-all duration-500"
+                          style={{ width: `${width}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-gray-150 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
-                      <div
-                        className="bg-emerald-500 h-full rounded-full"
-                        style={{ width: `${width}%` }}
-                      />
+                  );
+                })
+              ) : (
+                /* Country-Wise Breakdown */
+                (locationStats?.by_country?.length ? locationStats.by_country : [
+                  { country: 'India', visitors: 1420 },
+                  { country: 'Russia', visitors: 820 },
+                  { country: 'Georgia', visitors: 610 },
+                  { country: 'Uzbekistan', visitors: 450 },
+                  { country: 'Nepal', visitors: 280 }
+                ]).slice(0, 5).map((loc: any, idx: number) => {
+                  const maxVal = locationStats?.by_country?.[0]?.visitors || 1420;
+                  const width = (loc.visitors / maxVal) * 100;
+                  
+                  return (
+                    <div key={idx} className="space-y-1">
+                      <div className="flex justify-between items-baseline text-xs font-bold">
+                        <span className="text-gray-600 dark:text-gray-400">{loc.country}</span>
+                        <span className="text-gray-900 dark:text-white">{loc.visitors} leads</span>
+                      </div>
+                      <div className="w-full bg-gray-150 dark:bg-gray-800 h-2 rounded-full overflow-hidden">
+                        <div
+                          className="bg-emerald-500 h-full rounded-full"
+                          style={{ width: `${width}%` }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
