@@ -2236,6 +2236,50 @@ export default function LeadsPage() {
               {/* Editor Pane */}
               <div className="flex flex-col bg-white dark:bg-gray-850 border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden p-5 shadow-sm h-full overflow-y-auto">
                 <div className="space-y-4 flex-1">
+                  {/* Quick Templates Selector */}
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                      Quick Message Templates
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Thank you for contacting Intermost Study Abroad.\n\nWe specialize in NMC & WHO-approved MBBS admissions in Russia, Georgia, Uzbekistan, Kazakhstan, Nepal & Vietnam.\n\n📄 Download Official Brochure: https://intermost.in/brochures\n\nWhen is a good time to speak with our senior counselor?")}
+                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg border border-emerald-200 transition-colors"
+                      >
+                        👋 Welcome
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 🇬🇪 Here are details for MBBS in Georgia:\n\n• Annual Tuition: $4,800 - $6,000 / year\n• Curriculum: 100% English Medium (European Standard)\n• Recognition: WHO, NMC, WFME & ECFMG Approved\n• USMLE & PLAB support included\n\n👉 View Georgia Universities: https://intermost.in/countries/georgia\n\nWould you like to speak with our Georgia counselor today?")}
+                        className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-semibold rounded-lg border border-blue-200 transition-colors"
+                      >
+                        🇬🇪 Georgia Fee ($4,800/yr)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 🇷🇺 Studying MBBS in Russia is ultra-affordable:\n\n• Annual Tuition: $3,500 - $5,000 / year\n• Total 6-Year Program: Starting from ₹18 Lakhs\n• Recognition: 100+ year old top government universities\n• Medium: 100% English Medium\n\n👉 View Russia Colleges: https://intermost.in/countries/russia\n\nShould I share the admission procedure PDF with you?")}
+                        className="px-2.5 py-1 bg-red-50 hover:bg-red-100 text-red-700 text-[11px] font-semibold rounded-lg border border-red-200 transition-colors"
+                      >
+                        🇷🇺 Russia Fee ($3,500/yr)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 🇺🇿 Uzbekistan is the #1 choice for Indian medical students:\n\n• Annual Tuition: $3,500 / year (~₹2.9 Lakhs)\n• Facilities: Indian Mess (Veg/Non-Veg) & Hostels\n• Travel: Only 3 hours flight from New Delhi\n\n👉 View Details: https://intermost.in/countries/uzbekistan\n\nWould you like to reserve a seat before the intake closes?")}
+                        className="px-2.5 py-1 bg-teal-50 hover:bg-teal-100 text-teal-700 text-[11px] font-semibold rounded-lg border border-teal-200 transition-colors"
+                      >
+                        🇺🇿 Uzbekistan Fee ($3,500/yr)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! ⏰ Important update regarding 2026 MBBS Admissions:\n\nIf you have qualified NEET, seats are filling fast in top NMC-approved universities in Georgia, Russia & Uzbekistan.\n\n• Zero Donation\n• Direct Seat Allotment\n• Complete Hostel & Visa Support\n\n📞 Call/WhatsApp us at +91 90585 01818 or reply YES to reserve your seat!")}
+                        className="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 text-[11px] font-semibold rounded-lg border border-amber-200 transition-colors"
+                      >
+                        ⏰ NEET Alert
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Body Content */}
                   <div className="space-y-2 flex flex-col">
                     <div className="flex justify-between items-center">
