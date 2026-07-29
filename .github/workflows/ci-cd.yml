@@ -92,4 +92,6 @@ jobs:
           git pull origin main
           sudo systemctl stop nginx || true
           sudo systemctl disable nginx || true
+          docker builder prune -f || true
+          docker image prune -f || true
           docker compose -f docker-compose.prod.yml up -d --build
