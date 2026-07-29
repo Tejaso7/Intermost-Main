@@ -28,6 +28,10 @@ PyJWT>=2.8.0
 # Image handling
 Pillow>=10.0.0
 
+# AWS S3 Storage
+boto3>=1.28.0
+django-storages>=1.13.0
+
 # Cloudinary (image hosting)
 cloudinary>=1.36.0
 django-cloudinary-storage>=0.3.0
