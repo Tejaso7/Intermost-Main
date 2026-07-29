@@ -124,11 +124,11 @@ export default function GlimpseGallerySection() {
           const sorted = [...data].sort((a, b) => (a.display_order || 0) - (b.display_order || 0));
           setGalleryItems(sorted);
         } else {
-          setGalleryItems([]);
+          setGalleryItems(localGlimpses);
         }
       } catch (error) {
         console.error('Error fetching glimpses:', error);
-        setGalleryItems([]);
+        setGalleryItems(localGlimpses);
       } finally {
         setLoading(false);
       }

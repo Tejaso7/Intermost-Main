@@ -38,7 +38,7 @@ const recognitions = [
 ];
 
 const trustFactors = [
-  { icon: Shield, text: '100% Safe & Secure Admissions' },
+  { icon: Shield, text: 'Trusted & Transparent Admission Guidance' },
   { icon: Award, text: 'NMC & WHO Approved Universities' },
   { icon: CheckCircle2, text: 'Transparent Fee Structure' },
 ];

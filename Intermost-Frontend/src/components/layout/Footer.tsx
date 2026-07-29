@@ -44,7 +44,7 @@ export default function Footer() {
   });
 
   const [social, setSocial] = useState({
-    facebook: 'http://facebook.com/intermoststudyabr0ad',
+    facebook: 'https://www.facebook.com/intermoststudyabroad',
     instagram: 'https://www.instagram.com/intermoststudyabroad/',
     youtube: 'http://www.youtube.com/@IntermostStudyAbroad',
   });
@@ -64,7 +64,7 @@ export default function Footer() {
           }
           if (settings.social) {
             setSocial({
-              facebook: settings.social.facebook || 'http://facebook.com/intermoststudyabr0ad',
+              facebook: settings.social.facebook || 'https://www.facebook.com/intermoststudyabroad',
               instagram: settings.social.instagram || 'https://www.instagram.com/intermoststudyabroad/',
               youtube: settings.social.youtube || 'http://www.youtube.com/@IntermostStudyAbroad',
             });

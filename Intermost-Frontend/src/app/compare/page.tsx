@@ -86,7 +86,7 @@ const fallbackCountriesData = [
       'European standard curriculum and lifestyle',
       'WFME recognition makes licensing exams in US/Europe easy',
       'Extremely safe country for international students',
-      '100% visa success rate and simple process',
+      'High visa approval rate and streamlined process',
       'No language barrier - English is widely spoken in universities'
     ]
   },

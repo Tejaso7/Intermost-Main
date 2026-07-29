@@ -39,12 +39,12 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const title = settings?.seo?.title || settings?.meta_title || 'Intermost Study Abroad - Your Gateway to Global Medical Education';
-  const description = settings?.seo?.description || settings?.meta_description || 'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad. Study MBBS in Russia, Georgia, Nepal, Uzbekistan, and more.';
+  const description = settings?.seo?.description || settings?.meta_description || 'Expert-guided MBBS admission assistance for WHO & NMC approved medical universities abroad. Study MBBS in Russia, Georgia, Nepal, Uzbekistan, and more.';
   const keywords = settings?.seo?.keywords || settings?.meta_keywords || 'MBBS abroad, study medicine abroad, MBBS in Russia, MBBS in Georgia, medical universities abroad, NMC approved universities';
   
   const ogTitle = settings?.seo?.og_title || settings?.meta_title || 'Intermost Study Abroad - Your Gateway to Global Medical Education';
-  const ogDescription = settings?.seo?.og_description || settings?.meta_description || 'Get guaranteed MBBS admission in WHO & NMC approved medical universities abroad.';
-  const canonicalUrl = settings?.seo?.canonical_url || 'https://intermost.in/';
+  const ogDescription = settings?.seo?.og_description || settings?.meta_description || 'Expert-guided MBBS admission assistance for WHO & NMC approved medical universities abroad.';
+  const canonicalUrl = 'https://intermost.in';
   const robotsVal = settings?.seo?.robots || 'index, follow, max-image-preview:large';
 
   return {
@@ -55,6 +55,10 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(canonicalUrl),
     alternates: {
       canonical: canonicalUrl,
+      languages: {
+        'en-IN': 'https://intermost.in',
+        'en': 'https://intermost.eu',
+      },
     },
     openGraph: {
       title: ogTitle,

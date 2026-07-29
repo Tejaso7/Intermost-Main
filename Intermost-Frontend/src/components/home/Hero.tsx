@@ -250,7 +250,7 @@ export default function Hero() {
                 className="text-base sm:text-lg md:text-xl text-gray-200 leading-relaxed font-light"
               >
                 Study MBBS at WHO & NMC approved universities in Georgia, 
-                Uzbekistan, and more. Transparent pricing, 100% English medium, and guaranteed admission letters.
+                Uzbekistan, and more. Transparent pricing, 100% English medium, and official university admission support.
               </motion.p>
             </div>
 

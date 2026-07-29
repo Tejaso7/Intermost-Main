@@ -155,7 +155,7 @@ export default function StatsSection() {
                     suffix={stat.suffix}
                   />
                 ) : (
-                  <span>0{stat.suffix}</span>
+                  <span>{stat.value.toLocaleString()}{stat.suffix}</span>
                 )}
               </div>
 

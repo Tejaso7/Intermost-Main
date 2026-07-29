@@ -25,7 +25,7 @@ const benefits = [
 
 export default function WhyChooseUs() {
   const [siteStats, setSiteStats] = useState({
-    students_placed: 5500,
+    students_placed: 5953,
     partner_universities: 35,
     years_experience: 23, // updated default value to 23
     visa_success_rate: 99

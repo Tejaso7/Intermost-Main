@@ -36,6 +36,20 @@ const nextConfig = {
   experimental: {
     optimizeCss: true,
   },
+  async redirects() {
+    return [
+      {
+        source: '/dinipro_state_medical_university',
+        destination: '/colleges',
+        permanent: true,
+      },
+      {
+        source: '/dinipro_state_medical_university/',
+        destination: '/colleges',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 module.exports = nextConfig;

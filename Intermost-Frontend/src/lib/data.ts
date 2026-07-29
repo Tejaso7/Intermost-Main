@@ -855,7 +855,7 @@ export const newsItems: NewsItem[] = [
 // ============================================
 
 export const stats = {
-  studentsPlaced: '5500+',
+  studentsPlaced: '5953+',
   partnerUniversities: '35+',
   yearsExperience: '21+',
   visaSuccessRate: '99%'
@@ -901,7 +901,7 @@ export const companyInfo = {
   whatsapp: '+91 9158374434',
   email: 'admissionintermost@gmail.com',
   social: {
-    facebook: 'http://facebook.com/intermoststudyabr0ad',
+    facebook: 'https://www.facebook.com/intermoststudyabroad',
     instagram: 'https://www.instagram.com/intermoststudyabroad/',
     youtube: 'http://www.youtube.com/@IntermostStudyAbroad',
     whatsapp: 'https://wa.me/919158374434'

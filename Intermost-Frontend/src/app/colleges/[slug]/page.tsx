@@ -314,7 +314,7 @@ export default function CollegeDetailPage() {
                 <ul className="space-y-2.5 text-xs text-gray-300">
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
-                    <span>Guaranteed official university admission letter.</span>
+                    <span>Official university application processing & support.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
@@ -322,7 +322,7 @@ export default function CollegeDetailPage() {
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />
-                    <span>100% Student Visa issuance success rate.</span>
+                    <span>Proven track record of high student visa guidance.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-green-400 shrink-0 mt-0.5" />

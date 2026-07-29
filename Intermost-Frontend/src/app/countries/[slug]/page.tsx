@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import CountryDetail from '@/components/countries/CountryDetail';
+import JsonLdSchema from '@/components/seo/JsonLdSchema';
 import { countriesApi, collegesApi } from '@/lib/services';
 import type { Country } from '@/lib/api';
 
@@ -255,15 +256,25 @@ const fallbackCountriesMap: Record<string, Partial<Country>> = {
 
 export async function generateMetadata({ params }: CountryPageProps): Promise<Metadata> {
   const slug = params.slug.toLowerCase();
+  const canonicalUrl = `https://intermost.in/countries/${slug}`;
   try {
     const country = await countriesApi.getBySlug(slug);
+    const countryName = country.name || slug.toUpperCase();
     return {
-      title: country.seo?.title || `MBBS in ${country.name} | Intermost Study Abroad`,
-      description: country.seo?.description || `Study MBBS in ${country.name} at NMC & WHO approved universities.`,
-      keywords: country.seo?.keywords?.join(', '),
+      title: country.seo?.title || `MBBS in ${countryName} 2026 - Fees, NMC Recognition & Admission | Intermost`,
+      description: country.seo?.description || `Study MBBS in ${countryName} at WHO & NMC approved universities. Complete fee structure, NEET cutoff, eligibility, and admission process for Indian students.`,
+      keywords: country.seo?.keywords?.join(', ') || `MBBS in ${countryName}, MBBS in ${countryName} fees, NMC approved universities in ${countryName}, NEET cutoff for MBBS in ${countryName}`,
+      alternates: {
+        canonical: canonicalUrl,
+        languages: {
+          'en-IN': `https://intermost.in/countries/${slug}`,
+          'en': `https://intermost.eu/countries/${slug}`,
+        },
+      },
       openGraph: {
-        title: country.seo?.title || `MBBS in ${country.name}`,
-        description: country.seo?.description || `Study MBBS in ${country.name}`,
+        title: country.seo?.title || `MBBS in ${countryName} | Intermost`,
+        description: country.seo?.description || `Study MBBS in ${countryName}`,
+        url: canonicalUrl,
         images: [country.banner_image || country.hero_image || '/images/og-default.jpg'],
       },
     };
@@ -271,8 +282,11 @@ export async function generateMetadata({ params }: CountryPageProps): Promise<Me
     const fallback = fallbackCountriesMap[slug];
     if (fallback) {
       return {
-        title: `MBBS in ${fallback.name} | Intermost Study Abroad`,
-        description: `Study MBBS in ${fallback.name} at NMC & WHO approved medical universities.`,
+        title: `MBBS in ${fallback.name} 2026 - Fees & NMC Recognition | Intermost`,
+        description: `Study MBBS in ${fallback.name} at NMC & WHO approved medical universities. Fees, eligibility, and NEET guidelines.`,
+        alternates: {
+          canonical: canonicalUrl,
+        },
       };
     }
     return {
@@ -311,5 +325,12 @@ export default async function CountryPage({ params }: CountryPageProps) {
     colleges = [];
   }
 
-  return <CountryDetail country={country} colleges={colleges} />;
+  return (
+    <>
+      {country.faqs && country.faqs.length > 0 && (
+        <JsonLdSchema type="FAQPage" data={country.faqs} />
+      )}
+      <CountryDetail country={country} colleges={colleges} />
+    </>
+  );
 }

@@ -62,7 +62,7 @@ export default function AboutStats() {
                     suffix={stat.suffix}
                   />
                 ) : (
-                  <span>0{stat.suffix}</span>
+                  <span>{stat.value.toLocaleString()}{stat.suffix}</span>
                 )}
               </div>
               <div className="text-gray-600 mt-1">{stat.label}</div>
