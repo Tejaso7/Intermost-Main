@@ -113,7 +113,7 @@ export interface Country {
   pricing: {
     tuition_fee: string;
     hostel_fee: string;
-    living_cost: string;
+    living_cost?: string;
     total_course_fee: string;
     currency: string;
   };

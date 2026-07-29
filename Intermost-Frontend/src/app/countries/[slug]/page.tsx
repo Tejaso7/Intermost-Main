@@ -37,6 +37,7 @@ const fallbackCountriesMap: Record<string, Partial<Country>> = {
     pricing: {
       tuition_fee: '$3,500 - $6,000 / Year',
       hostel_fee: '$600 - $1,200 / Year',
+      living_cost: '$150 - $200 / Month',
       total_course_fee: 'Starting from 18 Lakhs',
       currency: 'USD'
     },
