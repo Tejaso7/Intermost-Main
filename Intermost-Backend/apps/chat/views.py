@@ -43,7 +43,7 @@ def get_gemini_client():
 
 
 def generate_response(prompt: str) -> str:
-    """Generate response using Google Gemini with dynamic model fallback."""
+    """Generate response using Google Gemini with dynamic model fallback and quota error handling."""
     client_obj = get_gemini_client()
     if not client_obj:
         raise ValueError("Google Gemini client is not initialized. Please configure GEMINI_API_KEY.")
@@ -67,8 +67,17 @@ def generate_response(prompt: str) -> str:
             if response and hasattr(response, 'text') and response.text:
                 return response.text
         except Exception as e:
-            logger.warning(f"Gemini generation error with model '{model_name}': {e}")
+            err_msg = str(e)
+            logger.warning(f"Gemini generation error with model '{model_name}': {err_msg}")
             last_error = e
+            if "429" in err_msg or "RESOURCE_EXHAUSTED" in err_msg or "quota" in err_msg.lower():
+                return (
+                    "Hello! I am Tejas, your Intermost Education Counselor. I am experiencing high inquiry volume right now!\n\n"
+                    "For instant assistance regarding MBBS admissions, fee structures, and NMC-approved university brochures for Russia, Georgia, Uzbekistan, or Kazakhstan:\n\n"
+                    "📞 **Call/WhatsApp Us:** +91 90585 01818\n"
+                    "📧 **Email:** admissionintermost@gmail.com\n\n"
+                    "Please leave your phone number or email address here, and our expert counselors will assist you right away!"
+                )
             continue
 
     if last_error:
