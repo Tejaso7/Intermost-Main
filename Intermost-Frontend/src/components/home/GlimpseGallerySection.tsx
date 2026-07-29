@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane, Loader2 } from 'lucide-react';
 import { glimpsesApi, Glimpse } from '@/lib/services';
+import { getS3AssetUrl } from '@/lib/utils';
 
 const localGlimpses: Glimpse[] = [
   {
@@ -228,7 +229,7 @@ export default function GlimpseGallerySection() {
                 {/* Photo container */}
                 <div className="relative flex-1 overflow-hidden">
                   <Image
-                    src={item.image}
+                    src={getS3AssetUrl(item.image)}
                     alt={item.title}
                     fill
                     className="object-cover group-hover:scale-108 transition-transform duration-500"
@@ -310,7 +311,7 @@ export default function GlimpseGallerySection() {
               {/* Photo Box */}
               <div className="relative flex-1 bg-black min-h-[300px] md:min-h-[460px]">
                 <Image
-                  src={activePhoto.image}
+                  src={getS3AssetUrl(activePhoto.image)}
                   alt={activePhoto.title}
                   fill
                   className="object-contain"
