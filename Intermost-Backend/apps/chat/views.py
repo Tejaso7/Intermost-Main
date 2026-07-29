@@ -15,6 +15,7 @@ import json
 import logging
 import os
 import requests
+import re
 from django.conf import settings as django_settings
 
 # Google Gemini SDK (new)
@@ -251,6 +252,31 @@ class StudentChatView(APIView):
                     {'error': 'Message is required'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+            # AUTOMATIC LEAD EXTRACTION: Detect 10-digit Indian phone numbers inside chat messages
+            try:
+                phone_matches = re.findall(r'\b(?:\+?91|0)?[6-9]\d{9}\b', message)
+                if phone_matches:
+                    extracted_phone = phone_matches[0]
+                    inquiries = get_collection('inquiries')
+                    inquiries.update_one(
+                        {'phone': extracted_phone},
+                        {
+                            '$setOnInsert': {
+                                'name': f"Chat Student ({session_id[:6]})",
+                                'phone': extracted_phone,
+                                'email': '',
+                                'source': 'Chatbot AI',
+                                'status': 'New',
+                                'notes': f"Captured via AI Chatbot message: '{message[:120]}'",
+                                'created_at': datetime.utcnow()
+                            }
+                        },
+                        upsert=True
+                    )
+                    logger.info(f"Captured AI Chatbot lead: {extracted_phone}")
+            except Exception as lead_err:
+                logger.warning(f"Lead capture error in chat: {lead_err}")
             
             if not get_gemini_api_key():
                 # Fallback educational counseling response when Gemini is not configured
