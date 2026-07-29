@@ -51,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic College Routes
   let collegeRoutes: MetadataRoute.Sitemap = [];
   try {
-    const colleges = await collegesApi.getAll({ active: true });
+    const colleges = await collegesApi.getAll({ is_active: true });
     collegeRoutes = colleges.map((c) => ({
       url: `${baseUrl}/colleges/${c.slug}`,
       lastModified: new Date(),
