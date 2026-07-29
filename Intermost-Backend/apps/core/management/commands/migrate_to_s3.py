@@ -171,10 +171,22 @@ class Command(BaseCommand):
 
         # RECURSIVE STATIC MEDIA SCANNER FOR JPG, PNG, WEBP, SVG, MP3, MP4, PDF
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Scanning Static Public Media Assets (JPG, PNG, WEBP, SVG, MP3, MP4, PDF) ==="))
-        public_dir = Path(settings.BASE_DIR).parent / 'Intermost-Frontend' / 'public'
         
+        possible_public_dirs = [
+            Path(settings.BASE_DIR) / 'frontend_public',
+            Path('/app/frontend_public'),
+            Path(settings.BASE_DIR).parent / 'Intermost-Frontend' / 'public',
+        ]
+        
+        public_dir = None
+        for pdir in possible_public_dirs:
+            if pdir.exists() and pdir.is_dir():
+                public_dir = pdir
+                break
+
         static_count = 0
-        if public_dir.exists():
+        if public_dir:
+            self.stdout.write(f"Found frontend public directory: {public_dir}")
             for filepath in public_dir.rglob('*'):
                 if filepath.is_file() and filepath.suffix.lower() in ('.jpg', '.jpeg', '.png', '.webp', '.svg', '.mp3', '.mp4', '.pdf', '.gif'):
                     rel_path = filepath.relative_to(public_dir).as_posix()
@@ -201,5 +213,7 @@ class Command(BaseCommand):
                             static_count += 1
                         except Exception as e:
                             self.stdout.write(self.style.ERROR(f"Failed uploading {rel_path}: {e}"))
+        else:
+            self.stdout.write(self.style.WARNING("Frontend public directory not found inside container."))
 
         self.stdout.write(self.style.SUCCESS(f"\n=== Migration Complete! Updated {total_updated} MongoDB docs & {static_count} static media assets ==="))
