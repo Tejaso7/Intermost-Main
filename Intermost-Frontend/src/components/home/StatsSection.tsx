@@ -135,7 +135,7 @@ export default function StatsSection() {
               viewport={{ once: true }}
               whileHover={{ y: -4, scale: 1.02 }}
               transition={{ delay: index * 0.1, duration: 0.5 }}
-              className="text-center group bg-white/60 backdrop-blur-xl border border-white/40 shadow-lg hover:shadow-xl hover:border-primary-200/50 transition-all duration-300 p-6 sm:p-8 rounded-3xl"
+              className="text-center group bg-white/70 backdrop-blur-xl border border-white/40 border-t-2 border-t-primary-500/40 shadow-lg hover:shadow-xl hover:border-primary-300/50 transition-all duration-300 p-6 sm:p-8 rounded-3xl"
             >
               {/* Icon */}
               <motion.div 
@@ -147,7 +147,7 @@ export default function StatsSection() {
               </motion.div>
 
               {/* Value */}
-              <div className="text-3xl sm:text-4xl md:text-5xl font-bold mb-1 sm:mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-primary-700">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold mb-1 sm:mb-2 bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-primary-700 tabular-nums">
                 {isInView ? (
                   <CountUp
                     end={stat.value}

@@ -68,70 +68,66 @@ export default function RecognitionSection() {
         </motion.div>
 
         {/* Recognition Logos - Scrolling Marquee */}
-        <div className="relative">
-          {/* Gradient fade on sides */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-gray-50 to-transparent z-10" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-gray-50 to-transparent z-10" />
-          
+        <div className="relative marquee-mask">
           {/* Scrolling container */}
           <div className="flex animate-marquee">
             {/* First set */}
-            <div className="flex space-x-12 items-center px-6">
+            <div className="flex space-x-10 items-center px-6">
               {recognitions.map((item, index) => (
                 <motion.div
                   key={`first-${index}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
+                  initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex-shrink-0 group hover:scale-105 transition-transform duration-300"
+                  transition={{ delay: index * 0.08 }}
+                  className="flex-shrink-0 group transition-all duration-300"
                 >
-                  <div className="bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center rounded-xl group-hover:-translate-y-1">
-                    <div className="relative w-20 h-20 mb-3 grayscale group-hover:grayscale-0 transition-all duration-300">
+                  <div className="bg-white/80 backdrop-blur-lg border border-gray-200/60 border-t-2 border-t-primary-500/30 shadow-sm hover:shadow-xl hover:border-primary-300/50 transition-all duration-300 p-5 w-52 h-44 flex flex-col items-center justify-center rounded-2xl group-hover:-translate-y-1">
+                    <div className="relative w-24 h-16 mb-2 grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                       {item.logo ? (
                         <Image
                           src={item.logo}
                           alt={item.name}
                           fill
-                          className="object-contain"
+                          className="object-contain p-1"
                         />
                       ) : (
-                        <div className="w-full h-full bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="text-primary-600 font-bold text-xl">{item.name}</span>
+                        <div className="w-full h-full bg-primary-50 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 font-bold text-lg">{item.name}</span>
                         </div>
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 text-lg">{item.name}</h3>
-                    <p className="text-gray-500 text-xs text-center mt-1 line-clamp-2">{item.fullName}</p>
+                    <h3 className="font-extrabold text-gray-900 text-base mt-1">{item.name}</h3>
+                    <p className="text-gray-500 text-[11px] font-medium text-center line-clamp-1">{item.fullName}</p>
                   </div>
                 </motion.div>
               ))}
             </div>
             
             {/* Duplicate set for seamless loop */}
-            <div className="flex space-x-12 items-center px-6">
+            <div className="flex space-x-10 items-center px-6">
               {recognitions.map((item, index) => (
                 <div
                   key={`second-${index}`}
-                  className="flex-shrink-0 group hover:scale-105 transition-transform duration-300"
+                  className="flex-shrink-0 group transition-all duration-300"
                 >
-                  <div className="bg-white/70 backdrop-blur-lg border border-white/50 shadow-md hover:shadow-lg hover:border-primary-200/40 transition-all duration-300 p-6 w-48 h-48 flex flex-col items-center justify-center rounded-xl group-hover:-translate-y-1">
-                    <div className="relative w-20 h-20 mb-3 grayscale group-hover:grayscale-0 transition-all duration-300">
+                  <div className="bg-white/80 backdrop-blur-lg border border-gray-200/60 border-t-2 border-t-primary-500/30 shadow-sm hover:shadow-xl hover:border-primary-300/50 transition-all duration-300 p-5 w-52 h-44 flex flex-col items-center justify-center rounded-2xl group-hover:-translate-y-1">
+                    <div className="relative w-24 h-16 mb-2 grayscale opacity-75 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
                       {item.logo ? (
                         <Image
                           src={item.logo}
                           alt={item.name}
                           fill
-                          className="object-contain"
+                          className="object-contain p-1"
                         />
                       ) : (
-                        <div className="w-full h-full bg-primary-100 rounded-full flex items-center justify-center">
-                          <span className="text-primary-600 font-bold text-xl">{item.name}</span>
+                        <div className="w-full h-full bg-primary-50 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 font-bold text-lg">{item.name}</span>
                         </div>
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 text-lg">{item.name}</h3>
-                    <p className="text-gray-500 text-xs text-center mt-1 line-clamp-2">{item.fullName}</p>
+                    <h3 className="font-extrabold text-gray-900 text-base mt-1">{item.name}</h3>
+                    <p className="text-gray-500 text-[11px] font-medium text-center line-clamp-1">{item.fullName}</p>
                   </div>
                 </div>
               ))}
