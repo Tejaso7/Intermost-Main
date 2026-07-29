@@ -2,107 +2,149 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Globe, CheckCircle2, ChevronRight, Download, BookOpen, Star } from 'lucide-react';
+import { MapPin, Globe, CheckCircle2, ChevronRight, Download, BookOpen, Star, LayoutGrid, Map as MapIcon, ArrowRight, ShieldCheck } from 'lucide-react';
 import BrochureDownloadModal from '@/components/common/BrochureDownloadModal';
 import { coreApi } from '@/lib/services';
+import Link from 'next/link';
 
 interface MapDestination {
   id: string;
   name: string;
   slug: string;
-  coords: { x: number; y: number }; // Coordinates on our custom eurasia SVG container
+  flagUrl: string;
+  coords: { x: number; y: number; labelX: number; labelY: number };
   placements: string;
   avgFee: string;
   visaRate: string;
   language: string;
   universities: string[];
+  description: string;
 }
 
 const destinations: MapDestination[] = [
   {
     id: 'russia',
-    name: 'Globally',
+    name: 'Russia',
     slug: 'russia',
-    coords: { x: 580, y: 140 },
+    flagUrl: 'https://flagcdn.com/w80/ru.png',
+    coords: { x: 580, y: 150, labelX: 580, labelY: 115 },
     placements: '5,953+ Students Placed',
-    avgFee: '$3,800 / Year',
-    visaRate: '99% Success Rate',
-    language: 'Fully English Medium',
+    avgFee: '$3,800 / Year (~₹3.2L)',
+    visaRate: '99% Success',
+    language: '100% English Medium',
     universities: [
-      'Andijan State Medical University (Uzbekistan)',
-      'East European University (Georgia)',
-      'Chitwan Medical College & Hospital (Nepal)',
-      'Voronezh State Medical University (Russia)',
+      'Voronezh State Medical University',
+      'Bashkir State Medical University',
+      'Crimea Federal University',
+      'Kazan Federal University'
     ],
+    description: 'Home to top government medical universities with 100+ years of legacy and high FMGE pass rates.'
   },
   {
     id: 'georgia',
     name: 'Georgia',
     slug: 'georgia',
-    coords: { x: 598, y: 215 },
-    placements: '950+ Students Placed',
-    avgFee: '$5,000 / Year',
-    visaRate: '99% Success Rate',
-    language: 'English & Georgian Dual Option',
-    universities: ['East European University', 'Tbilisi State Medical University'],
+    flagUrl: 'https://flagcdn.com/w80/ge.png',
+    coords: { x: 490, y: 220, labelX: 490, labelY: 185 },
+    placements: '1,250+ Students Placed',
+    avgFee: '$5,000 / Year (~₹4.2L)',
+    visaRate: '99% Success',
+    language: 'European Curriculum',
+    universities: [
+      'East European University',
+      'Alte University',
+      'Tbilisi State Medical University',
+      'Caucasus International University'
+    ],
+    description: 'European standard medical education with WHO, WFME & ECFMG recognition and USMLE focused training.'
   },
   {
     id: 'uzbekistan',
     name: 'Uzbekistan',
     slug: 'uzbekistan',
-    coords: { x: 645, y: 226 },
-    placements: '1,400+ Students Placed',
-    avgFee: '$3,500 / Year',
-    visaRate: '99% Success Rate',
-    language: 'Fully English Medium',
-    universities: ['Andijan State Medical University', 'Tashkent State Medical University', 'Samarkand State Medical Institute'],
+    flagUrl: 'https://flagcdn.com/w80/uz.png',
+    coords: { x: 620, y: 235, labelX: 620, labelY: 270 },
+    placements: '1,480+ Students Placed',
+    avgFee: '$3,500 / Year (~₹2.9L)',
+    visaRate: '99% Success',
+    language: '100% English Medium',
+    universities: [
+      'Andijan State Medical Institute',
+      'Tashkent State Medical University',
+      'Samarkand State Medical University'
+    ],
+    description: 'Ultra-budget medical study with Indian food mess, high safety index, and close geographic proximity to India.'
   },
   {
     id: 'kazakhstan',
     name: 'Kazakhstan',
     slug: 'kazakhstan',
-    coords: { x: 660, y: 195 },
-    placements: '1,100+ Students Placed',
-    avgFee: '$3,500 / Year',
-    visaRate: '99% Success Rate',
-    language: 'Fully English Medium',
-    universities: ['Asfendiyarov Kazakh National Medical University', 'Semey Medical University'],
+    flagUrl: 'https://flagcdn.com/w80/kz.png',
+    coords: { x: 670, y: 190, labelX: 670, labelY: 155 },
+    placements: '1,120+ Students Placed',
+    avgFee: '$3,600 / Year (~₹3.0L)',
+    visaRate: '99% Success',
+    language: '100% English Medium',
+    universities: [
+      'Asfendiyarov Kazakh National Medical University',
+      'Semey Medical University',
+      'West Kazakhstan Marat Ospanov Medical University'
+    ],
+    description: '5-year compact MBBS program compliant with latest NMC guidelines & clinical hospital rotations.'
   },
   {
     id: 'nepal',
     name: 'Nepal',
     slug: 'nepal',
-    coords: { x: 706, y: 350 },
-    placements: '800+ Students Placed',
-    avgFee: '₹55 Lakhs (Total)',
-    visaRate: '99% Success Rate',
-    language: 'English / Hindi Friendly',
-    universities: ['Chitwan Medical College & Hospital', 'Kathmandu Medical College & Hospital', 'B&C Medical College Teaching Hospital & Research Center'],
+    flagUrl: 'https://flagcdn.com/w80/np.png',
+    coords: { x: 740, y: 320, labelX: 740, labelY: 355 },
+    placements: '850+ Students Placed',
+    avgFee: '₹55 Lakhs (Package)',
+    visaRate: '100% Success (No Visa Needed)',
+    language: 'English & Hindi Friendly',
+    universities: [
+      'Chitwan Medical College',
+      'Kathmandu Medical College',
+      'B&C Medical College'
+    ],
+    description: 'Similar pattern to Indian MBBS, no passport/visa hassle for Indian citizens, and immediate proximity.'
   },
   {
     id: 'tajikistan',
     name: 'Tajikistan',
     slug: 'tajikistan',
-    coords: { x: 649, y: 240 },
-    placements: '450+ Students Placed',
-    avgFee: '$3,500 / Year',
-    visaRate: '99% Success Rate',
-    language: 'Fully English Medium',
-    universities: ['Tajik State Medical University'],
+    flagUrl: 'https://flagcdn.com/w80/tj.png',
+    coords: { x: 640, y: 275, labelX: 640, labelY: 310 },
+    placements: '480+ Students Placed',
+    avgFee: '$3,500 / Year (~₹2.9L)',
+    visaRate: '99% Success',
+    language: 'English Medium',
+    universities: [
+      'Avicenna Tajik State Medical University'
+    ],
+    description: 'Affordable medical university with government recognition and comprehensive hostel facilities.'
   },
+  {
+    id: 'vietnam',
+    name: 'Vietnam',
+    slug: 'vietnam',
+    flagUrl: 'https://flagcdn.com/w80/vn.png',
+    coords: { x: 800, y: 340, labelX: 800, labelY: 375 },
+    placements: '350+ Students Placed',
+    avgFee: '$4,200 / Year (~₹3.5L)',
+    visaRate: '99% Success',
+    language: '100% English Medium',
+    universities: [
+      'Can Tho University of Medicine and Pharmacy',
+      'Hanoi Medical University'
+    ],
+    description: 'Emerging destination with state-of-the-art medical equipment, English medium instruction, and safe environment.'
+  }
 ];
-
-const flagUrls: Record<string, string> = {
-  russia: 'https://flagcdn.com/w40/ru.png',
-  georgia: 'https://flagcdn.com/w40/ge.png',
-  uzbekistan: 'https://flagcdn.com/w40/uz.png',
-  kazakhstan: 'https://flagcdn.com/w40/kz.png',
-  nepal: 'https://flagcdn.com/w40/np.png',
-  tajikistan: 'https://flagcdn.com/w40/tj.png',
-};
 
 export default function PlacementsMapSection() {
   const [selectedDest, setSelectedDest] = useState<MapDestination>(destinations[0]);
+  const [viewMode, setViewMode] = useState<'cards' | 'map'>('cards');
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [siteStats, setSiteStats] = useState({
     students_placed: 5953,
@@ -112,15 +154,10 @@ export default function PlacementsMapSection() {
     const fetchSettings = async () => {
       try {
         const settings = await coreApi.getSettings();
-        if (settings && settings.stats && settings.stats.students_placed) {
+        if (settings?.stats?.students_placed) {
           setSiteStats({
             students_placed: settings.stats.students_placed,
           });
-        }
-        if (settings && (settings as any).top_recommended_colleges && Array.isArray((settings as any).top_recommended_colleges) && (settings as any).top_recommended_colleges.length > 0) {
-          const customColleges = (settings as any).top_recommended_colleges;
-          destinations[0].universities = customColleges;
-          setSelectedDest(prev => prev.id === 'russia' ? { ...prev, universities: customColleges } : prev);
         }
       } catch (error) {
         console.error('Error fetching site settings:', error);
@@ -131,264 +168,434 @@ export default function PlacementsMapSection() {
 
   const getDynamicPlacements = (destId: string) => {
     const total = siteStats.students_placed;
-    if (destId === 'russia') {
-      return `${total.toLocaleString()}+ Students Placed`;
-    }
+    if (destId === 'russia') return `${total.toLocaleString()}+ Students Placed`;
+    
     let count = 0;
     switch (destId) {
-      case 'uzbekistan':
-        count = Math.round(total * 0.25);
-        break;
-      case 'kazakhstan':
-        count = Math.round(total * 0.20);
-        break;
-      case 'georgia':
-        count = Math.round(total * 0.16);
-        break;
-      case 'nepal':
-        count = Math.round(total * 0.14);
-        break;
-      case 'tajikistan':
-        count = Math.round(total * 0.08);
-        break;
-      default:
-        return destinations.find(d => d.id === destId)?.placements || '';
+      case 'uzbekistan': count = Math.round(total * 0.25); break;
+      case 'georgia': count = Math.round(total * 0.21); break;
+      case 'kazakhstan': count = Math.round(total * 0.19); break;
+      case 'nepal': count = Math.round(total * 0.14); break;
+      case 'tajikistan': count = Math.round(total * 0.08); break;
+      case 'vietnam': count = Math.round(total * 0.06); break;
+      default: return destinations.find(d => d.id === destId)?.placements || '';
     }
     return `${count.toLocaleString()}+ Students Placed`;
   };
 
   return (
-    <section className="py-24 bg-gray-950 text-white relative overflow-hidden">
-      {/* Background decoration */}
+    <section className="py-16 sm:py-24 bg-gray-950 text-white relative overflow-hidden pb-24 md:pb-28">
+      {/* Ambient Background Gradient Orbs */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
-        <div className="absolute top-[20%] left-[10%] w-[350px] h-[350px] rounded-full bg-primary-500/10 blur-3xl" />
-        <div className="absolute bottom-[20%] right-[10%] w-[450px] h-[450px] rounded-full bg-secondary-500/10 blur-3xl" />
+        <div className="absolute top-[10%] left-[10%] w-[380px] h-[380px] rounded-full bg-primary-500/10 blur-3xl" />
+        <div className="absolute bottom-[10%] right-[10%] w-[480px] h-[480px] rounded-full bg-secondary-500/10 blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">
         {/* Section Header */}
-        <div className="text-center mb-16 max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-primary-500/10 text-primary-400 border border-primary-500/20">
-            <Globe className="w-3.5 h-3.5" />
-            Global Alumni footprint
+        <div className="text-center mb-10 sm:mb-14 max-w-3xl mx-auto">
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-500/10 text-primary-400 border border-primary-500/20 mb-3">
+            <Globe className="w-4 h-4 text-primary-400" />
+            Global Alumni Footprint
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mt-3 leading-tight">
-            Our Interactive <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-primary-300 to-secondary-400">Placements Map</span>
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight">
+            Our Placements & <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-teal-300 to-secondary-400">Global Reach</span>
           </h2>
-          <p className="text-gray-400 text-sm sm:text-base mt-4">
-            We guide thousands of Indian students to leading certified medical universities worldwide. Click any pulsing destination hotspot to inspect alumni statistics.
+          <p className="text-gray-300 text-sm sm:text-base mt-3 max-w-2xl mx-auto">
+            We have placed <span className="text-primary-300 font-bold">{siteStats.students_placed.toLocaleString()}+ Indian students</span> into top NMC & WHO-recognized medical universities across 7 primary countries.
           </p>
+
+          {/* View Mode Switcher */}
+          <div className="inline-flex p-1 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 mt-6 shadow-lg">
+            <button
+              onClick={() => setViewMode('cards')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                viewMode === 'cards'
+                  ? 'bg-primary-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Country Grid View
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+                viewMode === 'map'
+                  ? 'bg-primary-600 text-white shadow-md'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <MapIcon className="w-4 h-4" />
+              Interactive Map View
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          {/* Left panel: Interactive World Map */}
-          <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[32px] p-6 shadow-2xl relative min-h-[380px] sm:min-h-[440px] flex items-center justify-center overflow-hidden">
-            <div 
-              className="relative w-full h-full aspect-[1000/600] transition-transform duration-500"
-              style={{
-                transform: 'scale(1.9) translate(-14%, 8%)',
-                transformOrigin: 'center center',
-              }}
-            >
-              <img
-                src="/images/world-map.svg"
-                alt="World Map"
-                className="w-full h-full object-contain opacity-35 select-none pointer-events-none absolute inset-0 z-0"
-              />
+        {/* ========================================================================= */}
+        {/* VIEW 1: COUNTRY GRID VIEW (Default & Mobile Friendly) */}
+        {/* ========================================================================= */}
+        {viewMode === 'cards' && (
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+              {destinations.map((dest) => {
+                const isSelected = selectedDest.id === dest.id;
 
-              <svg
-                viewBox="0 0 1000 600"
-                className="w-full h-full select-none pointer-events-none absolute inset-0 z-10"
-              >
-                {/* Fake grid lines */}
-                <defs>
-                  <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                    <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="0.5" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
+                return (
+                  <div
+                    key={dest.id}
+                    onClick={() => setSelectedDest(dest)}
+                    className={`group cursor-pointer rounded-3xl p-5 border transition-all duration-300 relative flex flex-col justify-between ${
+                      isSelected
+                        ? 'bg-white/10 border-primary-400/80 shadow-2xl shadow-primary-500/10 ring-2 ring-primary-500/40'
+                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20 shadow-lg'
+                    }`}
+                  >
+                    <div>
+                      {/* Flag + Country Name */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl overflow-hidden border border-white/20 shadow-md flex-shrink-0 bg-gray-900">
+                            <img
+                              src={dest.flagUrl}
+                              alt={`${dest.name} flag`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-bold text-white group-hover:text-primary-300 transition-colors">
+                              {dest.name}
+                            </h3>
+                            <span className="text-[11px] font-semibold text-emerald-400 flex items-center gap-1">
+                              <ShieldCheck className="w-3 h-3" />
+                              NMC Approved
+                            </span>
+                          </div>
+                        </div>
 
-                {/* Flight Paths from India (Source: 688, 362) */}
-                {destinations.map((dest) => (
-                  <g key={`path-${dest.id}`}>
-                    {/* Dotted path curve */}
-                    <path
-                      d={`M 688 362 Q ${(688 + dest.coords.x) / 2} ${(362 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
-                      fill="none"
-                      stroke={selectedDest.id === dest.id ? '#0d9488' : 'rgba(255,255,255,0.1)'}
-                      strokeWidth={selectedDest.id === dest.id ? 2 : 1}
-                      strokeDasharray="4 4"
-                      className="transition-colors duration-300"
-                    />
-                    {/* Animated dot indicator flying along path */}
-                    <circle r="3" fill="#2dd4bf" className="pointer-events-none">
-                      <animateMotion
-                        dur="3s"
-                        repeatCount="indefinite"
-                        path={`M 688 362 Q ${(688 + dest.coords.x) / 2} ${(362 + dest.coords.y) / 2 - 30} ${dest.coords.x} ${dest.coords.y}`}
-                      />
-                    </circle>
-                  </g>
-                ))}
-
-                {/* India Source Pin */}
-                <circle cx="688" cy="362" r="7" fill="#0d9488" className="animate-pulse" />
-                <circle cx="688" cy="362" r="3" fill="#5eead4" />
-              </svg>
-
-              {/* Interactive buttons absolute positioning */}
-              <div className="absolute inset-0 z-20 pointer-events-auto">
-                {/* India Label */}
-                <div 
-                  className="absolute flex items-center gap-1.5 pointer-events-none"
-                  style={{ left: '68.8%', top: '60.3%' }}
-                >
-                  <div className="w-5 h-5 rounded-full overflow-hidden border border-white/20">
-                    <img src="https://flagcdn.com/w40/in.png" alt="India flag" className="w-full h-full object-cover" />
-                  </div>
-                  <span className="text-[10px] font-bold text-teal-300 uppercase tracking-widest bg-black/60 px-1.5 py-0.5 rounded">
-                    India
-                  </span>
-                </div>
-
-                {/* Destination Hotspots */}
-                {destinations.map((dest) => {
-                  const isSelected = selectedDest.id === dest.id;
-                  return (
-                    <button
-                      key={`node-${dest.id}`}
-                      onClick={() => setSelectedDest(dest)}
-                      style={{ left: `${dest.coords.x / 10}%`, top: `${dest.coords.y / 6}%` }}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 group cursor-pointer"
-                    >
-                      {/* Ripple rings */}
-                      <span
-                        className={`absolute inset-0 -m-3.5 rounded-full animate-ping opacity-60 ${
-                          isSelected ? 'bg-primary-500' : 'bg-gray-450 group-hover:bg-primary-500/40'
-                        }`}
-                        style={{ animationDuration: '2s' }}
-                      />
-                      
-                      {/* Inner flag button */}
-                      <div
-                        className={`w-7 h-7 rounded-full overflow-hidden flex items-center justify-center transition-all shadow-lg border-2 bg-gray-900 ${
-                          isSelected
-                            ? 'scale-125 border-primary-400'
-                            : 'border-white/20 hover:scale-110 hover:border-white/50'
-                        }`}
-                      >
-                        <img
-                          src={flagUrls[dest.id] || `/flags/${dest.id}.png`}
-                          alt={`${dest.name} flag`}
-                          className="w-full h-full object-cover select-none pointer-events-none"
-                        />
+                        {isSelected && (
+                          <span className="w-2.5 h-2.5 rounded-full bg-primary-400 animate-pulse" />
+                        )}
                       </div>
 
-                      {/* Hover text preview label */}
-                      <span className="absolute left-1/2 -translate-x-1/2 bottom-8 opacity-0 group-hover:opacity-100 transition-opacity bg-black border border-gray-800 text-white font-extrabold text-[9px] uppercase tracking-wider py-1 px-2.5 rounded shadow-sm whitespace-nowrap z-20">
-                        {dest.name}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-
-          {/* Right panel: Information Card */}
-          <div className="lg:col-span-5 h-full">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selectedDest.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="bg-white/5 border border-white/10 rounded-[30px] p-6 sm:p-8 flex flex-col justify-between h-full backdrop-blur-xl relative overflow-hidden"
-              >
-                {/* Visual line decoration */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-primary-500/10 rounded-full blur-2xl" />
-
-                <div className="space-y-6">
-                  {/* Country Title */}
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                    <div>
-                      <h3 className="text-2xl font-bold text-white flex items-center gap-2">
-                        MBBS Abroad - {selectedDest.name}
-                      </h3>
-                      <p className="text-xs text-primary-400 font-semibold tracking-wider uppercase mt-1">
-                        Placement Profile
+                      <p className="text-xs text-gray-300 line-clamp-2 mb-4 leading-relaxed">
+                        {dest.description}
                       </p>
-                    </div>
-                    <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center">
-                      <Globe className="w-6 h-6 text-primary-400" />
-                    </div>
-                  </div>
 
-                  {/* Highlights Grid */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">Students Placed</p>
-                      <p className="text-sm font-extrabold text-white mt-1">{getDynamicPlacements(selectedDest.id)}</p>
-                    </div>
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">Average Fees</p>
-                      <p className="text-sm font-extrabold text-white mt-1">{selectedDest.avgFee}</p>
-                    </div>
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">Visa Success</p>
-                      <p className="text-sm font-extrabold text-white mt-1 flex items-center gap-1">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                        {selectedDest.visaRate}
-                      </p>
-                    </div>
-                    <div className="p-3 bg-white/5 rounded-2xl border border-white/5">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase">Language medium</p>
-                      <p className="text-sm font-extrabold text-white mt-1">{selectedDest.language}</p>
-                    </div>
-                  </div>
-
-                  {/* Sample Universities */}
-                  <div className="space-y-3">
-                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
-                      <BookOpen className="w-3.5 h-3.5 text-primary-400" />
-                      Top Recognized Universities
-                    </p>
-                    <div className="space-y-2">
-                      {selectedDest.universities.map((uni, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center gap-2.5 px-3 py-2.5 bg-white/5 border border-white/5 rounded-xl text-xs hover:bg-white/10 transition-colors"
-                        >
-                          <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                          <span className="font-semibold text-gray-250 truncate">{uni}</span>
+                      {/* Stat Metrics Grid */}
+                      <div className="grid grid-cols-2 gap-2.5 mb-4">
+                        <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Placed</span>
+                          <span className="text-xs font-extrabold text-white">{getDynamicPlacements(dest.id)}</span>
                         </div>
-                      ))}
+                        <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Average Fee</span>
+                          <span className="text-xs font-extrabold text-primary-300">{dest.avgFee}</span>
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Card Actions */}
+                    <div className="flex items-center justify-between pt-3 border-t border-white/10 mt-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedDest(dest);
+                          setIsDownloadOpen(true);
+                        }}
+                        className="text-xs font-bold text-gray-300 hover:text-white flex items-center gap-1"
+                      >
+                        <Download className="w-3.5 h-3.5 text-primary-400" />
+                        Brochure
+                      </button>
+
+                      <Link
+                        href={`/countries/${dest.slug}`}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-primary-400 hover:text-primary-300 bg-primary-500/10 px-3 py-1.5 rounded-xl border border-primary-500/20 hover:bg-primary-500/20 transition-all"
+                      >
+                        View Universities
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Selected Destination Detail Sheet */}
+            <motion.div
+              key={`detail-${selectedDest.id}`}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/5 border border-white/15 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden"
+            >
+              <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden border border-white/20 shadow-lg bg-gray-900 flex-shrink-0">
+                    <img src={selectedDest.flagUrl} alt={selectedDest.name} className="w-full h-full object-cover" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                      MBBS in {selectedDest.name}
+                    </h3>
+                    <p className="text-xs text-primary-400 font-bold uppercase tracking-wider mt-1 flex items-center gap-2">
+                      <span>{selectedDest.language}</span>
+                      <span>•</span>
+                      <span>{selectedDest.visaRate} Visa</span>
+                    </p>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex flex-col sm:flex-row gap-3 pt-6 mt-6 border-t border-white/10">
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                   <button
                     onClick={() => setIsDownloadOpen(true)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 text-white font-bold py-3 rounded-2xl text-xs sm:text-sm shadow-lg shadow-primary-500/10 transition-colors cursor-pointer"
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm shadow-lg shadow-primary-500/20 transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    Download Prospectus
+                    Download {selectedDest.name} PDF Guide
                   </button>
-                  <a
+                  <Link
                     href={`/countries/${selectedDest.slug}`}
-                    className="flex-1 flex items-center justify-center gap-1.5 border border-white/10 hover:bg-white/5 text-white font-bold py-3 rounded-2xl text-xs sm:text-sm transition-colors"
+                    className="flex-1 lg:flex-none flex items-center justify-center gap-1.5 bg-white/10 hover:bg-white/20 text-white font-bold px-5 py-3 rounded-2xl text-xs sm:text-sm border border-white/20 transition-colors"
                   >
-                    View College Fee Plans
+                    Explore All {selectedDest.name} Colleges
                     <ChevronRight className="w-4 h-4" />
-                  </a>
+                  </Link>
                 </div>
-              </motion.div>
-            </AnimatePresence>
+              </div>
+
+              {/* Sample Universities */}
+              <div className="mt-6">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-primary-400" />
+                  Top NMC Recognized Colleges in {selectedDest.name}
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                  {selectedDest.universities.map((uni, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2.5 px-3.5 py-3 bg-black/40 border border-white/10 rounded-2xl text-xs font-semibold text-gray-200"
+                    >
+                      <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                      <span className="truncate">{uni}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW 2: INTERACTIVE HIGH-CONTRAST MAP VIEW */}
+        {/* ========================================================================= */}
+        {viewMode === 'map' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            {/* Left panel: Interactive SVG Map Container */}
+            <div className="lg:col-span-7 bg-white/5 border border-white/10 rounded-[32px] p-6 shadow-2xl relative min-h-[380px] sm:min-h-[460px] flex items-center justify-center overflow-hidden">
+              <div className="relative w-full h-full aspect-[1000/600]">
+                {/* World Map SVG background */}
+                <img
+                  src="/images/world-map.svg"
+                  alt="World Map"
+                  className="w-full h-full object-contain opacity-30 select-none pointer-events-none absolute inset-0 z-0"
+                />
+
+                <svg viewBox="0 0 1000 600" className="w-full h-full select-none pointer-events-none absolute inset-0 z-10">
+                  <defs>
+                    <pattern id="grid-dots" width="25" height="25" patternUnits="userSpaceOnUse">
+                      <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)" />
+                    </pattern>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#grid-dots)" />
+
+                  {/* Flight Paths from India (Source: 720, 360) */}
+                  {destinations.map((dest) => (
+                    <g key={`path-${dest.id}`}>
+                      <path
+                        d={`M 720 360 Q ${(720 + dest.coords.x) / 2} ${(360 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
+                        fill="none"
+                        stroke={selectedDest.id === dest.id ? '#38bdf8' : 'rgba(255,255,255,0.15)'}
+                        strokeWidth={selectedDest.id === dest.id ? 2.5 : 1}
+                        strokeDasharray="4 4"
+                        className="transition-colors duration-300"
+                      />
+                      <circle r="3" fill="#38bdf8" className="pointer-events-none motion-reduce:animate-none">
+                        <animateMotion
+                          dur="3.5s"
+                          repeatCount="indefinite"
+                          path={`M 720 360 Q ${(720 + dest.coords.x) / 2} ${(360 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
+                        />
+                      </circle>
+                    </g>
+                  ))}
+
+                  {/* India Source Marker */}
+                  <circle cx="720" cy="360" r="8" fill="#0284c7" className="motion-reduce:animate-none animate-pulse" />
+                  <circle cx="720" cy="360" r="3" fill="#e0f2fe" />
+                </svg>
+
+                {/* Country Marker Buttons */}
+                <div className="absolute inset-0 z-20 pointer-events-auto">
+                  {/* India Label */}
+                  <div className="absolute flex items-center gap-1.5 pointer-events-none" style={{ left: '72%', top: '60%' }}>
+                    <div className="w-5 h-5 rounded-full overflow-hidden border border-white/30 shadow-md">
+                      <img src="https://flagcdn.com/w40/in.png" alt="India flag" className="w-full h-full object-cover" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-sky-300 uppercase tracking-wider bg-black/80 px-2 py-0.5 rounded-lg border border-sky-500/30">
+                      India
+                    </span>
+                  </div>
+
+                  {/* Destination Markers */}
+                  {destinations.map((dest) => {
+                    const isSelected = selectedDest.id === dest.id;
+                    return (
+                      <div
+                        key={`node-${dest.id}`}
+                        style={{ left: `${dest.coords.x / 10}%`, top: `${dest.coords.y / 6}%` }}
+                        className="absolute -translate-x-1/2 -translate-y-1/2"
+                      >
+                        <button
+                          onClick={() => setSelectedDest(dest)}
+                          className="group relative flex flex-col items-center cursor-pointer focus:outline-none"
+                          aria-label={`Select ${dest.name}`}
+                        >
+                          {/* Pulse Ring */}
+                          <span
+                            className={`absolute inset-0 -m-3 rounded-full opacity-60 motion-reduce:animate-none ${
+                              isSelected ? 'bg-primary-400 animate-ping' : 'bg-gray-500 group-hover:bg-primary-400/50'
+                            }`}
+                            style={{ animationDuration: '2.5s' }}
+                          />
+
+                          {/* Flag Circle Pin */}
+                          <div
+                            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden flex items-center justify-center transition-all shadow-xl border-2 bg-gray-900 ${
+                              isSelected
+                                ? 'scale-125 border-primary-400 ring-4 ring-primary-500/30'
+                                : 'border-white/30 hover:scale-110 hover:border-white'
+                            }`}
+                          >
+                            <img
+                              src={dest.flagUrl}
+                              alt={`${dest.name} flag`}
+                              className="w-full h-full object-cover select-none pointer-events-none"
+                            />
+                          </div>
+
+                          {/* Unambiguous Country Label */}
+                          <span
+                            className={`mt-1 font-extrabold text-[10px] sm:text-xs uppercase tracking-wider py-0.5 px-2 rounded-lg border shadow-lg whitespace-nowrap transition-all ${
+                              isSelected
+                                ? 'bg-primary-600 text-white border-primary-300'
+                                : 'bg-gray-900/90 text-gray-200 border-gray-700 group-hover:bg-black group-hover:text-white'
+                            }`}
+                          >
+                            {dest.name}
+                          </span>
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Right panel: Information Card */}
+            <div className="lg:col-span-5 h-full">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedDest.id}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="bg-white/5 border border-white/10 rounded-[30px] p-6 sm:p-8 flex flex-col justify-between h-full backdrop-blur-xl relative overflow-hidden"
+                >
+                  <div className="space-y-6">
+                    {/* Country Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl overflow-hidden border border-white/20 shadow-md bg-gray-900 flex-shrink-0">
+                          <img src={selectedDest.flagUrl} alt={selectedDest.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold text-white">
+                            MBBS in {selectedDest.name}
+                          </h3>
+                          <p className="text-xs text-primary-400 font-semibold tracking-wider uppercase mt-0.5">
+                            Placement & Alumni Stats
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Students Placed</p>
+                        <p className="text-sm font-extrabold text-white mt-1">{getDynamicPlacements(selectedDest.id)}</p>
+                      </div>
+                      <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Average Fees</p>
+                        <p className="text-sm font-extrabold text-primary-300 mt-1">{selectedDest.avgFee}</p>
+                      </div>
+                      <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Visa Success</p>
+                        <p className="text-sm font-extrabold text-white mt-1 flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                          {selectedDest.visaRate}
+                        </p>
+                      </div>
+                      <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Medium</p>
+                        <p className="text-xs font-extrabold text-white mt-1">{selectedDest.language}</p>
+                      </div>
+                    </div>
+
+                    {/* Top Universities */}
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
+                        <BookOpen className="w-3.5 h-3.5 text-primary-400" />
+                        Top Recognized Universities
+                      </p>
+                      <div className="space-y-2">
+                        {selectedDest.universities.map((uni, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-center gap-2.5 px-3 py-2.5 bg-black/30 border border-white/5 rounded-xl text-xs hover:bg-black/50 transition-colors"
+                          >
+                            <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                            <span className="font-semibold text-gray-200 truncate">{uni}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col sm:flex-row gap-3 pt-6 mt-6 border-t border-white/10">
+                    <button
+                      onClick={() => setIsDownloadOpen(true)}
+                      className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 text-white font-bold py-3 rounded-2xl text-xs sm:text-sm shadow-lg transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      Download Prospectus
+                    </button>
+                    <Link
+                      href={`/countries/${selectedDest.slug}`}
+                      className="flex-1 flex items-center justify-center gap-1.5 border border-white/15 hover:bg-white/10 text-white font-bold py-3 rounded-2xl text-xs sm:text-sm transition-colors"
+                    >
+                      View Colleges
+                      <ChevronRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Prospectus download modal context */}
@@ -400,3 +607,4 @@ export default function PlacementsMapSection() {
     </section>
   );
 }
+
