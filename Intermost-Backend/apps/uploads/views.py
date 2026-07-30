@@ -87,27 +87,30 @@ class FileUploadView(APIView):
             # Generate unique filename
             filename = generate_filename(file.name)
             
-            # Save file. For videos, save locally to bypass Cloudinary resource type constraints.
-            # For other categories, try Cloudinary first, falling back to local file storage.
+            # Save file. If S3 is default_storage, use S3 for ALL categories (including videos).
+            # If local fallback is needed, use base_url='/media/' so local files never output S3 URLs.
             try:
                 save_path = f"uploads/{category}/{filename}"
+                from django.conf import settings as django_settings
                 
-                if category == 'videos' or ext in ['.mp4', '.webm', '.mov']:
-                    # Force local file storage
+                is_s3 = getattr(django_settings, 'DEFAULT_FILE_STORAGE', '').endswith('S3Boto3Storage')
+                
+                if is_s3:
+                    saved_file_path = default_storage.save(save_path, file)
+                    url_path = default_storage.url(saved_file_path)
+                elif category == 'videos' or ext in ['.mp4', '.webm', '.mov']:
                     from django.core.files.storage import FileSystemStorage
-                    from django.conf import settings as django_settings
-                    local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url=django_settings.MEDIA_URL)
+                    local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url='/media/')
                     saved_file_path = local_storage.save(save_path, file)
                     url_path = local_storage.url(saved_file_path)
                 else:
                     try:
                         saved_file_path = default_storage.save(save_path, file)
                         url_path = default_storage.url(saved_file_path)
-                    except Exception as cloudinary_err:
-                        logger.warning(f"Cloudinary upload failed, falling back to local storage: {cloudinary_err}")
+                    except Exception as storage_err:
+                        logger.warning(f"Storage upload failed, falling back to local storage: {storage_err}")
                         from django.core.files.storage import FileSystemStorage
-                        from django.conf import settings as django_settings
-                        local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url=django_settings.MEDIA_URL)
+                        local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url='/media/')
                         saved_file_path = local_storage.save(save_path, file)
                         url_path = local_storage.url(saved_file_path)
                 
