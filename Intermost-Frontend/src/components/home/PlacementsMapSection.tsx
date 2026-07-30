@@ -12,7 +12,7 @@ interface MapDestination {
   name: string;
   slug: string;
   flagUrl: string;
-  coords: { x: number; y: number; labelX: number; labelY: number };
+  coords: { x: number; y: number; labelPos: 'top' | 'bottom' | 'left' | 'right' };
   placements: string;
   avgFee: string;
   visaRate: string;
@@ -27,7 +27,7 @@ const destinations: MapDestination[] = [
     name: 'Russia',
     slug: 'russia',
     flagUrl: 'https://flagcdn.com/w80/ru.png',
-    coords: { x: 520, y: 130, labelX: 520, labelY: 95 },
+    coords: { x: 460, y: 110, labelPos: 'top' },
     placements: '5,953+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -47,7 +47,7 @@ const destinations: MapDestination[] = [
     name: 'Georgia',
     slug: 'georgia',
     flagUrl: 'https://flagcdn.com/w80/ge.png',
-    coords: { x: 470, y: 200, labelX: 470, labelY: 165 },
+    coords: { x: 330, y: 220, labelPos: 'left' },
     placements: '1,250+ Students Placed',
     avgFee: '$5,000 / Year (~₹4.2L)',
     visaRate: '99% Success',
@@ -67,7 +67,7 @@ const destinations: MapDestination[] = [
     name: 'Uzbekistan',
     slug: 'uzbekistan',
     flagUrl: 'https://flagcdn.com/w80/uz.png',
-    coords: { x: 590, y: 205, labelX: 590, labelY: 240 },
+    coords: { x: 520, y: 215, labelPos: 'left' },
     placements: '1,480+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -85,7 +85,7 @@ const destinations: MapDestination[] = [
     name: 'Kazakhstan',
     slug: 'kazakhstan',
     flagUrl: 'https://flagcdn.com/w80/kz.png',
-    coords: { x: 615, y: 160, labelX: 615, labelY: 125 },
+    coords: { x: 580, y: 145, labelPos: 'top' },
     placements: '1,120+ Students Placed',
     avgFee: '$3,600 / Year (~₹3.0L)',
     visaRate: '99% Success',
@@ -102,7 +102,7 @@ const destinations: MapDestination[] = [
     name: 'Tajikistan',
     slug: 'tajikistan',
     flagUrl: 'https://flagcdn.com/w80/tj.png',
-    coords: { x: 625, y: 220, labelX: 625, labelY: 255 },
+    coords: { x: 620, y: 250, labelPos: 'right' },
     placements: '480+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -118,7 +118,7 @@ const destinations: MapDestination[] = [
     name: 'Nepal',
     slug: 'nepal',
     flagUrl: 'https://flagcdn.com/w80/np.png',
-    coords: { x: 715, y: 260, labelX: 715, labelY: 295 },
+    coords: { x: 740, y: 300, labelPos: 'right' },
     placements: '850+ Students Placed',
     avgFee: '₹55 Lakhs (Package)',
     visaRate: '100% Success (No Visa Needed)',
@@ -135,7 +135,7 @@ const destinations: MapDestination[] = [
     name: 'Vietnam',
     slug: 'vietnam',
     flagUrl: 'https://flagcdn.com/w80/vn.png',
-    coords: { x: 770, y: 300, labelX: 770, labelY: 335 },
+    coords: { x: 850, y: 380, labelPos: 'bottom' },
     placements: '350+ Students Placed',
     avgFee: '$4,200 / Year (~₹3.5L)',
     visaRate: '99% Success',
@@ -456,6 +456,8 @@ export default function PlacementsMapSection() {
                   {/* Destination Markers */}
                   {destinations.map((dest) => {
                     const isSelected = selectedDest.id === dest.id;
+                    const pos = dest.coords.labelPos;
+
                     return (
                       <div
                         key={`node-${dest.id}`}
@@ -464,11 +466,19 @@ export default function PlacementsMapSection() {
                       >
                         <button
                           onClick={() => setSelectedDest(dest)}
-                          className="group relative flex flex-col items-center cursor-pointer focus:outline-none"
+                          className={`group relative flex items-center cursor-pointer focus:outline-none ${
+                            pos === 'left'
+                              ? 'flex-row-reverse gap-1.5'
+                              : pos === 'right'
+                              ? 'flex-row gap-1.5'
+                              : pos === 'top'
+                              ? 'flex-col-reverse gap-1'
+                              : 'flex-col gap-1'
+                          }`}
                           aria-label={`Select ${dest.name}`}
                         >
                           {/* Flag Circle Pin Container */}
-                          <div className="relative flex items-center justify-center">
+                          <div className="relative flex items-center justify-center flex-shrink-0">
                             {/* Pulse Ring ONLY on selected pin */}
                             {isSelected && (
                               <span className="absolute -inset-1 rounded-full bg-primary-400 opacity-75 animate-ping" />
@@ -490,11 +500,11 @@ export default function PlacementsMapSection() {
                             </div>
                           </div>
 
-                          {/* Compact Country Label */}
+                          {/* Directional Country Label */}
                           <span
-                            className={`mt-1 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider py-0.5 px-1.5 rounded-md border shadow-md whitespace-nowrap transition-all ${
+                            className={`font-bold text-[9px] sm:text-[10px] uppercase tracking-wider py-0.5 px-1.5 rounded-md border shadow-md whitespace-nowrap transition-all ${
                               isSelected
-                                ? 'bg-primary-600 text-white border-primary-400 shadow-primary-900/50'
+                                ? 'bg-primary-600 text-white border-primary-400 shadow-primary-900/50 scale-105'
                                 : 'bg-gray-950/90 text-gray-300 border-white/10 group-hover:bg-black group-hover:text-white group-hover:border-white/30'
                             }`}
                           >
