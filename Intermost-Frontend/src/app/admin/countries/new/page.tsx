@@ -138,7 +138,7 @@ export default function NewCountryPage() {
         hero_video: '',
         banner_image: '',
         seo: {
-          title: data.seo_title || `MBBS in ${data.name} - Admission, Fees, Top Universities`,
+          title: data.seo_title || `MBBS in ${data.name} - Admission, Fees, Top Universities & Colleges`,
           description: data.seo_description || data.description.substring(0, 160),
           keywords: data.seo_keywords || [],
         },

@@ -29,7 +29,7 @@ const destinations: MapDestination[] = [
     flagUrl: 'https://flagcdn.com/w80/ru.png',
     coords: { x: 580, y: 150, labelX: 580, labelY: 115 },
     placements: '5,953+ Students Placed',
-    avgFee: '$3,800 / Year (~₹3.2L)',
+    avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
     language: '100% English Medium',
     universities: [
@@ -289,7 +289,7 @@ export default function PlacementsMapSection() {
                           <span className="text-xs font-extrabold text-white">{getDynamicPlacements(dest.id)}</span>
                         </div>
                         <div className="bg-black/30 rounded-xl p-2.5 border border-white/5">
-                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Average Fee</span>
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Starting Tuition Fee</span>
                           <span className="text-xs font-extrabold text-primary-300">{dest.avgFee}</span>
                         </div>
                       </div>
@@ -538,7 +538,7 @@ export default function PlacementsMapSection() {
                         <p className="text-sm font-extrabold text-white mt-1">{getDynamicPlacements(selectedDest.id)}</p>
                       </div>
                       <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
-                        <p className="text-[10px] font-bold text-gray-400 uppercase">Average Fees</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase">Starting Tuition Fee</p>
                         <p className="text-sm font-extrabold text-primary-300 mt-1">{selectedDest.avgFee}</p>
                       </div>
                       <div className="p-3 bg-black/40 rounded-2xl border border-white/5">
@@ -554,11 +554,11 @@ export default function PlacementsMapSection() {
                       </div>
                     </div>
 
-                    {/* Top Universities */}
+                    {/* Top Universities & Colleges */}
                     <div className="space-y-3">
                       <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-1.5">
                         <BookOpen className="w-3.5 h-3.5 text-primary-400" />
-                        Top Recognized Universities
+                        Top Universities & Colleges
                       </p>
                       <div className="space-y-2">
                         {selectedDest.universities.map((uni, idx) => (

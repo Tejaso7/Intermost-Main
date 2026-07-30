@@ -51,7 +51,7 @@ const fallbackCountriesMap: Record<string, Partial<Country>> = {
     faqs: [
       { question: 'Is Russian MBBS degree valid in India?', answer: 'Yes, MBBS degrees from NMC-approved Russian medical universities are valid worldwide and in India after passing NEXT / FMGE.' },
       { question: 'What is the medium of instruction in Russia?', answer: 'The medium of instruction is 100% English for the full 6-year duration.' },
-      { question: 'What is the average cost of studying MBBS in Russia?', answer: 'Average fee starting from 3,500 $ / Year, with complete program starting from 18 Lakhs.' }
+      { question: 'What is the tuition cost of studying MBBS in Russia?', answer: 'Starting tuition fee from $3,500 / Year, with complete program starting from 18 Lakhs.' }
     ]
   },
   georgia: {
@@ -108,7 +108,7 @@ const fallbackCountriesMap: Record<string, Partial<Country>> = {
       title: 'Why Study MBBS in Uzbekistan?',
       description: 'Uzbekistan is a top choice for Indian students offering highly affordable tuition fees, government universities like Andijan State Medical University, and direct flight connectivity from Delhi.',
       highlights: [
-        { title: 'Highly Affordable', description: 'Average fee starting from 3,500 $ / Year.' },
+        { title: 'Highly Affordable', description: 'Starting tuition fee from $3,500 / Year.' },
         { title: 'Indian Mess & Food', description: 'Dedicated Indian mess and accommodation in hostels.' },
         { title: 'Government Universities', description: 'Study in government universities like Andijan State Medical University.' },
         { title: 'Close to India', description: 'Just 3 hours flight time from New Delhi.' }
