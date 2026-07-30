@@ -2280,6 +2280,57 @@ export default function LeadsPage() {
                     </div>
                   </div>
 
+                  {/* State & City Group Links Quick Selector */}
+                  <div className="space-y-1.5 pt-1">
+                    <label className="block text-xs font-semibold text-gray-650 dark:text-gray-400 uppercase tracking-wider">
+                      🗺️ State-Wise WhatsApp Group Invites
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **Maharashtra Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/MAHARASHTRA_MBBS_2026")}
+                        className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-[11px] font-semibold rounded-lg border border-indigo-200 transition-colors flex items-center gap-1"
+                      >
+                        🔵 Maharashtra Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **Uttar Pradesh Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/UP_MBBS_2026")}
+                        className="px-2.5 py-1 bg-orange-50 hover:bg-orange-100 text-orange-700 text-[11px] font-semibold rounded-lg border border-orange-200 transition-colors flex items-center gap-1"
+                      >
+                        🟠 UP Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **Karnataka Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/KARNATAKA_MBBS_2026")}
+                        className="px-2.5 py-1 bg-yellow-50 hover:bg-yellow-100 text-yellow-700 text-[11px] font-semibold rounded-lg border border-yellow-200 transition-colors flex items-center gap-1"
+                      >
+                        🟡 Karnataka Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **Tamil Nadu Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/TAMILNADU_MBBS_2026")}
+                        className="px-2.5 py-1 bg-purple-50 hover:bg-purple-100 text-purple-700 text-[11px] font-semibold rounded-lg border border-purple-200 transition-colors flex items-center gap-1"
+                      >
+                        🟣 Tamil Nadu Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **West Bengal Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/WESTBENGAL_MBBS_2026")}
+                        className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-[11px] font-semibold rounded-lg border border-emerald-200 transition-colors flex items-center gap-1"
+                      >
+                        🟢 West Bengal Group
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWhatsappCampaignMessage("Hello {{name}}! 👋 Welcome from Intermost Study Abroad.\n\nJoin our Official **Rajasthan Medical Aspirants Group** for exclusive MBBS fee plans, brochures & counseling updates:\n\n🔗 https://chat.whatsapp.com/RAJASTHAN_MBBS_2026")}
+                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold rounded-lg border border-rose-200 transition-colors flex items-center gap-1"
+                      >
+                        🔴 Rajasthan Group
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Body Content */}
                   <div className="space-y-2 flex flex-col">
                     <div className="flex justify-between items-center">

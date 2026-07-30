@@ -423,3 +423,39 @@ class WhatsAppCampaignView(APIView):
             'failed_count': failed_count,
             'errors': errors
         })
+
+
+class WhatsAppGroupLinksView(APIView):
+    """
+    Get and Save State/City WhatsApp Group Links
+    """
+    permission_classes = [IsAdminUser]
+
+    def get(self, request):
+        collection = get_collection('whatsapp_group_links')
+        doc = collection.find_one({'_id': 'global_links'})
+        default_links = {
+            'Maharashtra': 'https://chat.whatsapp.com/MAHARASHTRA_MBBS_2026',
+            'Karnataka': 'https://chat.whatsapp.com/KARNATAKA_MBBS_2026',
+            'Uttar Pradesh': 'https://chat.whatsapp.com/UP_MBBS_2026',
+            'Tamil Nadu': 'https://chat.whatsapp.com/TAMILNADU_MBBS_2026',
+            'West Bengal': 'https://chat.whatsapp.com/WESTBENGAL_MBBS_2026',
+            'Rajasthan': 'https://chat.whatsapp.com/RAJASTHAN_MBBS_2026',
+            'General': 'https://chat.whatsapp.com/INDIA_MBBS_2026'
+        }
+        links = doc.get('links', default_links) if doc else default_links
+        return Response(links)
+
+    def post(self, request):
+        links = request.data.get('links', {})
+        if not isinstance(links, dict):
+            return Response({'error': 'Expected links dictionary'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        collection = get_collection('whatsapp_group_links')
+        collection.update_one(
+            {'_id': 'global_links'},
+            {'$set': {'links': links, 'updated_at': datetime.utcnow()}},
+            upsert=True
+        )
+        return Response({'message': 'State & City group links updated successfully', 'links': links})
+

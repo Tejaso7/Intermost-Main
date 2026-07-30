@@ -548,6 +548,16 @@ export const messagesApi = {
     return response.data;
   },
 
+  getGroupLinks: async () => {
+    const response = await api.get<Record<string, string>>('/whatsapp/group-links/');
+    return response.data;
+  },
+
+  saveGroupLinks: async (links: Record<string, string>) => {
+    const response = await api.post<{ message: string; links: Record<string, string> }>('/whatsapp/group-links/', { links });
+    return response.data;
+  },
+
   sendWhatsAppCampaign: async (inquiryIds: string[], message: string, selectAll: boolean = false) => {
     const response = await api.post<{ message: string; status: string; sent_count: number; failed_count: number; errors?: string[] }>('/whatsapp/campaign/', {
       inquiry_ids: inquiryIds,
