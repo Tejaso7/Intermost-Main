@@ -467,35 +467,35 @@ export default function PlacementsMapSection() {
                           className="group relative flex flex-col items-center cursor-pointer focus:outline-none"
                           aria-label={`Select ${dest.name}`}
                         >
-                          {/* Pulse Ring */}
-                          <span
-                            className={`absolute inset-0 -m-3 rounded-full opacity-60 motion-reduce:animate-none ${
-                              isSelected ? 'bg-primary-400 animate-ping' : 'bg-gray-500 group-hover:bg-primary-400/50'
-                            }`}
-                            style={{ animationDuration: '2.5s' }}
-                          />
+                          {/* Flag Circle Pin Container */}
+                          <div className="relative flex items-center justify-center">
+                            {/* Pulse Ring ONLY on selected pin */}
+                            {isSelected && (
+                              <span className="absolute -inset-1 rounded-full bg-primary-400 opacity-75 animate-ping" />
+                            )}
 
-                          {/* Flag Circle Pin */}
-                          <div
-                            className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full overflow-hidden flex items-center justify-center transition-all shadow-xl border-2 bg-gray-900 ${
-                              isSelected
-                                ? 'scale-125 border-primary-400 ring-4 ring-primary-500/30'
-                                : 'border-white/30 hover:scale-110 hover:border-white'
-                            }`}
-                          >
-                            <img
-                              src={dest.flagUrl}
-                              alt={`${dest.name} flag`}
-                              className="w-full h-full object-cover select-none pointer-events-none"
-                            />
+                            {/* Flag Circle */}
+                            <div
+                              className={`w-6 h-6 sm:w-7 sm:h-7 rounded-full overflow-hidden flex items-center justify-center transition-all shadow-md border-2 bg-gray-900 relative z-10 ${
+                                isSelected
+                                  ? 'scale-125 border-primary-400 ring-2 ring-primary-400/50'
+                                  : 'border-white/70 opacity-90 group-hover:opacity-100 group-hover:scale-115 group-hover:border-white'
+                              }`}
+                            >
+                              <img
+                                src={dest.flagUrl}
+                                alt={`${dest.name} flag`}
+                                className="w-full h-full object-cover select-none pointer-events-none"
+                              />
+                            </div>
                           </div>
 
-                          {/* Unambiguous Country Label */}
+                          {/* Compact Country Label */}
                           <span
-                            className={`mt-1 font-extrabold text-[10px] sm:text-xs uppercase tracking-wider py-0.5 px-2 rounded-lg border shadow-lg whitespace-nowrap transition-all ${
+                            className={`mt-1 font-bold text-[9px] sm:text-[10px] uppercase tracking-wider py-0.5 px-1.5 rounded-md border shadow-md whitespace-nowrap transition-all ${
                               isSelected
-                                ? 'bg-primary-600 text-white border-primary-300'
-                                : 'bg-gray-900/90 text-gray-200 border-gray-700 group-hover:bg-black group-hover:text-white'
+                                ? 'bg-primary-600 text-white border-primary-400 shadow-primary-900/50'
+                                : 'bg-gray-950/90 text-gray-300 border-white/10 group-hover:bg-black group-hover:text-white group-hover:border-white/30'
                             }`}
                           >
                             {dest.name}
