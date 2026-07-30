@@ -33,6 +33,8 @@ const destinations: MapDestination[] = [
     visaRate: '99% Success',
     language: '100% English Medium',
     universities: [
+      'Yaroslavl State Medical University',
+      'Izhevsk State Medical Academy',
       'Voronezh State Medical University',
       'Bashkir State Medical University',
       'Crimea Federal University',
@@ -51,8 +53,10 @@ const destinations: MapDestination[] = [
     visaRate: '99% Success',
     language: 'European Curriculum',
     universities: [
-      'East European University',
       'Alte University',
+      'Geomedi Medical University',
+      'Georgian National University (SEU)',
+      'East European University',
       'Tbilisi State Medical University',
       'Caucasus International University'
     ],
@@ -71,7 +75,8 @@ const destinations: MapDestination[] = [
     universities: [
       'Andijan State Medical Institute',
       'Tashkent State Medical University',
-      'Samarkand State Medical University'
+      'Samarkand State Medical University',
+      'Bukhara State Medical Institute'
     ],
     description: 'Ultra-budget medical study with Indian food mess, high safety index, and close geographic proximity to India.'
   },
@@ -120,6 +125,7 @@ const destinations: MapDestination[] = [
     visaRate: '99% Success',
     language: 'English Medium',
     universities: [
+      'Tajik National University',
       'Avicenna Tajik State Medical University'
     ],
     description: 'Affordable medical university with government recognition and comprehensive hostel facilities.'
