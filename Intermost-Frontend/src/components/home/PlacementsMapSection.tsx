@@ -27,7 +27,7 @@ const destinations: MapDestination[] = [
     name: 'Russia',
     slug: 'russia',
     flagUrl: 'https://flagcdn.com/w80/ru.png',
-    coords: { x: 580, y: 150, labelX: 580, labelY: 115 },
+    coords: { x: 520, y: 130, labelX: 520, labelY: 95 },
     placements: '5,953+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -47,7 +47,7 @@ const destinations: MapDestination[] = [
     name: 'Georgia',
     slug: 'georgia',
     flagUrl: 'https://flagcdn.com/w80/ge.png',
-    coords: { x: 490, y: 220, labelX: 490, labelY: 185 },
+    coords: { x: 410, y: 230, labelX: 410, labelY: 195 },
     placements: '1,250+ Students Placed',
     avgFee: '$5,000 / Year (~₹4.2L)',
     visaRate: '99% Success',
@@ -67,7 +67,7 @@ const destinations: MapDestination[] = [
     name: 'Uzbekistan',
     slug: 'uzbekistan',
     flagUrl: 'https://flagcdn.com/w80/uz.png',
-    coords: { x: 620, y: 235, labelX: 620, labelY: 270 },
+    coords: { x: 550, y: 250, labelX: 550, labelY: 285 },
     placements: '1,480+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -85,7 +85,7 @@ const destinations: MapDestination[] = [
     name: 'Kazakhstan',
     slug: 'kazakhstan',
     flagUrl: 'https://flagcdn.com/w80/kz.png',
-    coords: { x: 670, y: 190, labelX: 670, labelY: 155 },
+    coords: { x: 630, y: 170, labelX: 630, labelY: 135 },
     placements: '1,120+ Students Placed',
     avgFee: '$3,600 / Year (~₹3.0L)',
     visaRate: '99% Success',
@@ -96,23 +96,6 @@ const destinations: MapDestination[] = [
       'West Kazakhstan Marat Ospanov Medical University'
     ],
     description: '5-year compact MBBS program compliant with latest NMC guidelines & clinical hospital rotations.'
-  },
-  {
-    id: 'nepal',
-    name: 'Nepal',
-    slug: 'nepal',
-    flagUrl: 'https://flagcdn.com/w80/np.png',
-    coords: { x: 740, y: 320, labelX: 740, labelY: 355 },
-    placements: '850+ Students Placed',
-    avgFee: '₹55 Lakhs (Package)',
-    visaRate: '100% Success (No Visa Needed)',
-    language: 'English & Hindi Friendly',
-    universities: [
-      'Chitwan Medical College',
-      'Kathmandu Medical College',
-      'B&C Medical College'
-    ],
-    description: 'Similar pattern to Indian MBBS, no passport/visa hassle for Indian citizens, and immediate proximity.'
   },
   {
     id: 'tajikistan',
@@ -131,11 +114,28 @@ const destinations: MapDestination[] = [
     description: 'Affordable medical university with government recognition and comprehensive hostel facilities.'
   },
   {
+    id: 'nepal',
+    name: 'Nepal',
+    slug: 'nepal',
+    flagUrl: 'https://flagcdn.com/w80/np.png',
+    coords: { x: 740, y: 325, labelX: 740, labelY: 360 },
+    placements: '850+ Students Placed',
+    avgFee: '₹55 Lakhs (Package)',
+    visaRate: '100% Success (No Visa Needed)',
+    language: 'English & Hindi Friendly',
+    universities: [
+      'Chitwan Medical College',
+      'Kathmandu Medical College',
+      'B&C Medical College'
+    ],
+    description: 'Similar pattern to Indian MBBS, no passport/visa hassle for Indian citizens, and immediate proximity.'
+  },
+  {
     id: 'vietnam',
     name: 'Vietnam',
     slug: 'vietnam',
     flagUrl: 'https://flagcdn.com/w80/vn.png',
-    coords: { x: 800, y: 340, labelX: 800, labelY: 375 },
+    coords: { x: 840, y: 380, labelX: 840, labelY: 415 },
     placements: '350+ Students Placed',
     avgFee: '$4,200 / Year (~₹3.5L)',
     visaRate: '99% Success',
@@ -150,7 +150,7 @@ const destinations: MapDestination[] = [
 
 export default function PlacementsMapSection() {
   const [selectedDest, setSelectedDest] = useState<MapDestination>(destinations[0]);
-  const [viewMode, setViewMode] = useState<'cards' | 'map'>('cards');
+  const [viewMode, setViewMode] = useState<'cards' | 'map'>('map');
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [siteStats, setSiteStats] = useState({
     students_placed: 5953,
