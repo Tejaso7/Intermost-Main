@@ -27,7 +27,7 @@ const destinations: MapDestination[] = [
     name: 'Russia',
     slug: 'russia',
     flagUrl: 'https://flagcdn.com/w80/ru.png',
-    coords: { x: 580, y: 120, labelPos: 'top' },
+    coords: { x: 590, y: 120, labelPos: 'top' },
     placements: '5,953+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -47,7 +47,7 @@ const destinations: MapDestination[] = [
     name: 'Georgia',
     slug: 'georgia',
     flagUrl: 'https://flagcdn.com/w80/ge.png',
-    coords: { x: 505, y: 220, labelPos: 'left' },
+    coords: { x: 540, y: 220, labelPos: 'left' },
     placements: '1,250+ Students Placed',
     avgFee: '$5,000 / Year (~₹4.2L)',
     visaRate: '99% Success',
@@ -67,7 +67,7 @@ const destinations: MapDestination[] = [
     name: 'Uzbekistan',
     slug: 'uzbekistan',
     flagUrl: 'https://flagcdn.com/w80/uz.png',
-    coords: { x: 590, y: 215, labelPos: 'left' },
+    coords: { x: 630, y: 215, labelPos: 'left' },
     placements: '1,480+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -85,7 +85,7 @@ const destinations: MapDestination[] = [
     name: 'Kazakhstan',
     slug: 'kazakhstan',
     flagUrl: 'https://flagcdn.com/w80/kz.png',
-    coords: { x: 620, y: 165, labelPos: 'top' },
+    coords: { x: 670, y: 165, labelPos: 'top' },
     placements: '1,120+ Students Placed',
     avgFee: '$3,600 / Year (~₹3.0L)',
     visaRate: '99% Success',
@@ -102,7 +102,7 @@ const destinations: MapDestination[] = [
     name: 'Tajikistan',
     slug: 'tajikistan',
     flagUrl: 'https://flagcdn.com/w80/tj.png',
-    coords: { x: 630, y: 235, labelPos: 'right' },
+    coords: { x: 685, y: 235, labelPos: 'right' },
     placements: '480+ Students Placed',
     avgFee: '$3,500 / Year (~₹2.9L)',
     visaRate: '99% Success',
@@ -118,7 +118,7 @@ const destinations: MapDestination[] = [
     name: 'Nepal',
     slug: 'nepal',
     flagUrl: 'https://flagcdn.com/w80/np.png',
-    coords: { x: 720, y: 275, labelPos: 'top' },
+    coords: { x: 745, y: 275, labelPos: 'right' },
     placements: '850+ Students Placed',
     avgFee: '₹55 Lakhs (Package)',
     visaRate: '100% Success (No Visa Needed)',
@@ -135,7 +135,7 @@ const destinations: MapDestination[] = [
     name: 'Vietnam',
     slug: 'vietnam',
     flagUrl: 'https://flagcdn.com/w80/vn.png',
-    coords: { x: 790, y: 325, labelPos: 'bottom' },
+    coords: { x: 815, y: 325, labelPos: 'bottom' },
     placements: '350+ Students Placed',
     avgFee: '$4,200 / Year (~₹3.5L)',
     visaRate: '99% Success',
@@ -415,11 +415,11 @@ export default function PlacementsMapSection() {
                   </defs>
                   <rect width="100%" height="100%" fill="url(#grid-dots)" />
 
-                  {/* Flight Paths from India (Source: 700, 290) */}
+                  {/* Flight Paths from India (Source: 730, 305) */}
                   {destinations.map((dest) => (
                     <g key={`path-${dest.id}`}>
                       <path
-                        d={`M 700 290 Q ${(700 + dest.coords.x) / 2} ${(290 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
+                        d={`M 730 305 Q ${(730 + dest.coords.x) / 2} ${(305 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
                         fill="none"
                         stroke={selectedDest.id === dest.id ? '#38bdf8' : 'rgba(255,255,255,0.15)'}
                         strokeWidth={selectedDest.id === dest.id ? 2.5 : 1}
@@ -430,21 +430,21 @@ export default function PlacementsMapSection() {
                         <animateMotion
                           dur="3.5s"
                           repeatCount="indefinite"
-                          path={`M 700 290 Q ${(700 + dest.coords.x) / 2} ${(290 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
+                          path={`M 730 305 Q ${(730 + dest.coords.x) / 2} ${(305 + dest.coords.y) / 2 - 35} ${dest.coords.x} ${dest.coords.y}`}
                         />
                       </circle>
                     </g>
                   ))}
 
                   {/* India Source Marker */}
-                  <circle cx="700" cy="290" r="8" fill="#0284c7" className="motion-reduce:animate-none animate-pulse" />
-                  <circle cx="700" cy="290" r="3" fill="#e0f2fe" />
+                  <circle cx="730" cy="305" r="8" fill="#0284c7" className="motion-reduce:animate-none animate-pulse" />
+                  <circle cx="730" cy="305" r="3" fill="#e0f2fe" />
                 </svg>
 
                 {/* Country Marker Buttons */}
                 <div className="absolute inset-0 z-20 pointer-events-auto">
                   {/* India Label */}
-                  <div className="absolute flex items-center gap-1.5 pointer-events-none -translate-x-1/2 -translate-y-1/2" style={{ left: '70%', top: '48.3%' }}>
+                  <div className="absolute flex items-center gap-1.5 pointer-events-none -translate-x-1/2 -translate-y-1/2" style={{ left: '73%', top: '50.8%' }}>
                     <div className="w-5 h-5 rounded-full overflow-hidden border border-white/30 shadow-md">
                       <img src="https://flagcdn.com/w40/in.png" alt="India flag" className="w-full h-full object-cover" />
                     </div>
