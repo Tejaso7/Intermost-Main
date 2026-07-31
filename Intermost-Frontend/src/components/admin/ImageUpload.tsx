@@ -44,9 +44,9 @@ export default function ImageUpload({
       return;
     }
 
-    // Validate file size (max 50MB)
-    if (file.size > 50 * 1024 * 1024) {
-      toast.error('File size must be less than 50MB');
+    // Validate file size (max 500MB)
+    if (file.size > 500 * 1024 * 1024) {
+      toast.error('File size must be less than 500MB');
       return;
     }
 
@@ -182,7 +182,7 @@ export default function ImageUpload({
                     </p>
                     {!isCompact && (
                       <p className="text-xs text-gray-400 mt-1">
-                        {accept.includes('video') ? 'MP4, WebM, MOV' : 'PNG, JPG, GIF, WebP'} up to 50MB
+                        {accept.includes('video') ? 'MP4, WebM, MOV' : 'PNG, JPG, GIF, WebP, SVG'}
                       </p>
                     )}
                   </>

@@ -80,9 +80,7 @@ class FileUploadView(APIView):
             if ext not in allowed_extensions:
                 continue
             
-            # Validate file size (max 50MB)
-            if file.size > 50 * 1024 * 1024:
-                continue
+
             
             # Generate unique filename
             filename = generate_filename(file.name)
