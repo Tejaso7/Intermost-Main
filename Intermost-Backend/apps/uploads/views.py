@@ -87,32 +87,20 @@ class FileUploadView(APIView):
             # Generate unique filename
             filename = generate_filename(file.name)
             
-            # Save file. If S3 is default_storage, use S3 for ALL categories (including videos).
-            # If local fallback is needed, use base_url='/media/' so local files never output S3 URLs.
             try:
                 save_path = f"uploads/{category}/{filename}"
                 from django.conf import settings as django_settings
                 
-                is_s3 = getattr(django_settings, 'DEFAULT_FILE_STORAGE', '').endswith('S3Boto3Storage')
-                
-                if is_s3:
+                # Save file using default_storage (S3 when configured). Fallback to local storage if S3 fails.
+                try:
                     saved_file_path = default_storage.save(save_path, file)
                     url_path = default_storage.url(saved_file_path)
-                elif category == 'videos' or ext in ['.mp4', '.webm', '.mov']:
+                except Exception as storage_err:
+                    logger.warning(f"Storage upload failed, falling back to local storage: {storage_err}")
                     from django.core.files.storage import FileSystemStorage
                     local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url='/media/')
                     saved_file_path = local_storage.save(save_path, file)
                     url_path = local_storage.url(saved_file_path)
-                else:
-                    try:
-                        saved_file_path = default_storage.save(save_path, file)
-                        url_path = default_storage.url(saved_file_path)
-                    except Exception as storage_err:
-                        logger.warning(f"Storage upload failed, falling back to local storage: {storage_err}")
-                        from django.core.files.storage import FileSystemStorage
-                        local_storage = FileSystemStorage(location=django_settings.MEDIA_ROOT, base_url='/media/')
-                        saved_file_path = local_storage.save(save_path, file)
-                        url_path = local_storage.url(saved_file_path)
                 
                 # Ensure local URL starts with a slash
                 if not (url_path.startswith('http://') or url_path.startswith('https://')) and not url_path.startswith('/'):

@@ -32,11 +32,14 @@ export default function ImageUpload({
     if (!file) return;
 
     // Validate file type
-    const allowedTypes = accept.includes('video')
-      ? ['video/mp4', 'video/webm', 'video/mov']
-      : ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const isVideoFile = file.type.startsWith('video/') || /\.(mp4|webm|mov)$/i.test(file.name);
+    const isImageFile = file.type.startsWith('image/') || /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(file.name);
+    const isDocFile = file.type.includes('pdf') || file.type.includes('word') || /\.(pdf|doc|docx)$/i.test(file.name);
     
-    if (!allowedTypes.some((type) => file.type.includes(type.split('/')[1]))) {
+    if (accept.includes('video') && !isVideoFile) {
+      toast.error('Invalid video file. Allowed formats: MP4, WebM, MOV');
+      return;
+    } else if (accept.includes('image') && !isImageFile && !isDocFile) {
       toast.error(`Invalid file type. Allowed: ${accept}`);
       return;
     }
@@ -97,7 +100,7 @@ export default function ImageUpload({
     }
   }, [onChange]);
 
-  const isVideo = accept.includes('video') || value?.includes('/video/');
+  const isVideo = accept.includes('video') || value?.includes('/video/') || value?.includes('/videos/') || /\.(mp4|webm|mov)(\?.*)?$/i.test(value || '');
 
   return (
     <div className={className}>
