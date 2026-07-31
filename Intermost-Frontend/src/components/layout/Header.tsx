@@ -145,7 +145,7 @@ export default function Header() {
                 >
                   <span>{item.name}</span>
                   {item.submenu && (
-                    <ChevronDown className="w-4 h-4" />
+                    <ChevronDown className="w-4 h-4" aria-hidden="true" />
                   )}
                 </Link>
 
@@ -195,7 +195,7 @@ export default function Header() {
                   : 'text-white hover:text-primary-200'
               )}
             >
-              <Phone className="w-5 h-5" />
+              <Phone className="w-5 h-5" aria-hidden="true" />
               <span>{phoneNumber}</span>
             </a>
             <Link
@@ -208,18 +208,21 @@ export default function Header() {
 
           {/* Mobile Menu Toggle */}
           <button
+            type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={isMobileMenuOpen}
             className={cn(
-              'lg:hidden p-2 rounded-lg transition-colors duration-300',
+              'lg:hidden p-2 rounded-lg transition-colors duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none',
               useSolidHeader
                 ? 'text-gray-700 hover:bg-gray-100'
                 : 'text-white hover:bg-white/10'
             )}
           >
             {isMobileMenuOpen ? (
-              <X className="w-6 h-6" />
+              <X className="w-6 h-6" aria-hidden="true" />
             ) : (
-              <Menu className="w-6 h-6" />
+              <Menu className="w-6 h-6" aria-hidden="true" />
             )}
           </button>
         </div>
@@ -248,10 +251,12 @@ export default function Header() {
                 <div className="flex items-center justify-between p-4 border-b border-gray-100/50">
                   <span className="font-bold text-lg text-gray-900">Menu</span>
                   <button
+                    type="button"
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="p-2 rounded-full bg-gray-100/50 text-gray-700 hover:bg-gray-200 transition-colors"
+                    aria-label="Close navigation menu"
+                    className="p-2 rounded-full bg-gray-100/50 text-gray-700 hover:bg-gray-200 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                   >
-                    <X className="w-5 h-5" />
+                    <X className="w-5 h-5" aria-hidden="true" />
                   </button>
                 </div>
 
@@ -262,7 +267,7 @@ export default function Header() {
                         <details className="group">
                           <summary className="flex items-center justify-between py-3 px-4 text-gray-700 text-lg font-medium hover:bg-primary-50 hover:text-primary-600 rounded-xl transition-colors cursor-pointer list-none">
                             {item.name}
-                            <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
+                            <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" aria-hidden="true" />
                           </summary>
                           <div className="mt-2 ml-4 space-y-1 border-l-2 border-primary-100 pl-4">
                             {item.submenu.map((subItem) => (
@@ -305,7 +310,7 @@ export default function Header() {
                       href={`tel:${phoneNumber.replace(/\s/g, '')}`}
                       className="flex items-center justify-center space-x-2 text-gray-700 hover:text-primary-600 font-medium py-2"
                     >
-                      <Phone className="w-5 h-5" />
+                      <Phone className="w-5 h-5" aria-hidden="true" />
                       <span>{phoneNumber}</span>
                     </a>
                   </div>

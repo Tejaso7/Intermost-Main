@@ -79,7 +79,7 @@ export default function WhyChooseUs() {
   ];
 
   return (
-    <section className="py-24 bg-gradient-to-b from-gray-50 to-white relative overflow-hidden">
+    <section className="py-20 sm:py-24 bg-gradient-to-b from-gray-50 via-white to-gray-50 bg-dot-grid relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-100 rounded-full blur-3xl opacity-50" />

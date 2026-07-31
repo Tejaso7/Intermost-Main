@@ -288,7 +288,7 @@ export default function Hero() {
                 className="btn-primary group shadow-xl shadow-primary-600/35 px-8 py-3.5 text-center flex items-center justify-center gap-2"
               >
                 Apply Now
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" />
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform duration-300" aria-hidden="true" />
               </Link>
               <Link
                 href="/countries"
@@ -299,9 +299,9 @@ export default function Hero() {
               <button
                 type="button"
                 onClick={() => setIsDownloadModalOpen(true)}
-                className="btn-white px-8 py-3.5 text-center flex items-center justify-center border border-white/10 gap-2 cursor-pointer bg-white/5 hover:bg-white/10 text-white"
+                className="btn-white px-8 py-3.5 text-center flex items-center justify-center border border-white/10 gap-2 cursor-pointer bg-white/5 hover:bg-white/10 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
-                <FileText className="w-4 h-4 text-primary-400" />
+                <FileText className="w-4 h-4 text-primary-400" aria-hidden="true" />
                 Download Brochure
               </button>
             </motion.div>
@@ -323,7 +323,7 @@ export default function Hero() {
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
                   <div className="w-10 h-10 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
-                    <Sparkles className="w-5 h-5 text-white" />
+                    <Sparkles className="w-5 h-5 text-white" aria-hidden="true" />
                   </div>
                   <div>
                     <h3 className="font-bold text-sm sm:text-base tracking-wide flex items-center gap-1.5">
@@ -345,80 +345,96 @@ export default function Hero() {
                       className="space-y-4"
                     >
                       <div>
-                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
+                        <label htmlFor="hero-target-country" className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
                           Target Destination
                         </label>
-                        <select
-                          value={targetCountry}
-                          onChange={(e) => setTargetCountry(e.target.value)}
-                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
-                          required
-                        >
-                          <option className="bg-gray-900" value="">Select Country</option>
-                          <option className="bg-gray-900" value="Russia">Russia</option>
-                          <option className="bg-gray-900" value="Georgia">Georgia</option>
-                          <option className="bg-gray-900" value="Uzbekistan">Uzbekistan</option>
-                          <option className="bg-gray-900" value="Kazakhstan">Kazakhstan</option>
-                          <option className="bg-gray-900" value="Nepal">Nepal</option>
-                          <option className="bg-gray-900" value="Tajikistan">Tajikistan</option>
-                        </select>
+                        <div className="relative">
+                          <select
+                            id="hero-target-country"
+                            value={targetCountry}
+                            onChange={(e) => setTargetCountry(e.target.value)}
+                            className="w-full bg-white/5 border border-white/15 rounded-xl pr-10 pl-4 py-3 text-white placeholder-gray-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
+                            required
+                          >
+                            <option className="bg-gray-900" value="">Select Country</option>
+                            <option className="bg-gray-900" value="Russia">Russia</option>
+                            <option className="bg-gray-900" value="Georgia">Georgia</option>
+                            <option className="bg-gray-900" value="Uzbekistan">Uzbekistan</option>
+                            <option className="bg-gray-900" value="Kazakhstan">Kazakhstan</option>
+                            <option className="bg-gray-900" value="Nepal">Nepal</option>
+                            <option className="bg-gray-900" value="Tajikistan">Tajikistan</option>
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                        </div>
                       </div>
 
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
+                          <label htmlFor="hero-neet-qualified" className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
                             NEET Qualified?
                           </label>
-                          <select
-                            value={neetQualified}
-                            onChange={(e) => setNeetQualified(e.target.value)}
-                            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
-                            required
-                          >
-                            <option className="bg-gray-900" value="">Select</option>
-                            <option className="bg-gray-900" value="Yes">Yes</option>
-                            <option className="bg-gray-900" value="No">No</option>
-                          </select>
+                          <div className="relative">
+                            <select
+                              id="hero-neet-qualified"
+                              value={neetQualified}
+                              onChange={(e) => setNeetQualified(e.target.value)}
+                              className="w-full bg-white/5 border border-white/15 rounded-xl pr-10 pl-4 py-3 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
+                              required
+                            >
+                              <option className="bg-gray-900" value="">Select</option>
+                              <option className="bg-gray-900" value="Yes">Yes</option>
+                              <option className="bg-gray-900" value="No">No</option>
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                          </div>
                         </div>
                         <div>
-                          <label className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
+                          <label htmlFor="hero-pcb-marks" className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
                             12th PCB Marks
                           </label>
-                          <select
-                            value={pcbMarks}
-                            onChange={(e) => setPcbMarks(e.target.value)}
-                            className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
-                            required
-                          >
-                            <option className="bg-gray-900" value="">Select</option>
-                            <option className="bg-gray-900" value="50%+ Marks">50% +</option>
-                            <option className="bg-gray-900" value="Below 50%">Below 50%</option>
-                          </select>
+                          <div className="relative">
+                            <select
+                              id="hero-pcb-marks"
+                              value={pcbMarks}
+                              onChange={(e) => setPcbMarks(e.target.value)}
+                              className="w-full bg-white/5 border border-white/15 rounded-xl pr-10 pl-4 py-3 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
+                              required
+                            >
+                              <option className="bg-gray-900" value="">Select</option>
+                              <option className="bg-gray-900" value="50%+ Marks">50% +</option>
+                              <option className="bg-gray-900" value="Below 50%">Below 50%</option>
+                            </select>
+                            <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                          </div>
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
+                        <label htmlFor="hero-budget" className="block text-[11px] uppercase tracking-wider font-semibold text-gray-300 mb-1.5">
                           Annual Tuition Budget
                         </label>
-                        <select
-                          value={budget}
-                          onChange={(e) => setBudget(e.target.value)}
-                          className="w-full bg-white/5 border border-white/15 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary-400 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
-                          required
-                        >
-                          <option className="bg-gray-900" value="">Select Budget Range</option>
-                          <option className="bg-gray-900" value="Low">Low (&lt; $4,000 / year)</option>
-                          <option className="bg-gray-900" value="Medium">Medium ($4,000 - $6,000 / year)</option>
-                          <option className="bg-gray-900" value="High">Premium ($6,000+ / year)</option>
-                        </select>
+                        <div className="relative">
+                          <select
+                            id="hero-budget"
+                            value={budget}
+                            onChange={(e) => setBudget(e.target.value)}
+                            className="w-full bg-white/5 border border-white/15 rounded-xl pr-10 pl-4 py-3 text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:bg-white/10 transition-all text-xs sm:text-sm appearance-none cursor-pointer"
+                            required
+                          >
+                            <option className="bg-gray-900" value="">Select Budget Range</option>
+                            <option className="bg-gray-900" value="Low">Low (&lt; $4,000 / year)</option>
+                            <option className="bg-gray-900" value="Medium">Medium ($4,000 - $6,000 / year)</option>
+                            <option className="bg-gray-900" value="High">Premium ($6,000+ / year)</option>
+                          </select>
+                          <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                        </div>
                       </div>
 
                       <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 mt-6 text-sm"
+                        className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-semibold py-3.5 rounded-xl shadow-lg transition-all duration-300 transform active:scale-95 flex items-center justify-center gap-2 mt-6 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                       >
-                        <Sparkles className="w-4.5 h-4.5" />
+                        <Sparkles className="w-4.5 h-4.5" aria-hidden="true" />
                         Check Admission Match
                       </button>
                     </motion.form>
@@ -435,7 +451,7 @@ export default function Hero() {
                     >
                       <div className="relative">
                         <div className="w-16 h-16 border-4 border-primary-500/20 border-t-primary-400 rounded-full animate-spin" />
-                        <Sparkles className="w-6 h-6 text-secondary-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" />
+                        <Sparkles className="w-6 h-6 text-secondary-400 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 animate-pulse" aria-hidden="true" />
                       </div>
                       <div className="space-y-2 max-w-xs">
                         <p className="text-sm font-semibold tracking-wide text-white">{steps[calculationStep]}</p>
@@ -463,10 +479,12 @@ export default function Hero() {
                       <div className="flex items-center justify-between">
                         <span className="text-xs uppercase tracking-wider font-bold text-gray-300">AI Calculations</span>
                         <button
+                          type="button"
                           onClick={handleReset}
-                          className="text-xs text-primary-300 hover:text-primary-200 flex items-center gap-1 font-semibold transition"
+                          aria-label="Recheck admission match"
+                          className="text-xs text-primary-300 hover:text-primary-200 flex items-center gap-1 font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded"
                         >
-                          <RefreshCw className="w-3 h-3" /> Recheck
+                          <RefreshCw className="w-3 h-3" aria-hidden="true" /> Recheck
                         </button>
                       </div>
 
@@ -475,7 +493,7 @@ export default function Hero() {
                         <div className="relative w-20 h-20 flex-shrink-0 flex items-center justify-center">
                           {/* Inner radial gradient shadow */}
                           <div className="absolute inset-0 bg-gradient-to-tr from-primary-500/10 to-secondary-500/10 rounded-full blur-sm" />
-                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36" aria-hidden="true">
                             <path
                               className="text-white/10"
                               strokeWidth="3"
@@ -520,7 +538,7 @@ export default function Hero() {
                       {matchResult.universities.length > 0 && (
                         <div className="space-y-2.5">
                           <p className="text-[11px] uppercase tracking-wider font-semibold text-gray-300 flex items-center gap-1">
-                            <GraduationCap className="w-3.5 h-3.5 text-primary-400" />
+                            <GraduationCap className="w-3.5 h-3.5 text-primary-400" aria-hidden="true" />
                             Best Match Universities
                           </p>
                           <div className="space-y-2">
@@ -530,7 +548,7 @@ export default function Hero() {
                                 className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 text-xs sm:text-sm hover:bg-white/10 transition"
                               >
                                 <span className="font-medium text-gray-200 truncate pr-2">{uni}</span>
-                                <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                                <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" aria-hidden="true" />
                               </div>
                             ))}
                           </div>
@@ -544,7 +562,7 @@ export default function Hero() {
                             href="/contact"
                             className="w-full bg-amber-500 hover:bg-amber-600 text-gray-900 font-bold py-3 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-center text-xs sm:text-sm"
                           >
-                            <AlertTriangle className="w-4.5 h-4.5" />
+                            <AlertTriangle className="w-4.5 h-4.5" aria-hidden="true" />
                             Request Manual Counsel Review
                           </Link>
                         ) : (
@@ -552,7 +570,7 @@ export default function Hero() {
                             href={`/apply?country=${targetCountry}`}
                             className="w-full bg-gradient-to-r from-primary-500 to-secondary-500 hover:from-primary-600 hover:to-secondary-600 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 text-center text-xs sm:text-sm"
                           >
-                            <CheckCircle className="w-4.5 h-4.5" />
+                            <CheckCircle className="w-4.5 h-4.5" aria-hidden="true" />
                             Lock Verified Seat Allocation
                           </Link>
                         )}
@@ -572,10 +590,11 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.2, duration: 0.6 }}
           onClick={handleScrollDown}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/50 hover:text-white transition-colors cursor-pointer group z-20"
+          aria-label="Explore homepage sections"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center text-white/50 hover:text-white transition-colors cursor-pointer group z-20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-lg p-1"
         >
           <span className="text-xs mb-1.5 tracking-wider font-light group-hover:translate-y-0.5 transition-transform">EXPLORE OPTIONS</span>
-          <ChevronDown className="w-5 h-5 animate-bounce text-primary-400" />
+          <ChevronDown className="w-5 h-5 animate-bounce text-primary-400" aria-hidden="true" />
         </motion.button>
       </div>
       

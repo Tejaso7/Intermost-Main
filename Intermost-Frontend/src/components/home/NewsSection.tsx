@@ -49,6 +49,7 @@ export default function NewsSection() {
   const [news, setNews] = useState<News[]>(fallbackNews);
   const [loading, setLoading] = useState(true);
   const [playingVideoId, setPlayingVideoId] = useState<string | null>(null);
+  const [isMarqueePaused, setIsMarqueePaused] = useState(false);
 
   const getYoutubeId = (url: string) => {
     if (!url) return null;
@@ -84,7 +85,7 @@ export default function NewsSection() {
   const gridNews = news.filter((n) => n.media_type !== 'marquee').slice(0, 6);
 
   return (
-    <section id="news-section" className="py-16 sm:py-20 md:py-24 bg-gray-50">
+    <section id="news-section" className="py-16 sm:py-20 md:py-24 bg-gray-50/80">
       <div className="container-custom">
         {/* Section Header */}
         <motion.div
@@ -102,7 +103,7 @@ export default function NewsSection() {
           </p>
         </motion.div>
 
-        {/* Marquee Banner */}
+        {/* Marquee Banner with Pause/Play Toggle & Edge Fade Mask */}
         {loading ? (
           <div className="bg-gray-200 h-10 rounded-xl mb-8 animate-pulse border border-gray-300/40" />
         ) : (
@@ -111,24 +112,35 @@ export default function NewsSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white py-2 sm:py-3 rounded-lg sm:rounded-xl mb-8 sm:mb-10 overflow-hidden"
+              className="bg-gradient-to-r from-primary-600 to-secondary-500 text-white py-2.5 sm:py-3.5 rounded-xl mb-8 sm:mb-10 overflow-hidden relative group flex items-center"
             >
-              <div className="animate-marquee whitespace-nowrap text-xs sm:text-sm md:text-base">
-                {marqueeNews.map((item, index) => (
-                  <span key={item._id} className="mx-4 sm:mx-8 inline-flex items-center">
-                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
-                    {item.title}
-                    {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
-                  </span>
-                ))}
-                {/* Duplicate for seamless loop */}
-                {marqueeNews.map((item, index) => (
-                  <span key={`dup-${item._id}`} className="mx-4 sm:mx-8 inline-flex items-center">
-                    <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" />
-                    {item.title}
-                    {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
-                  </span>
-                ))}
+              <button
+                type="button"
+                onClick={() => setIsMarqueePaused(!isMarqueePaused)}
+                aria-label={isMarqueePaused ? "Resume news ticker animation" : "Pause news ticker animation"}
+                className="absolute left-3 z-20 bg-black/40 hover:bg-black/60 text-white p-1.5 rounded-lg backdrop-blur-md text-xs font-semibold transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              >
+                {isMarqueePaused ? '▶ Play' : '❚❚ Pause'}
+              </button>
+              
+              <div className={`marquee-mask w-full pl-20 ${isMarqueePaused ? '[animation-play-state:paused]' : ''}`}>
+                <div className={`animate-marquee whitespace-nowrap text-xs sm:text-sm md:text-base font-medium ${isMarqueePaused ? '[animation-play-state:paused]' : ''}`}>
+                  {marqueeNews.map((item, index) => (
+                    <span key={item._id} className="mx-4 sm:mx-8 inline-flex items-center">
+                      <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" aria-hidden="true" />
+                      {item.title}
+                      {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                    </span>
+                  ))}
+                  {/* Duplicate for seamless loop */}
+                  {marqueeNews.map((item, index) => (
+                    <span key={`dup-${item._id}`} className="mx-4 sm:mx-8 inline-flex items-center">
+                      <span className="w-1.5 sm:w-2 h-1.5 sm:h-2 bg-white rounded-full mr-2 sm:mr-3" aria-hidden="true" />
+                      {item.title}
+                      {index < marqueeNews.length - 1 && <span className="mx-4 sm:mx-8">|</span>}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           )
@@ -138,7 +150,7 @@ export default function NewsSection() {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 md:gap-8">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-gray-150 overflow-hidden flex flex-col h-full animate-pulse shadow-sm">
+              <div key={i} className="bg-white rounded-2xl border border-gray-200 overflow-hidden flex flex-col h-full animate-pulse shadow-sm">
                 <div className="bg-gray-200 h-40 sm:h-48 w-full" />
                 <div className="p-5 flex-1 flex flex-col space-y-4">
                   <div className="h-4 bg-gray-200 rounded w-1/4" />
@@ -171,6 +183,7 @@ export default function NewsSection() {
                           className="w-full h-full object-cover"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
+                          title={item.title}
                         />
                       ) : (
                         <video
@@ -182,10 +195,19 @@ export default function NewsSection() {
                       )
                     ) : (
                       <div 
+                        role="button"
+                        tabIndex={0}
+                        aria-label={`Play video: ${item.title}`}
                         className="relative w-full h-full cursor-pointer group"
                         onClick={(e) => {
                           e.preventDefault();
                           setPlayingVideoId(item._id);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setPlayingVideoId(item._id);
+                          }
                         }}
                       >
                         {getYoutubeId(item.media_url || '') ? (
@@ -208,7 +230,7 @@ export default function NewsSection() {
                             className="w-11 sm:w-14 h-11 sm:h-14 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg"
                             whileHover={{ scale: 1.1 }}
                           >
-                            <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" />
+                            <Play className="w-5 sm:w-6 h-5 sm:h-6 text-primary-600 ml-1" aria-hidden="true" />
                           </motion.div>
                         </div>
                       </div>
@@ -246,17 +268,17 @@ export default function NewsSection() {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 gap-2">
                     {item.location && (
                       <span className="flex items-center text-xs sm:text-sm text-gray-500">
-                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" />
+                        <MapPin className="w-4 h-4 mr-1 flex-shrink-0" aria-hidden="true" />
                         <span className="truncate">{item.location}</span>
                       </span>
                     )}
                     {item.link && (
                       <Link
                         href={item.link}
-                        className="text-primary-600 text-xs sm:text-sm font-medium flex items-center hover:text-primary-700 whitespace-nowrap"
+                        className="text-primary-600 text-xs sm:text-sm font-medium flex items-center hover:text-primary-700 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 rounded"
                       >
                         Read More
-                        <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" />
+                        <ArrowRight className="w-3 sm:w-4 h-3 sm:h-4 ml-1" aria-hidden="true" />
                       </Link>
                     )}
                   </div>
@@ -275,7 +297,7 @@ export default function NewsSection() {
         >
           <Link href="/news" className="btn-outline">
             View All News
-            <ArrowRight className="ml-2 w-5 h-5" />
+            <ArrowRight className="ml-2 w-5 h-5" aria-hidden="true" />
           </Link>
         </motion.div>
       </div>

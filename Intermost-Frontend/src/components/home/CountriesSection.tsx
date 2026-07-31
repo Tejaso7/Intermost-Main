@@ -145,7 +145,7 @@ export default function CountriesSection() {
                 <div className="p-5 flex-1 flex flex-col space-y-4">
                   <div className="h-4 bg-gray-200 rounded w-1/3" />
                   <div className="h-6 bg-gray-200 rounded w-3/4" />
-                  <div className="h-10 bg-gray-150 rounded w-full" />
+                  <div className="h-10 bg-gray-200 rounded w-full" />
                   <div className="h-4 bg-gray-200 rounded w-2/3 mt-auto" />
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function CountriesSection() {
                   <motion.div
                     onMouseEnter={() => setHoveredIndex(index)}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className="bg-white rounded-[28px] border border-gray-250 hover:border-primary-300/40 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary-500/5 relative group/card"
+                    className="bg-white rounded-[28px] border border-gray-200 hover:border-primary-300/40 overflow-hidden h-full flex flex-col transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary-500/5 relative group/card"
                     whileHover={{ y: -8 }}
                     transition={{ duration: 0.3 }}
                   >

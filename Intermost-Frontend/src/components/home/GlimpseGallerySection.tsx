@@ -116,6 +116,7 @@ export default function GlimpseGallerySection() {
   const [likes, setLikes] = useState<Record<string, number>>({});
   const [galleryItems, setGalleryItems] = useState<Glimpse[]>([]);
   const [loading, setLoading] = useState(true);
+  const modalRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchGlimpses = async () => {
@@ -155,12 +156,64 @@ export default function GlimpseGallerySection() {
     { id: 'training', label: 'Clinical Training', icon: GraduationCap },
   ];
 
+  // Accessible Modal focus trap and ESC listener
+  useEffect(() => {
+    if (!activePhoto) return;
+
+    const previousActiveElement = document.activeElement as HTMLElement;
+
+    // Focus first focusable element inside modal
+    setTimeout(() => {
+      const closeBtn = modalRef.current?.querySelector('button') as HTMLElement;
+      if (closeBtn) {
+        closeBtn.focus();
+      }
+    }, 50);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setActivePhoto(null);
+        return;
+      }
+
+      if (e.key === 'Tab' && modalRef.current) {
+        const focusables = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusables.length === 0) return;
+
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+        previousActiveElement.focus();
+      }
+    };
+  }, [activePhoto]);
+
   if (loading) {
     return (
       <section className="py-24 bg-white relative flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
-          <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" />
-          <p className="text-gray-550 text-sm">Loading student glimpses...</p>
+          <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto" aria-hidden="true" />
+          <p className="text-gray-500 text-sm">Loading student glimpses...</p>
         </div>
       </section>
     );
@@ -171,12 +224,18 @@ export default function GlimpseGallerySection() {
   }
 
   return (
-    <section className="py-24 bg-white relative">
-      <div className="container-custom">
+    <section className="py-24 bg-white relative overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="container-custom"
+      >
         {/* Section Header */}
         <div className="text-center mb-12 max-w-3xl mx-auto">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary-50 text-primary-650 rounded-full font-bold text-xs uppercase tracking-wider mb-4 border border-primary-100">
-            <Camera className="w-3.5 h-3.5" />
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-primary-50 text-primary-600 rounded-full font-bold text-xs uppercase tracking-wider mb-4 border border-primary-100">
+            <Camera className="w-3.5 h-3.5" aria-hidden="true" />
             Campus Life & Glimpses
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
@@ -186,29 +245,30 @@ export default function GlimpseGallerySection() {
             Browse true images of university premises, modern classrooms, departure groups, and our dining halls serving home-style Indian food.
           </p>
         </div>
- 
-        {/* Categories Tab Selector */}
-        <div className="flex flex-wrap items-center justify-center gap-2.5 mb-12">
+
+        {/* Categories Tab Selector (Horizontal scrollable container on mobile) */}
+        <div className="flex overflow-x-auto whitespace-nowrap scrollbar-none sm:flex-wrap items-center justify-start sm:justify-center gap-2.5 mb-12 pb-2 sm:pb-0 snap-x">
           {categories.map((cat) => {
             const Icon = cat.icon;
             const isSelected = selectedCategory === cat.id;
             return (
               <button
                 key={cat.id}
+                type="button"
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold transition-all cursor-pointer shrink-0 snap-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                   isSelected
                     ? 'bg-primary text-white shadow-lg shadow-primary-500/15'
-                    : 'bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-205'
+                    : 'bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 {cat.label}
               </button>
             );
           })}
         </div>
- 
+
         {/* Gallery Grid */}
         <motion.div
           layout
@@ -224,7 +284,16 @@ export default function GlimpseGallerySection() {
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.4 }}
                 onClick={() => setActivePhoto(item)}
-                className="bg-gray-50 rounded-[24px] overflow-hidden border border-gray-200 group cursor-pointer shadow-sm hover:shadow-xl transition-all relative flex flex-col h-[320px]"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePhoto(item);
+                  }
+                }}
+                tabIndex={0}
+                role="button"
+                aria-label={`View photo: ${item.title}`}
+                className="bg-gray-50 rounded-[24px] overflow-hidden border border-gray-200 group cursor-pointer shadow-sm hover:shadow-xl transition-all relative flex flex-col h-[320px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 {/* Photo container */}
                 <div className="relative flex-1 overflow-hidden">
@@ -232,28 +301,28 @@ export default function GlimpseGallerySection() {
                     src={getS3AssetUrl(item.image)}
                     alt={item.title}
                     fill
-                    className="object-cover group-hover:scale-108 transition-transform duration-500"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
                     <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transform scale-75 group-hover:scale-100 transition-all duration-300">
-                      <ZoomIn className="w-5 h-5" />
+                      <ZoomIn className="w-5 h-5" aria-hidden="true" />
                     </div>
                   </div>
- 
+
                   {/* Country Flag Badge */}
                   <span className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/65 backdrop-blur-md text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-white/10">
                     {item.country}
                   </span>
- 
+
                   {/* Category Badge */}
                   <span className="absolute top-4 right-4 z-20 px-2.5 py-1 bg-primary/85 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg shadow-sm">
                     {item.categoryLabel}
                   </span>
                 </div>
- 
+
                 {/* Info Text footer */}
-                <div className="p-4 bg-white border-t border-gray-150 flex items-center justify-between z-20">
+                <div className="p-4 bg-white border-t border-gray-100 flex items-center justify-between z-20">
                   <div className="min-w-0 flex-1 pr-3">
                     <h4 className="font-bold text-gray-900 text-sm truncate leading-snug">
                       {item.title}
@@ -263,13 +332,16 @@ export default function GlimpseGallerySection() {
                     </p>
                   </div>
                   <button
+                    type="button"
+                    aria-label={`Like ${item.title}`}
                     onClick={(e) => handleLike(item._id || '', e)}
-                    className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-150 rounded-xl px-2.5 py-1 cursor-pointer"
+                    className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-100 rounded-xl px-2.5 py-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                   >
                     <Heart
                       className={`w-3.5 h-3.5 ${
                         item._id && likes[item._id] ? 'text-red-500 fill-red-500' : 'text-gray-400'
                       }`}
+                      aria-hidden="true"
                     />
                     <span>{item._id ? likes[item._id] || 0 : 0}</span>
                   </button>
@@ -278,12 +350,18 @@ export default function GlimpseGallerySection() {
             ))}
           </AnimatePresence>
         </motion.div>
-      </div>
- 
+      </motion.div>
+
       {/* Full Screen Lightbox Modal */}
       <AnimatePresence>
         {activePhoto && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div 
+            ref={modalRef}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="lightbox-title"
+          >
             {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
@@ -292,7 +370,7 @@ export default function GlimpseGallerySection() {
               onClick={() => setActivePhoto(null)}
               className="absolute inset-0 bg-black/90 backdrop-blur-md"
             />
- 
+
             {/* Modal Box */}
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
@@ -302,12 +380,14 @@ export default function GlimpseGallerySection() {
             >
               {/* Close Button */}
               <button
+                type="button"
                 onClick={() => setActivePhoto(null)}
-                className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 rounded-full text-white border border-white/10 transition-colors cursor-pointer"
+                aria-label="Close image preview"
+                className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 rounded-full text-white border border-white/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" aria-hidden="true" />
               </button>
- 
+
               {/* Photo Box */}
               <div className="relative flex-1 bg-black min-h-[300px] md:min-h-[460px]">
                 <Image
@@ -317,7 +397,7 @@ export default function GlimpseGallerySection() {
                   className="object-contain"
                 />
               </div>
- 
+
               {/* Detail Description */}
               <div className="p-6 md:p-8 bg-gray-950 text-white space-y-3">
                 <div className="flex items-center gap-3">
@@ -328,7 +408,7 @@ export default function GlimpseGallerySection() {
                     {activePhoto.country}
                   </span>
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold">{activePhoto.title}</h3>
+                <h3 id="lightbox-title" className="text-xl md:text-2xl font-bold">{activePhoto.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed max-w-3xl">
                   {activePhoto.caption}
                 </p>

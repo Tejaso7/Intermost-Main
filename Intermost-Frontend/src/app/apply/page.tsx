@@ -228,8 +228,9 @@ export default function ApplyPage() {
                     </h2>
 
                     <div>
-                      <label className="label">Full Name *</label>
+                      <label htmlFor="apply-name" className="label">Full Name *</label>
                       <input
+                        id="apply-name"
                         type="text"
                         {...register('name')}
                         className={cn('input-field', errors.name && 'input-error')}
@@ -241,8 +242,9 @@ export default function ApplyPage() {
                     </div>
 
                     <div>
-                      <label className="label">Email Address *</label>
+                      <label htmlFor="apply-email" className="label">Email Address *</label>
                       <input
+                        id="apply-email"
                         type="email"
                         {...register('email')}
                         className={cn('input-field', errors.email && 'input-error')}
@@ -254,9 +256,11 @@ export default function ApplyPage() {
                     </div>
 
                     <div>
-                      <label className="label">Phone Number *</label>
+                      <label htmlFor="apply-phone" className="label">Phone Number *</label>
                       <div className="flex">
                         <select
+                          id="apply-country-code"
+                          aria-label="Country Code"
                           {...register('country_code')}
                           className="input-field w-24 rounded-r-none"
                         >
@@ -265,6 +269,7 @@ export default function ApplyPage() {
                           <option value="+1">+1</option>
                         </select>
                         <input
+                          id="apply-phone"
                           type="tel"
                           {...register('phone')}
                           className={cn(
@@ -280,8 +285,9 @@ export default function ApplyPage() {
                     </div>
 
                     <div>
-                      <label className="label">City</label>
+                      <label htmlFor="apply-city" className="label">City</label>
                       <input
+                        id="apply-city"
                         type="text"
                         {...register('city')}
                         className="input-field"
@@ -303,8 +309,9 @@ export default function ApplyPage() {
                     </h2>
 
                     <div>
-                      <label className="label">10th Percentage</label>
+                      <label htmlFor="apply-tenth" className="label">10th Percentage</label>
                       <input
+                        id="apply-tenth"
                         type="text"
                         {...register('tenth_percentage')}
                         className="input-field"
@@ -313,8 +320,9 @@ export default function ApplyPage() {
                     </div>
 
                     <div>
-                      <label className="label">12th Percentage (PCB)</label>
+                      <label htmlFor="apply-twelfth" className="label">12th Percentage (PCB)</label>
                       <input
+                        id="apply-twelfth"
                         type="text"
                         {...register('twelfth_percentage')}
                         className="input-field"
@@ -323,8 +331,9 @@ export default function ApplyPage() {
                     </div>
 
                     <div>
-                      <label className="label">NEET Score</label>
+                      <label htmlFor="apply-neet" className="label">NEET Score</label>
                       <input
+                        id="apply-neet"
                         type="text"
                         {...register('neet_score')}
                         className="input-field"
@@ -353,7 +362,7 @@ export default function ApplyPage() {
                         <label
                           key={country.value}
                           className={cn(
-                            'relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-colors',
+                            'relative flex items-center p-4 rounded-xl border-2 cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-blue-500',
                             selectedCountry === country.label
                               ? 'border-primary-500 bg-primary-50'
                               : 'border-gray-200 hover:border-gray-300'
@@ -361,6 +370,7 @@ export default function ApplyPage() {
                         >
                           <input
                             type="radio"
+                            aria-label={`Select ${country.label}`}
                             {...register('interested_country')}
                             value={country.label}
                             className="sr-only"
@@ -372,7 +382,7 @@ export default function ApplyPage() {
                             <p className="text-sm text-gray-500">{country.fee}</p>
                           </div>
                           {selectedCountry === country.label && (
-                            <CheckCircle className="w-6 h-6 text-primary-600" />
+                            <CheckCircle className="w-6 h-6 text-primary-600" aria-hidden="true" />
                           )}
                         </label>
                       ))}
@@ -384,8 +394,9 @@ export default function ApplyPage() {
                     )}
 
                     <div>
-                      <label className="label">Additional Message (Optional)</label>
+                      <label htmlFor="apply-message" className="label">Additional Message (Optional)</label>
                       <textarea
+                        id="apply-message"
                         {...register('message')}
                         rows={4}
                         className="input-field resize-none"

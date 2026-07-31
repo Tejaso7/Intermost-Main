@@ -182,14 +182,19 @@ export default function BrochureDownloadModal({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Download brochure modal"
           className="bg-white dark:bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-gray-150 dark:border-gray-800 w-full max-w-2xl relative z-10 flex flex-col md:flex-row max-h-[90vh] md:max-h-[550px]"
         >
           {/* Close button */}
           <button
+            type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 z-20 p-2 bg-gray-100 hover:bg-gray-250 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors"
+            aria-label="Close download modal"
+            className="absolute top-4 right-4 z-20 p-2 bg-gray-100 hover:bg-gray-250 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-full text-gray-500 hover:text-gray-800 dark:hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
 
           {/* Left Panel: Selector */}
@@ -200,12 +205,12 @@ export default function BrochureDownloadModal({
 
             {loading ? (
               <div className="flex-1 flex flex-col items-center justify-center py-10">
-                <Loader2 className="w-7 h-7 text-primary animate-spin mb-2" />
+                <Loader2 className="w-7 h-7 text-primary animate-spin mb-2" aria-hidden="true" />
                 <p className="text-xs text-gray-500">Loading catalog...</p>
               </div>
             ) : brochures.length === 0 ? (
               <div className="flex-1 flex flex-col items-center justify-center text-center py-8">
-                <FileText className="w-10 h-10 text-gray-350 mb-2" />
+                <FileText className="w-10 h-10 text-gray-350 mb-2" aria-hidden="true" />
                 <p className="text-sm font-bold text-gray-700 dark:text-gray-300">
                   No brochures available
                 </p>
@@ -218,8 +223,10 @@ export default function BrochureDownloadModal({
                   return (
                     <button
                       key={b._id}
+                      type="button"
                       onClick={() => handleBrochureClick(b)}
-                      className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 ${
+                      aria-label={`Select brochure ${b.title}`}
+                      className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 ${
                         isSelected
                           ? 'bg-primary-50 dark:bg-primary-950/20 border-primary text-primary-900 dark:text-primary-100'
                           : 'bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 hover:bg-gray-100/50'
@@ -232,7 +239,7 @@ export default function BrochureDownloadModal({
                             : 'bg-gray-50 dark:bg-gray-950 border-gray-150 dark:border-gray-850 text-gray-500'
                         }`}
                       >
-                        <FileText className="w-4 h-4" />
+                        <FileText className="w-4 h-4" aria-hidden="true" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="font-bold text-sm leading-tight text-gray-800 dark:text-white truncate">
@@ -256,7 +263,7 @@ export default function BrochureDownloadModal({
             {isPreAuthorized ? (
               <div className="text-center py-6 space-y-4">
                 <div className="w-14 h-14 bg-green-50 dark:bg-green-950/20 text-green-600 rounded-full flex items-center justify-center mx-auto border border-green-100">
-                  <Download className="w-7 h-7" />
+                  <Download className="w-7 h-7" aria-hidden="true" />
                 </div>
                 <div>
                   <h4 className="font-bold text-gray-900 dark:text-white text-lg">
@@ -269,7 +276,7 @@ export default function BrochureDownloadModal({
 
                 {selectedBrochure && (
                   <div className="p-3 bg-gray-50 dark:bg-gray-950 rounded-2xl border border-gray-150 dark:border-gray-850 max-w-xs mx-auto text-left flex items-center gap-3">
-                    <FileText className="w-8 h-8 text-primary flex-shrink-0" />
+                    <FileText className="w-8 h-8 text-primary flex-shrink-0" aria-hidden="true" />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-xs text-gray-800 dark:text-white truncate">
                         {selectedBrochure.title}
@@ -282,11 +289,12 @@ export default function BrochureDownloadModal({
                 )}
 
                 <button
+                  type="button"
                   onClick={() => selectedBrochure && executeDownload(selectedBrochure)}
                   disabled={!selectedBrochure}
-                  className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-50 text-white py-3 rounded-2xl font-bold shadow-lg shadow-primary-500/10 transition-colors"
+                  className="w-full max-w-xs mx-auto flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-50 text-white py-3 rounded-2xl font-bold shadow-lg shadow-primary-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
                 >
-                  <Download className="w-5 h-5" />
+                  <Download className="w-5 h-5" aria-hidden="true" />
                   Download Document
                 </button>
               </div>
@@ -303,53 +311,56 @@ export default function BrochureDownloadModal({
 
                 {/* Name */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <label htmlFor="modal-lead-name" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                     Your Name
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
+                      id="modal-lead-name"
                       type="text"
                       required
                       placeholder="e.g. Rahul Sharma"
                       value={leadForm.name}
                       onChange={(e) => setFormVal('name', e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <label htmlFor="modal-lead-phone" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                     WhatsApp Mobile No.
                   </label>
                   <div className="relative">
-                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
+                      id="modal-lead-phone"
                       type="tel"
                       required
                       placeholder="e.g. +91 98765 43210"
                       value={leadForm.phone}
                       onChange={(e) => setFormVal('phone', e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
 
                 {/* Email */}
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                  <label htmlFor="modal-lead-email" className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
                     Email Address (Optional)
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
+                      id="modal-lead-email"
                       type="email"
                       placeholder="e.g. rahul@gmail.com"
                       value={leadForm.email}
                       onChange={(e) => setFormVal('email', e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
+                      className="w-full pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl text-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:bg-white transition-all text-gray-900 dark:text-white"
                     />
                   </div>
                 </div>
@@ -357,17 +368,17 @@ export default function BrochureDownloadModal({
                 <button
                   type="submit"
                   disabled={submitting || !selectedBrochure}
-                  className="w-full mt-2 flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-50 text-white py-3 rounded-2xl font-bold shadow-lg shadow-primary-500/10 transition-colors"
+                  className="w-full mt-2 flex items-center justify-center gap-2 bg-primary hover:bg-primary-700 disabled:opacity-50 text-white py-3 rounded-2xl font-bold shadow-lg shadow-primary-500/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                       Submitting...
                     </>
                   ) : (
                     <>
                       Download Now
-                      <ArrowRight className="w-4 h-4" />
+                      <ArrowRight className="w-4 h-4" aria-hidden="true" />
                     </>
                   )}
                 </button>

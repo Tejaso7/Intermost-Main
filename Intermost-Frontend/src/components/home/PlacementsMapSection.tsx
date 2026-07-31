@@ -157,6 +157,12 @@ export default function PlacementsMapSection() {
   });
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setViewMode('cards');
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchSettings = async () => {
       try {
         const settings = await coreApi.getSettings();
@@ -197,7 +203,13 @@ export default function PlacementsMapSection() {
         <div className="absolute bottom-[10%] right-[10%] w-[480px] h-[480px] rounded-full bg-secondary-500/10 blur-3xl" />
       </div>
 
-      <div className="container-custom relative z-10">
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="container-custom relative z-10"
+      >
         {/* Section Header */}
         <div className="text-center mb-10 sm:mb-14 max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-primary-500/10 text-primary-400 border border-primary-500/20 mb-3">
@@ -214,25 +226,29 @@ export default function PlacementsMapSection() {
           {/* View Mode Switcher */}
           <div className="inline-flex p-1 bg-white/10 backdrop-blur-md rounded-2xl border border-white/15 mt-6 shadow-lg">
             <button
+              type="button"
               onClick={() => setViewMode('cards')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              aria-label="Switch to Country Grid View"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
                 viewMode === 'cards'
                   ? 'bg-primary-600 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <LayoutGrid className="w-4 h-4" />
+              <LayoutGrid className="w-4 h-4" aria-hidden="true" />
               Country Grid View
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('map')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              aria-label="Switch to Interactive Map View"
+              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 ${
                 viewMode === 'map'
                   ? 'bg-primary-600 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
-              <MapIcon className="w-4 h-4" />
+              <MapIcon className="w-4 h-4" aria-hidden="true" />
               Interactive Map View
             </button>
           </div>
@@ -465,8 +481,9 @@ export default function PlacementsMapSection() {
                         className="absolute -translate-x-1/2 -translate-y-1/2"
                       >
                         <button
+                          type="button"
                           onClick={() => setSelectedDest(dest)}
-                          className={`group relative flex items-center cursor-pointer focus:outline-none ${
+                          className={`group relative flex items-center cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 rounded-full ${
                             pos === 'left'
                               ? 'flex-row-reverse gap-1.5'
                               : pos === 'right'
@@ -475,7 +492,7 @@ export default function PlacementsMapSection() {
                               ? 'flex-col-reverse gap-1'
                               : 'flex-col gap-1'
                           }`}
-                          aria-label={`Select ${dest.name}`}
+                          aria-label={`Select ${dest.name} destination pin`}
                         >
                           {/* Flag Circle Pin Container */}
                           <div className="relative flex items-center justify-center flex-shrink-0">
@@ -612,7 +629,7 @@ export default function PlacementsMapSection() {
             </div>
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Prospectus download modal context */}
       <BrochureDownloadModal

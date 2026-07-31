@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Shield, Award, CheckCircle2 } from 'lucide-react';
@@ -44,6 +45,8 @@ const trustFactors = [
 ];
 
 export default function RecognitionSection() {
+  const [isPaused, setIsPaused] = useState(false);
+
   return (
     <section className="py-16 bg-gray-50 overflow-hidden relative">
       {/* Background Pattern */}
@@ -65,12 +68,23 @@ export default function RecognitionSection() {
           <p className="text-gray-600 text-lg mt-4 max-w-2xl mx-auto">
             All partner universities are recognized by leading international medical education bodies
           </p>
+
+          <div className="mt-4 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setIsPaused(!isPaused)}
+              aria-label={isPaused ? "Resume recognitions animation" : "Pause recognitions animation"}
+              className="text-xs font-semibold px-3 py-1 rounded-full bg-white border border-gray-200 text-gray-600 hover:text-primary-600 hover:border-primary-300 shadow-sm transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+            >
+              {isPaused ? '▶ Resume Marquee' : '❚❚ Pause Marquee'}
+            </button>
+          </div>
         </motion.div>
 
         {/* Recognition Logos - Scrolling Marquee */}
         <div className="relative marquee-mask">
           {/* Scrolling container */}
-          <div className="flex animate-marquee">
+          <div className={`flex animate-marquee ${isPaused ? '[animation-play-state:paused]' : ''}`}>
             {/* First set */}
             <div className="flex space-x-10 items-center px-6">
               {recognitions.map((item, index) => (
@@ -148,7 +162,7 @@ export default function RecognitionSection() {
               className="flex items-center space-x-3 bg-white/70 backdrop-blur-md px-6 py-3 rounded-full shadow-sm border border-white/50 relative overflow-hidden group hover:shadow-md transition-all duration-300"
             >
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/40 to-transparent group-hover:animate-[shimmer_1.5s_infinite]" />
-              <factor.icon className="w-5 h-5 text-green-500 relative z-10" />
+              <factor.icon className="w-5 h-5 text-green-500 relative z-10" aria-hidden="true" />
               <span className="text-gray-700 font-medium relative z-10">{factor.text}</span>
             </div>
           ))}

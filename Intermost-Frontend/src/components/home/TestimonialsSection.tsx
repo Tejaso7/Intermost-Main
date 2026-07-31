@@ -148,7 +148,9 @@ const fallbackTestimonials: Testimonial[] = [
 export default function TestimonialsSection() {
   const [testimonials, setTestimonials] = useState<Testimonial[]>(fallbackTestimonials);
   const [loading, setLoading] = useState(true);
+  const [activeVideoUrl, setActiveVideoUrl] = useState<string | null>(null);
   const [marqueeImages, setMarqueeImages] = useState<string[]>([]);
+  const [isAlumniMarqueePaused, setIsAlumniMarqueePaused] = useState(false);
 
   useEffect(() => {
     const fetchTestimonials = async () => {
@@ -253,7 +255,7 @@ export default function TestimonialsSection() {
                 <SwiperSlide key={testimonial._id}>
                   <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/10 h-full">
                     {/* Quote Icon */}
-                    <Quote className="w-10 h-10 text-primary-400 mb-4" />
+                    <Quote className="w-10 h-10 text-primary-400 mb-4" aria-hidden="true" />
 
                     {/* Content */}
                     <p className="text-white/90 leading-relaxed mb-6 line-clamp-4">
@@ -270,6 +272,7 @@ export default function TestimonialsSection() {
                               ? 'text-yellow-400 fill-yellow-400'
                               : 'text-gray-400'
                           }`}
+                          aria-hidden="true"
                         />
                       ))}
                     </div>
@@ -307,8 +310,12 @@ export default function TestimonialsSection() {
 
                     {/* Video Link */}
                     {testimonial.video_url && (
-                      <button className="mt-4 flex items-center text-primary-300 hover:text-white transition-colors text-sm">
-                        <Play className="w-4 h-4 mr-1" />
+                      <button 
+                        type="button"
+                        aria-label={`Watch video testimonial by ${testimonial.name}`}
+                        className="mt-4 flex items-center text-primary-300 hover:text-white transition-colors text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-400 rounded"
+                      >
+                        <Play className="w-4 h-4 mr-1" aria-hidden="true" />
                         Watch Video Testimonial
                       </button>
                     )}
@@ -330,6 +337,14 @@ export default function TestimonialsSection() {
               <p className="text-primary-200 text-sm mt-2 max-w-xl mx-auto">
                 Glance at the historical admissions, visa copies, and university allocations of students placed by Intermost.
               </p>
+              <button
+                type="button"
+                onClick={() => setIsAlumniMarqueePaused(!isAlumniMarqueePaused)}
+                aria-label={isAlumniMarqueePaused ? "Resume alumni records animation" : "Pause alumni records animation"}
+                className="mt-3 text-xs font-semibold px-3 py-1 rounded-full bg-white/10 text-primary-200 hover:text-white border border-white/20 transition-colors cursor-pointer focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
+              >
+                {isAlumniMarqueePaused ? '▶ Resume Slider' : '❚❚ Pause Slider'}
+              </button>
             </div>
 
             <div className="relative overflow-hidden w-full py-4">
@@ -337,7 +352,7 @@ export default function TestimonialsSection() {
               <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-primary-900 to-transparent z-10 pointer-events-none" />
               <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-primary-900 to-transparent z-10 pointer-events-none" />
               
-              <div className="flex animate-marquee-alumni whitespace-nowrap gap-6 w-max">
+              <div className={`flex animate-marquee-alumni whitespace-nowrap gap-6 w-max ${isAlumniMarqueePaused ? '[animation-play-state:paused]' : ''}`}>
                 {/* First loop of images */}
                 <div className="flex gap-6 shrink-0">
                   {marqueeImages.map((src, idx) => (

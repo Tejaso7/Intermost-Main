@@ -134,9 +134,10 @@ export default function Footer() {
                   href={social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300"
+                  aria-label="Facebook"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary-600 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  <Facebook className="w-5 h-5" />
+                  <Facebook className="w-5 h-5" aria-hidden="true" />
                 </a>
               )}
               {social.instagram && (
@@ -144,9 +145,10 @@ export default function Footer() {
                   href={social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-pink-600 hover:shadow-lg hover:shadow-pink-600/25 transition-all duration-300"
+                  aria-label="Instagram"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-pink-600 hover:shadow-lg hover:shadow-pink-600/25 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  <Instagram className="w-5 h-5" />
+                  <Instagram className="w-5 h-5" aria-hidden="true" />
                 </a>
               )}
               {social.youtube && (
@@ -154,9 +156,10 @@ export default function Footer() {
                   href={social.youtube}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-red-600 hover:shadow-lg hover:shadow-red-600/25 transition-all duration-300"
+                  aria-label="YouTube"
+                  className="w-10 h-10 bg-white/5 border border-white/10 rounded-full flex items-center justify-center hover:bg-red-600 hover:shadow-lg hover:shadow-red-600/25 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  <Youtube className="w-5 h-5" />
+                  <Youtube className="w-5 h-5" aria-hidden="true" />
                 </a>
               )}
             </div>
@@ -170,7 +173,7 @@ export default function Footer() {
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="group flex items-center text-gray-400 hover:text-white transition-all duration-300 relative z-10"
+                    className="group flex items-center text-gray-400 hover:text-white transition-all duration-300 relative z-10 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded"
                   >
                     <span className="w-0 h-px bg-primary-500 mr-0 group-hover:w-4 group-hover:mr-2 transition-all duration-300" />
                     {link.name}
@@ -185,27 +188,27 @@ export default function Footer() {
             <h4 className="text-white font-semibold text-lg mb-6">Contact Us</h4>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start space-x-3">
-                <Phone className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
+                <Phone className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" aria-hidden="true" />
                 <div>
-                  <a href={`tel:${contact.phone1.replace(/\s/g, '')}`} className="hover:text-white transition-colors block">
+                  <a href={`tel:${contact.phone1.replace(/\s/g, '')}`} className="hover:text-white transition-colors block focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded">
                     {contact.phone1}
                   </a>
-                  <a href={`tel:${contact.phone2.replace(/\s/g, '')}`} className="hover:text-white transition-colors block mt-1">
+                  <a href={`tel:${contact.phone2.replace(/\s/g, '')}`} className="hover:text-white transition-colors block mt-1 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded">
                     {contact.phone2}
                   </a>
                 </div>
               </li>
               <li className="flex items-start space-x-3">
-                <Mail className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
+                <Mail className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" aria-hidden="true" />
                 <a
                   href={`mailto:${contact.email}`}
-                  className="hover:text-white transition-colors break-all"
+                  className="hover:text-white transition-colors break-all focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none rounded"
                 >
                   {contact.email}
                 </a>
               </li>
               <li className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" />
+                <MapPin className="w-5 h-5 text-primary-500 mt-1 flex-shrink-0" aria-hidden="true" />
                 <span className="leading-relaxed">
                   {contact.address}
                 </span>
@@ -223,17 +226,19 @@ export default function Footer() {
               <div className="relative">
                 <input
                   type="email"
+                  aria-label="Email address for newsletter"
                   placeholder="Enter your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:border-primary-400 focus:ring-1 focus:ring-primary-400/30 outline-none transition-all duration-300 text-white placeholder-gray-500"
+                  className="w-full px-4 py-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg focus:border-primary-400 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none transition-all duration-300 text-white placeholder-gray-500"
                   required
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-600 rounded-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300"
+                  aria-label="Subscribe to newsletter"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-primary-600 rounded-lg hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-600/25 transition-all duration-300 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  <Send className="w-4 h-4 text-white" />
+                  <Send className="w-4 h-4 text-white" aria-hidden="true" />
                 </button>
               </div>
             </form>

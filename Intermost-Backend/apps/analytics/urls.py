@@ -17,4 +17,5 @@ urlpatterns = [
     path('devices/', views.get_device_stats, name='device_stats'),
     path('realtime/', views.get_realtime_visitors, name='realtime_visitors'),
     path('trends/', views.get_trends, name='trends'),
+    path('activity-patterns/', views.get_activity_patterns, name='activity_patterns'),
 ]

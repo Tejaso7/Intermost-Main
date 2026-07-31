@@ -114,14 +114,14 @@ export default function CTASection() {
                 className="btn-white group hover:shadow-xl hover:shadow-white/20 hover:scale-105 transition-all duration-300"
               >
                 Apply Now
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
               </Link>
               
               <button
                 onClick={handleWhatsApp}
-                className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-primary-600 hover:shadow-lg hover:shadow-green-400/25 hover:scale-105 transition-all duration-300"
+                className="inline-flex items-center justify-center px-6 py-3 rounded-lg border-2 border-white text-white font-semibold hover:bg-white hover:text-primary-600 hover:shadow-lg hover:shadow-green-400/25 hover:scale-105 transition-all duration-300 cursor-pointer"
               >
-                <MessageCircle className="mr-2 w-5 h-5" />
+                <MessageCircle className="mr-2 w-5 h-5" aria-hidden="true" />
                 Chat on WhatsApp
               </button>
               
@@ -129,7 +129,7 @@ export default function CTASection() {
                 href={`tel:${phoneNumber.replace(/\s/g, '')}`}
                 className="inline-flex items-center justify-center px-6 py-3 text-white font-semibold rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors"
               >
-                <Phone className="mr-2 w-5 h-5" />
+                <Phone className="mr-2 w-5 h-5" aria-hidden="true" />
                 {phoneNumber}
               </a>
             </motion.div>
@@ -144,25 +144,25 @@ export default function CTASection() {
             >
               <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-white/80">
                 <span className="flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   Free Counseling
                 </span>
                 <span className="flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   No Hidden Charges
                 </span>
                 <span className="flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   Complete Documentation Help
                 </span>
                 <span className="flex items-center">
-                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 mr-2 text-green-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   Visa Assistance

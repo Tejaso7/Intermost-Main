@@ -15,6 +15,7 @@ import {
   MessageCircle,
   Building2,
   Globe,
+  ChevronDown,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { getWhatsAppLink } from '@/lib/utils';
@@ -274,13 +275,14 @@ export default function ContactPage() {
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="contact-page-name" className="block text-sm font-medium text-gray-700 mb-2">
                       Full Name *
                     </label>
                     <input
+                      id="contact-page-name"
                       {...register('name')}
                       type="text"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="Your name"
                     />
                     {errors.name && (
@@ -290,13 +292,14 @@ export default function ContactPage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="contact-page-email" className="block text-sm font-medium text-gray-700 mb-2">
                       Email Address *
                     </label>
                     <input
+                      id="contact-page-email"
                       {...register('email')}
                       type="email"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                       placeholder="your@email.com"
                     />
                     {errors.email && (
@@ -309,23 +312,29 @@ export default function ContactPage() {
 
                 <div className="grid md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="contact-page-phone" className="block text-sm font-medium text-gray-700 mb-2">
                       Phone Number *
                     </label>
                     <div className="flex">
-                      <select
-                        {...register('countryCode')}
-                        className="px-3 py-3 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 focus:ring-2 focus:ring-primary"
-                      >
-                        <option value="+91">+91</option>
-                        <option value="+1">+1</option>
-                        <option value="+44">+44</option>
-                        <option value="+971">+971</option>
-                      </select>
+                      <div className="relative w-24">
+                        <select
+                          id="contact-page-country-code"
+                          aria-label="Country Code"
+                          {...register('countryCode')}
+                          className="w-full pl-3 pr-7 py-3 border border-r-0 border-gray-300 rounded-l-lg bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary appearance-none cursor-pointer text-sm"
+                        >
+                          <option value="+91">+91</option>
+                          <option value="+1">+1</option>
+                          <option value="+44">+44</option>
+                          <option value="+971">+971</option>
+                        </select>
+                        <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                      </div>
                       <input
+                        id="contact-page-phone"
                         {...register('phone')}
                         type="tel"
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                        className="flex-1 px-4 py-3 border border-gray-300 rounded-r-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                         placeholder="9876543210"
                       />
                     </div>
@@ -336,18 +345,22 @@ export default function ContactPage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="contact-page-qualification" className="block text-sm font-medium text-gray-700 mb-2">
                       Current Qualification *
                     </label>
-                    <select
-                      {...register('qualification')}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                    >
-                      <option value="">Select your qualification</option>
-                      <option value="12th">12th Pass / Appearing</option>
-                      <option value="bsc">BSc / Graduation</option>
-                      <option value="other">Other</option>
-                    </select>
+                    <div className="relative">
+                      <select
+                        id="contact-page-qualification"
+                        {...register('qualification')}
+                        className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent appearance-none cursor-pointer text-sm"
+                      >
+                        <option value="">Select your qualification</option>
+                        <option value="12th">12th Pass / Appearing</option>
+                        <option value="bsc">BSc / Graduation</option>
+                        <option value="other">Other</option>
+                      </select>
+                      <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                    </div>
                     {errors.qualification && (
                       <p className="mt-1 text-sm text-red-500">
                         {errors.qualification.message}
@@ -357,22 +370,26 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="contact-page-destination" className="block text-sm font-medium text-gray-700 mb-2">
                     Preferred Study Destination *
                   </label>
-                  <select
-                    {...register('destination')}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  >
-                    <option value="">Select your preferred destination</option>
-                    <option value="uzbekistan">Uzbekistan</option>
-                    <option value="georgia">Georgia</option>
-                    <option value="nepal">Nepal</option>
-                    <option value="tajikistan">Tajikistan</option>
-                    <option value="russia">Russia</option>
-                    <option value="kazakhstan">Kazakhstan</option>
-                    <option value="other">Other</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="contact-page-destination"
+                      {...register('destination')}
+                      className="w-full pl-4 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent appearance-none cursor-pointer text-sm"
+                    >
+                      <option value="">Select your preferred destination</option>
+                      <option value="uzbekistan">Uzbekistan</option>
+                      <option value="georgia">Georgia</option>
+                      <option value="nepal">Nepal</option>
+                      <option value="tajikistan">Tajikistan</option>
+                      <option value="russia">Russia</option>
+                      <option value="kazakhstan">Kazakhstan</option>
+                      <option value="other">Other</option>
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                  </div>
                   {errors.destination && (
                     <p className="mt-1 text-sm text-red-500">
                       {errors.destination.message}
@@ -381,13 +398,14 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="contact-page-message" className="block text-sm font-medium text-gray-700 mb-2">
                     Additional Message (Optional)
                   </label>
                   <textarea
+                    id="contact-page-message"
                     {...register('message')}
                     rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:ring-2 focus:ring-primary focus:border-transparent"
                     placeholder="Any additional details you'd like to share..."
                   />
                 </div>
@@ -395,13 +413,13 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full flex items-center justify-center gap-2"
+                  className="btn-primary w-full flex items-center justify-center gap-2 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
                   {isSubmitting ? (
                     <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
                   ) : (
                     <>
-                      <Send className="w-5 h-5" />
+                      <Send className="w-5 h-5" aria-hidden="true" />
                       Send Message
                     </>
                   )}

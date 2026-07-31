@@ -108,9 +108,10 @@ export default function SubscriptionModal({ isOpen, onClose, initialEmail = '' }
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            aria-label="Close modal"
+            className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
 
           {step === 'info' && (
@@ -121,7 +122,7 @@ export default function SubscriptionModal({ isOpen, onClose, initialEmail = '' }
             >
               <div className="text-center mb-6">
                 <div className="w-12 h-12 bg-primary-100 dark:bg-primary-950 rounded-xl flex items-center justify-center mx-auto mb-3 text-primary-600 dark:text-primary-400">
-                  <Mail className="w-6 h-6" />
+                  <Mail className="w-6 h-6" aria-hidden="true" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 dark:text-white">Join Our Newsletter</h3>
                 <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
@@ -132,54 +133,58 @@ export default function SubscriptionModal({ isOpen, onClose, initialEmail = '' }
               <form onSubmit={handleSendOtp} className="space-y-4">
                 {error && (
                   <div className="p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 rounded-lg flex items-center gap-2 text-xs">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
                     <span>{error}</span>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="sub-name" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
                     Your Name
                   </label>
                   <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
+                      id="sub-name"
                       type="text"
                       required
                       placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-gray-900 dark:text-white transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="sub-email" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                     <input
+                      id="sub-email"
                       type="email"
                       required
                       placeholder="johndoe@example.com"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none transition-all"
+                      className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-gray-900 dark:text-white transition-all"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
+                  <label htmlFor="sub-phone" className="block text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider mb-1">
                     Phone Number
                   </label>
                   <div className="flex gap-2">
                     <select
+                      id="sub-country-code"
+                      aria-label="Country Code"
                       value={countryCode}
                       onChange={(e) => setCountryCode(e.target.value)}
-                      className="px-3 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl text-gray-950 dark:text-white outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                      className="px-3 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl text-gray-950 dark:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                     >
                       <option value="+91">+91 (IN)</option>
                       <option value="+7">+7 (RU)</option>
@@ -188,14 +193,15 @@ export default function SubscriptionModal({ isOpen, onClose, initialEmail = '' }
                       <option value="+1">+1 (US)</option>
                     </select>
                     <div className="relative flex-1">
-                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" aria-hidden="true" />
                       <input
+                        id="sub-phone"
                         type="tel"
                         required
                         placeholder="9876543210"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-gray-900 dark:text-white outline-none transition-all"
+                        className="w-full pl-10 pr-4 py-2.5 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-850 rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 text-gray-900 dark:text-white transition-all"
                       />
                     </div>
                   </div>
@@ -204,9 +210,9 @@ export default function SubscriptionModal({ isOpen, onClose, initialEmail = '' }
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-750 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-6"
+                  className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-750 hover:from-primary-700 hover:to-primary-800 text-white font-semibold rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all mt-6 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Get OTP Code'}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" aria-hidden="true" /> : 'Get OTP Code'}
                 </button>
               </form>
             </motion.div>

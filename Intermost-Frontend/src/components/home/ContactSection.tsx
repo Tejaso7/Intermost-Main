@@ -12,9 +12,10 @@ import {
   MapPin, 
   Send, 
   Clock,
-  CheckCircle
+  CheckCircle,
+  ChevronDown
 } from 'lucide-react';
-import { inquiriesApi, coreApi } from '@/lib/services';
+import { coreApi, inquiriesApi } from '@/lib/services';
 import { cn } from '@/lib/utils';
 
 const formSchema = z.object({
@@ -216,11 +217,12 @@ export default function ContactSection() {
 
                 {/* Name */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Full Name *</label>
+                  <label htmlFor="contact-full-name" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Full Name *</label>
                   <input
+                    id="contact-full-name"
                     type="text"
                     {...register('name')}
-                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.name && 'input-error')}
+                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.name && 'input-error')}
                     placeholder="Enter your full name"
                   />
                   {errors.name && (
@@ -230,11 +232,12 @@ export default function ContactSection() {
 
                 {/* Email */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Email Address *</label>
+                  <label htmlFor="contact-email" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Email Address *</label>
                   <input
+                    id="contact-email"
                     type="email"
                     {...register('email')}
-                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.email && 'input-error')}
+                    className={cn('w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none', errors.email && 'input-error')}
                     placeholder="Enter your email"
                   />
                   {errors.email && (
@@ -244,21 +247,27 @@ export default function ContactSection() {
 
                 {/* Phone */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Phone Number *</label>
+                  <label htmlFor="contact-phone" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Phone Number *</label>
                   <div className="flex">
-                    <select
-                      {...register('country_code')}
-                      className="bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-l-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none w-24 border-r-0"
-                    >
-                      <option value="+91">+91</option>
-                      <option value="+971">+971</option>
-                      <option value="+1">+1</option>
-                    </select>
+                    <div className="relative w-24 border-r-0">
+                      <select
+                        id="contact-country-code"
+                        aria-label="Country Dial Code"
+                        {...register('country_code')}
+                        className="bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-l-xl pl-3 pr-7 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none w-full border-r-0 text-sm"
+                      >
+                        <option value="+91">+91</option>
+                        <option value="+971">+971</option>
+                        <option value="+1">+1</option>
+                      </select>
+                      <ChevronDown className="w-3.5 h-3.5 text-gray-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                    </div>
                     <input
+                      id="contact-phone"
                       type="tel"
                       {...register('phone')}
                       className={cn(
-                        'flex-1 bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-r-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none border-l-0',
+                        'flex-1 bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-r-xl px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none border-l-0 text-sm',
                         errors.phone && 'input-error'
                       )}
                       placeholder="Enter your phone number"
@@ -271,38 +280,44 @@ export default function ContactSection() {
 
                 {/* Interested Country */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Interested Country</label>
-                  <select
-                    {...register('interested_country')}
-                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none"
-                  >
-                    <option value="">Select a country</option>
-                    {countries.map((country) => (
-                      <option key={country} value={country}>
-                        {country}
-                      </option>
-                    ))}
-                  </select>
+                  <label htmlFor="contact-interested-country" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Interested Country</label>
+                  <div className="relative">
+                    <select
+                      id="contact-interested-country"
+                      {...register('interested_country')}
+                      className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl pr-10 pl-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 appearance-none text-sm cursor-pointer"
+                    >
+                      <option value="">Select a country</option>
+                      {countries.map((country) => (
+                        <option key={country} value={country}>
+                          {country}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="w-4 h-4 text-gray-400 absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none" aria-hidden="true" />
+                  </div>
                 </div>
 
                 {/* NEET Score */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">NEET Score (Optional)</label>
+                  <label htmlFor="contact-neet-score" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">NEET Score (Optional)</label>
                   <input
+                    id="contact-neet-score"
                     type="text"
                     {...register('neet_score')}
-                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none"
+                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 appearance-none text-sm"
                     placeholder="Enter your NEET score"
                   />
                 </div>
 
                 {/* Message */}
                 <div className="relative z-10">
-                  <label className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Message (Optional)</label>
+                  <label htmlFor="contact-message" className="block text-sm font-semibold text-gray-700 tracking-wide mb-1.5">Message (Optional)</label>
                   <textarea
+                    id="contact-message"
                     {...register('message')}
                     rows={3}
-                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none resize-none"
+                    className="w-full bg-white/70 backdrop-blur-sm border border-gray-200/60 rounded-xl px-4 py-3 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus:border-primary-400 focus:ring-2 focus:ring-primary-400/20 focus:bg-white transition-all duration-200 appearance-none resize-none"
                     placeholder="Any specific questions or requirements?"
                   />
                 </div>
@@ -311,7 +326,7 @@ export default function ContactSection() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="btn-primary w-full relative z-10 hover:shadow-lg hover:shadow-primary-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  className="btn-primary w-full relative z-10 hover:shadow-lg hover:shadow-primary-500/25 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                 >
                   {isSubmitting ? (
                     <span className="flex items-center justify-center">
@@ -320,7 +335,7 @@ export default function ContactSection() {
                     </span>
                   ) : (
                     <span className="flex items-center justify-center">
-                      <Send className="w-5 h-5 mr-2" />
+                      <Send className="w-5 h-5 mr-2" aria-hidden="true" />
                       Submit Inquiry
                     </span>
                   )}

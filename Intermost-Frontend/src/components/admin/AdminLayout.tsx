@@ -158,11 +158,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           </Link>
           <motion.button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Close navigation menu"
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </motion.button>
         </div>
 
@@ -183,13 +184,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   href={item.href}
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
-                    'flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200',
+                    'flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none',
                     isActive
                       ? 'bg-primary-50 text-primary-600 font-medium'
                       : 'text-gray-700 hover:bg-gray-50'
                   )}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <item.icon className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
                   <span className="truncate">{item.name}</span>
                 </Link>
               </motion.div>
@@ -201,11 +202,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         <div className="p-4 border-t flex-shrink-0">
           <motion.button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-4 py-2.5 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200"
+            className="flex items-center gap-3 px-4 py-2.5 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <LogOut className="w-5 h-5 flex-shrink-0" />
+            <LogOut className="w-5 h-5 flex-shrink-0" aria-hidden="true" />
             <span className="font-medium truncate">Logout</span>
           </motion.button>
         </div>
@@ -222,11 +223,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         >
           <motion.button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            aria-label="Toggle navigation menu"
+            aria-expanded={sidebarOpen}
+            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
           >
-            <Menu className="w-5 sm:w-6 h-5 sm:h-6" />
+            <Menu className="w-5 sm:w-6 h-5 sm:h-6" aria-hidden="true" />
           </motion.button>
 
           <div className="flex-1" />
@@ -234,11 +237,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
             {/* Notifications */}
             <motion.button 
-              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Notifications"
+              className="relative p-2 rounded-lg hover:bg-gray-100 transition-colors focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-none"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Bell className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
+              <Bell className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" aria-hidden="true" />
               <motion.span 
                 className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"
                 animate={{ scale: [1, 1.2, 1] }}

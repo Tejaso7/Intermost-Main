@@ -363,57 +363,113 @@ export const coreApi = {
 };
 
 // Analytics API
+export interface AnalyticsFilterParams {
+  days?: number;
+  date_from?: string;
+  date_to?: string;
+  source?: string;
+  device?: string;
+  country?: string;
+  city?: string;
+  page?: number;
+  page_size?: number;
+}
+
 export const analyticsApi = {
   trackPageview: async (data: { url: string; title: string; referrer: string; session_id: string }) => {
     const response = await api.post('/analytics/track/', data);
     return response.data;
   },
 
-  getSummary: async (source?: string, device?: string) => {
-    let url = '/analytics/summary/?';
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getSummary: async (source?: string, device?: string, date_from?: string, date_to?: string) => {
+    const params = new URLSearchParams();
+    if (source && source !== 'all') params.append('source', source);
+    if (device && device !== 'all') params.append('device', device);
+    if (date_from) params.append('date_from', date_from);
+    if (date_to) params.append('date_to', date_to);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await api.get(`/analytics/summary/${query}`);
     return response.data;
   },
 
-  getVisitorStats: async (days: number = 30, source?: string, device?: string) => {
-    let url = `/analytics/visitors/?days=${days}&`;
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getVisitorStats: async (days: number = 30, source?: string, device?: string, date_from?: string, date_to?: string) => {
+    const params = new URLSearchParams();
+    params.append('days', days.toString());
+    if (source && source !== 'all') params.append('source', source);
+    if (device && device !== 'all') params.append('device', device);
+    if (date_from) params.append('date_from', date_from);
+    if (date_to) params.append('date_to', date_to);
+    const response = await api.get(`/analytics/visitors/?${params.toString()}`);
     return response.data;
   },
 
-  getPageviewStats: async (days: number = 30, source?: string, device?: string) => {
-    let url = `/analytics/pageviews/?days=${days}&`;
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getPageviewStats: async (days: number = 30, source?: string, device?: string, date_from?: string, date_to?: string) => {
+    const params = new URLSearchParams();
+    params.append('days', days.toString());
+    if (source && source !== 'all') params.append('source', source);
+    if (device && device !== 'all') params.append('device', device);
+    if (date_from) params.append('date_from', date_from);
+    if (date_to) params.append('date_to', date_to);
+    const response = await api.get(`/analytics/pageviews/?${params.toString()}`);
     return response.data;
   },
 
-  getLocationStats: async (days: number = 30, source?: string, device?: string) => {
-    let url = `/analytics/locations/?days=${days}&`;
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getLocationStats: async (paramsObj?: AnalyticsFilterParams | number, source?: string, device?: string) => {
+    const params = new URLSearchParams();
+    if (typeof paramsObj === 'number') {
+      params.append('days', paramsObj.toString());
+      if (source && source !== 'all') params.append('source', source);
+      if (device && device !== 'all') params.append('device', device);
+    } else if (paramsObj) {
+      if (paramsObj.days) params.append('days', paramsObj.days.toString());
+      if (paramsObj.date_from) params.append('date_from', paramsObj.date_from);
+      if (paramsObj.date_to) params.append('date_to', paramsObj.date_to);
+      if (paramsObj.source && paramsObj.source !== 'all') params.append('source', paramsObj.source);
+      if (paramsObj.device && paramsObj.device !== 'all') params.append('device', paramsObj.device);
+      if (paramsObj.country) params.append('country', paramsObj.country);
+      if (paramsObj.city) params.append('city', paramsObj.city);
+      if (paramsObj.page) params.append('page', paramsObj.page.toString());
+      if (paramsObj.page_size) params.append('page_size', paramsObj.page_size.toString());
+    }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await api.get(`/analytics/locations/${query}`);
     return response.data;
   },
 
-  getTopPages: async (days: number = 30, limit: number = 10, source?: string, device?: string) => {
-    let url = `/analytics/pages/?days=${days}&limit=${limit}&`;
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getActivityPatterns: async (paramsObj?: AnalyticsFilterParams) => {
+    const params = new URLSearchParams();
+    if (paramsObj) {
+      if (paramsObj.days) params.append('days', paramsObj.days.toString());
+      if (paramsObj.date_from) params.append('date_from', paramsObj.date_from);
+      if (paramsObj.date_to) params.append('date_to', paramsObj.date_to);
+      if (paramsObj.source && paramsObj.source !== 'all') params.append('source', paramsObj.source);
+      if (paramsObj.device && paramsObj.device !== 'all') params.append('device', paramsObj.device);
+    }
+    const query = params.toString() ? `?${params.toString()}` : '';
+    const response = await api.get(`/analytics/activity-patterns/${query}`);
     return response.data;
   },
 
-  getDeviceStats: async (days: number = 30, source?: string, device?: string) => {
-    let url = `/analytics/devices/?days=${days}&`;
-    if (source) url += `source=${source}&`;
-    if (device) url += `device=${device}&`;
-    const response = await api.get(url);
+  getTopPages: async (days: number = 30, limit: number = 10, source?: string, device?: string, date_from?: string, date_to?: string) => {
+    const params = new URLSearchParams();
+    params.append('days', days.toString());
+    params.append('limit', limit.toString());
+    if (source && source !== 'all') params.append('source', source);
+    if (device && device !== 'all') params.append('device', device);
+    if (date_from) params.append('date_from', date_from);
+    if (date_to) params.append('date_to', date_to);
+    const response = await api.get(`/analytics/pages/?${params.toString()}`);
+    return response.data;
+  },
+
+  getDeviceStats: async (days: number = 30, source?: string, device?: string, date_from?: string, date_to?: string) => {
+    const params = new URLSearchParams();
+    params.append('days', days.toString());
+    if (source && source !== 'all') params.append('source', source);
+    if (device && device !== 'all') params.append('device', device);
+    if (date_from) params.append('date_from', date_from);
+    if (date_to) params.append('date_to', date_to);
+    const response = await api.get(`/analytics/devices/?${params.toString()}`);
     return response.data;
   },
 

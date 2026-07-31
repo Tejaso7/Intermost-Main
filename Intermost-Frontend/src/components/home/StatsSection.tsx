@@ -143,7 +143,7 @@ export default function StatsSection() {
                 whileHover={{ rotate: 10, scale: 1.1 }}
                 transition={{ duration: 0.3 }}
               >
-                <stat.icon className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-white transition-colors" />
+                <stat.icon className="w-6 sm:w-7 md:w-8 h-6 sm:h-7 md:h-8 text-white transition-colors" aria-hidden="true" />
               </motion.div>
 
               {/* Value */}
