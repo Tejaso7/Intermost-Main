@@ -51,3 +51,12 @@ db.sqlite3
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Large media files (served from S3)
+Intermost-Frontend/public/video/
+Intermost-Frontend/public/images/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.webm
