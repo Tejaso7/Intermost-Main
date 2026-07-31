@@ -54,7 +54,7 @@ desktop.ini
 
 # Large media files (served from S3)
 Intermost-Frontend/public/video/
-Intermost-Frontend/public/images/
+# Intermost-Frontend/public/images/ # kept - small files needed for logo/flags
 *.mp4
 *.mov
 *.avi

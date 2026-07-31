@@ -8,6 +8,7 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import { Star, Quote, Play } from 'lucide-react';
 import { testimonialsApi, coreApi } from '@/lib/services';
 import type { Testimonial } from '@/lib/api';
+import { getS3AssetUrl } from '@/lib/utils';
 import { getInitials } from '@/lib/utils';
 
 import 'swiper/css';
@@ -173,11 +174,11 @@ export default function TestimonialsSection() {
         if (settings && settings.alumni_marquee_images && settings.alumni_marquee_images.length > 0) {
           setMarqueeImages(settings.alumni_marquee_images);
         } else {
-          setMarqueeImages([...Array(15)].map((_, i) => `/images/alu/alumini pdf-images-${i}-min.jpg`));
+          setMarqueeImages([...Array(15)].map((_, i) => getS3AssetUrl(`images/alu/alumini pdf-images-${i}-min.jpg`)));
         }
       } catch (error) {
         console.error('Error fetching settings for marquee:', error);
-        setMarqueeImages([...Array(15)].map((_, i) => `/images/alu/alumini pdf-images-${i}-min.jpg`));
+        setMarqueeImages([...Array(15)].map((_, i) => getS3AssetUrl(`images/alu/alumini pdf-images-${i}-min.jpg`)));
       }
     };
 

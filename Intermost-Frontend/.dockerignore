@@ -1,6 +1,5 @@
-# Large media (served from S3)
+# Large video files (served from S3)
 public/video/
-public/images/
 *.mp4
 *.mov
 *.avi

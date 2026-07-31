@@ -4,37 +4,38 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { Shield, Award, CheckCircle2 } from 'lucide-react';
+import { getS3AssetUrl } from '@/lib/utils';
 
 const recognitions = [
   {
     name: 'WHO',
     fullName: 'World Health Organization',
     description: 'Globally recognized medical standards',
-    logo: '/images/logo/WHo.png',
+    logo: getS3AssetUrl('images/logo/WHo.png'),
   },
   {
     name: 'NMC',
     fullName: 'National Medical Commission',
     description: 'India\'s medical education authority',
-    logo: '/images/logo/NMC.jpg',
+    logo: getS3AssetUrl('images/logo/NMC.jpg'),
   },
   {
     name: 'WFME',
     fullName: 'World Federation for Medical Education',
     description: 'International quality assurance',
-    logo: '/images/logo/WFME-logo.png',
+    logo: getS3AssetUrl('images/logo/WFME-logo.png'),
   },
   {
     name: 'ECFMG',
     fullName: 'Educational Commission for Foreign Medical Graduates',
     description: 'US medical certification pathway',
-    logo: '/images/logo/ecfmg.png',
+    logo: getS3AssetUrl('images/logo/ecfmg.png'),
   },
   {
     name: 'FAIMER',
     fullName: 'Foundation for Advancement of International Medical Education',
     description: 'Medical education research',
-    logo: '/images/logo/faimer.png',
+    logo: getS3AssetUrl('images/logo/faimer.png'),
   },
 ];
 
