@@ -2,7 +2,7 @@
 Django>=4.2.0
 djangorestframework>=3.14.0
 django-cors-headers>=4.3.0
-django-environ>=0.11.0
+django-environ>=0.13.0
 
 # MongoDB
 pymongo>=4.6.0
