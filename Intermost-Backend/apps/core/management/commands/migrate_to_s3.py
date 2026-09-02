@@ -173,16 +173,22 @@ class Command(BaseCommand):
         self.stdout.write(self.style.MIGRATE_HEADING("\n=== Scanning Static Public Media Assets (JPG, PNG, WEBP, SVG, MP3, MP4, PDF) ==="))
         
         possible_public_dirs = [
-            Path(settings.BASE_DIR) / 'frontend_public',
             Path('/app/frontend_public'),
+            Path(settings.BASE_DIR) / 'frontend_public',
+            Path('/home/ubuntu/intermost/Intermost-Frontend/public'),
             Path(settings.BASE_DIR).parent / 'Intermost-Frontend' / 'public',
+            Path(settings.STATIC_ROOT),
+            Path(settings.BASE_DIR) / 'static',
         ]
         
         public_dir = None
         for pdir in possible_public_dirs:
             if pdir.exists() and pdir.is_dir():
-                public_dir = pdir
-                break
+                # Check if directory contains files
+                file_count = len(list(pdir.rglob('*')))
+                if file_count > 0:
+                    public_dir = pdir
+                    break
 
         static_count = 0
         if public_dir:
