@@ -74,6 +74,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: ogDescription,
     },
     robots: robotsVal,
+    other: {
+      'facebook-domain-verification': 'gqc6ikff8zx6e0zforc802rqqpfkpi',
+    },
   };
 }
 
@@ -84,6 +87,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${poppins.variable} scroll-smooth`}>
+      <head>
+        <meta name="facebook-domain-verification" content="gqc6ikff8zx6e0zforc802rqqpfkpi" />
+      </head>
       <body className="font-sans bg-gray-50 text-gray-900 antialiased selection:bg-primary-500/20 selection:text-primary-900">
         <Toaster
           position="top-right"
