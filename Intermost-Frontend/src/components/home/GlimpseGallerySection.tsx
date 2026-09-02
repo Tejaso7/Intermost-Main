@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane, Loader2 } from 'lucide-react';
+import { Camera, Eye, X, ZoomIn, Heart, GraduationCap, Utensils, Plane, Loader2, Play } from 'lucide-react';
 import { glimpsesApi, Glimpse } from '@/lib/services';
 import { getS3AssetUrl } from '@/lib/utils';
 
@@ -17,6 +17,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Indian medical students sharing their study experiences at Alte University, Georgia.',
     country: 'Georgia',
     display_order: 10,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-2',
@@ -27,6 +28,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Alte University medical batch discussing clinical case studies outside the campus lab.',
     country: 'Georgia',
     display_order: 11,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-3',
@@ -37,6 +39,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Student meet and peer interaction program organized on Alte University campus.',
     country: 'Georgia',
     display_order: 12,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-4',
@@ -47,6 +50,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Selected medical students attending the orientation briefing in Kanpur prior to departure.',
     country: 'India',
     display_order: 13,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-5',
@@ -57,6 +61,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Counseling and visa briefing session for incoming freshmen going abroad.',
     country: 'India',
     display_order: 14,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-6',
@@ -67,6 +72,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Addressing parent queries regarding hostel facilities, flight batches, and Indian mess services.',
     country: 'India',
     display_order: 15,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-7',
@@ -77,6 +83,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Students celebrating their university selection during the Kanpur meet.',
     country: 'India',
     display_order: 16,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-8',
@@ -87,6 +94,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Intermost Ventures team and senior counseling staff coordinating admissions.',
     country: 'India',
     display_order: 17,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-9',
@@ -97,6 +105,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Information session on studying medical courses overseas in Kolkata.',
     country: 'India',
     display_order: 18,
+    is_active: true,
   },
   {
     _id: 'local-glimpse-10',
@@ -107,6 +116,7 @@ const localGlimpses: Glimpse[] = [
     caption: 'Direct one-on-one document verification and assessment for MBBS admissions.',
     country: 'India',
     display_order: 19,
+    is_active: true,
   }
 ];
 
@@ -117,6 +127,13 @@ export default function GlimpseGallerySection() {
   const [galleryItems, setGalleryItems] = useState<Glimpse[]>([]);
   const [loading, setLoading] = useState(true);
   const modalRef = React.useRef<HTMLDivElement>(null);
+
+  const getYoutubeId = (url?: string) => {
+    if (!url) return '';
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|shorts\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : '';
+  };
 
   useEffect(() => {
     const fetchGlimpses = async () => {
@@ -138,9 +155,9 @@ export default function GlimpseGallerySection() {
     fetchGlimpses();
   }, []);
 
-  const filteredItems = galleryItems.filter(
-    (item) => selectedCategory === 'all' || item.category === selectedCategory
-  );
+  const filteredItems = galleryItems
+    .filter((item) => item.is_active !== false)
+    .filter((item) => selectedCategory === 'all' || item.category === selectedCategory);
 
   const handleLike = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -219,9 +236,11 @@ export default function GlimpseGallerySection() {
     );
   }
 
-  if (galleryItems.length === 0) {
+  if (filteredItems.length === 0 && galleryItems.length === 0) {
     return null; // Skip section if no items
   }
+
+  const activeYtId = activePhoto ? getYoutubeId(activePhoto.video_url) : '';
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
@@ -242,7 +261,7 @@ export default function GlimpseGallerySection() {
             See Our Students' <span className="gradient-text">Real Journeys</span>
           </h2>
           <p className="text-gray-500 text-sm sm:text-base mt-4">
-            Browse true images of university premises, modern classrooms, departure groups, and our dining halls serving home-style Indian food.
+            Browse true images and videos of university premises, modern classrooms, departure groups, and our dining halls serving home-style Indian food.
           </p>
         </div>
 
@@ -275,84 +294,103 @@ export default function GlimpseGallerySection() {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
           <AnimatePresence mode="popLayout">
-            {filteredItems.map((item) => (
-              <motion.div
-                key={item._id}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{ duration: 0.4 }}
-                onClick={() => setActivePhoto(item)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setActivePhoto(item);
-                  }
-                }}
-                tabIndex={0}
-                role="button"
-                aria-label={`View photo: ${item.title}`}
-                className="bg-gray-50 rounded-[24px] overflow-hidden border border-gray-200 group cursor-pointer shadow-sm hover:shadow-xl transition-all relative flex flex-col h-[320px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-              >
-                {/* Photo container */}
-                <div className="relative flex-1 overflow-hidden">
-                  <Image
-                    src={getS3AssetUrl(item.image)}
-                    alt={item.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Hover Overlay */}
-                  <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
-                    <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transform scale-75 group-hover:scale-100 transition-all duration-300">
-                      <ZoomIn className="w-5 h-5" aria-hidden="true" />
-                    </div>
-                  </div>
+            {filteredItems.map((item) => {
+              const ytId = getYoutubeId(item.video_url);
+              const displayImg = item.image ? getS3AssetUrl(item.image) : (ytId ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg` : '/images/placeholder.jpg');
 
-                  {/* Country Flag Badge */}
-                  <span className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/65 backdrop-blur-md text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-white/10">
-                    {item.country}
-                  </span>
-
-                  {/* Category Badge */}
-                  <span className="absolute top-4 right-4 z-20 px-2.5 py-1 bg-primary/85 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg shadow-sm">
-                    {item.categoryLabel}
-                  </span>
-                </div>
-
-                {/* Info Text footer */}
-                <div className="p-4 bg-white border-t border-gray-100 flex items-center justify-between z-20">
-                  <div className="min-w-0 flex-1 pr-3">
-                    <h4 className="font-bold text-gray-900 text-sm truncate leading-snug">
-                      {item.title}
-                    </h4>
-                    <p className="text-[10px] text-gray-400 font-medium truncate mt-0.5">
-                      {item.caption}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    aria-label={`Like ${item.title}`}
-                    onClick={(e) => handleLike(item._id || '', e)}
-                    className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-100 rounded-xl px-2.5 py-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  >
-                    <Heart
-                      className={`w-3.5 h-3.5 ${
-                        item._id && likes[item._id] ? 'text-red-500 fill-red-500' : 'text-gray-400'
-                      }`}
-                      aria-hidden="true"
+              return (
+                <motion.div
+                  key={item._id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                  onClick={() => setActivePhoto(item)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setActivePhoto(item);
+                    }
+                  }}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`View item: ${item.title}`}
+                  className="bg-gray-50 rounded-[24px] overflow-hidden border border-gray-200 group cursor-pointer shadow-sm hover:shadow-xl transition-all relative flex flex-col h-[320px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                >
+                  {/* Photo / Video Thumbnail container */}
+                  <div className="relative flex-1 overflow-hidden">
+                    <Image
+                      src={displayImg}
+                      alt={item.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <span>{item._id ? likes[item._id] || 0 : 0}</span>
-                  </button>
-                </div>
-              </motion.div>
-            ))}
+                    {/* Hover Overlay */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center z-10">
+                      <div className="w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/30 transform scale-75 group-hover:scale-100 transition-all duration-300">
+                        {ytId ? (
+                          <Play className="w-6 h-6 fill-white ml-0.5" aria-hidden="true" />
+                        ) : (
+                          <ZoomIn className="w-5 h-5" aria-hidden="true" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* YouTube Video Badge */}
+                    {ytId && (
+                      <span className="absolute top-4 left-4 z-20 px-2.5 py-1 bg-red-600/90 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-red-400/30 flex items-center gap-1 shadow-sm">
+                        <Play className="w-2.5 h-2.5 fill-white" aria-hidden="true" />
+                        Video
+                      </span>
+                    )}
+
+                    {/* Country Flag Badge (If no video badge or offset) */}
+                    {!ytId && (
+                      <span className="absolute top-4 left-4 z-20 px-3 py-1 bg-black/65 backdrop-blur-md text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg border border-white/10">
+                        {item.country}
+                      </span>
+                    )}
+
+                    {/* Category Badge */}
+                    <span className="absolute top-4 right-4 z-20 px-2.5 py-1 bg-primary/85 text-white font-extrabold text-[9px] uppercase tracking-wider rounded-lg shadow-sm">
+                      {item.categoryLabel}
+                    </span>
+                  </div>
+
+                  {/* Info Text footer */}
+                  <div className="p-4 bg-white border-t border-gray-100 flex items-center justify-between z-20">
+                    <div className="min-w-0 flex-1 pr-3">
+                      <h4 className="font-bold text-gray-900 text-sm truncate leading-snug">
+                        {item.title}
+                      </h4>
+                      <p className="text-[10px] text-gray-400 font-medium truncate mt-0.5">
+                        {item.caption}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      aria-label={`Like ${item.title}`}
+                      onClick={(e) => handleLike(item._id || '', e)}
+                      className="flex items-center gap-1 text-[10px] font-bold text-gray-500 hover:text-red-500 transition-colors bg-gray-50 hover:bg-red-50 border border-gray-100 rounded-xl px-2.5 py-1 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+                    >
+                      <Heart
+                        className={`w-3.5 h-3.5 ${
+                          item._id && likes[item._id] ? 'text-red-500 fill-red-500' : 'text-gray-400'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span>{item._id ? likes[item._id] || 0 : 0}</span>
+                    </button>
+                  </div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </motion.div>
       </motion.div>
 
-      {/* Full Screen Lightbox Modal */}
+      {/* Full Screen Lightbox / Video Modal */}
       <AnimatePresence>
         {activePhoto && (
           <div 
@@ -382,20 +420,30 @@ export default function GlimpseGallerySection() {
               <button
                 type="button"
                 onClick={() => setActivePhoto(null)}
-                aria-label="Close image preview"
+                aria-label="Close preview modal"
                 className="absolute top-4 right-4 z-20 p-2.5 bg-black/60 hover:bg-black/90 rounded-full text-white border border-white/10 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
 
-              {/* Photo Box */}
-              <div className="relative flex-1 bg-black min-h-[300px] md:min-h-[460px]">
-                <Image
-                  src={getS3AssetUrl(activePhoto.image)}
-                  alt={activePhoto.title}
-                  fill
-                  className="object-contain"
-                />
+              {/* Photo or YouTube Video Box */}
+              <div className="relative flex-1 bg-black min-h-[300px] md:min-h-[460px] flex items-center justify-center">
+                {activeYtId ? (
+                  <iframe
+                    src={`https://www.youtube.com/embed/${activeYtId}?autoplay=1&rel=0`}
+                    title={activePhoto.title}
+                    className="w-full h-full min-h-[320px] md:min-h-[460px] border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <Image
+                    src={getS3AssetUrl(activePhoto.image)}
+                    alt={activePhoto.title}
+                    fill
+                    className="object-contain"
+                  />
+                )}
               </div>
 
               {/* Detail Description */}
@@ -404,6 +452,12 @@ export default function GlimpseGallerySection() {
                   <span className="px-3 py-1 bg-primary/20 text-primary-300 font-extrabold text-[10px] uppercase tracking-wider rounded-lg border border-primary-500/25">
                     {activePhoto.categoryLabel}
                   </span>
+                  {activeYtId && (
+                    <span className="px-3 py-1 bg-red-600/30 text-red-400 font-extrabold text-[10px] uppercase tracking-wider rounded-lg border border-red-500/30 flex items-center gap-1">
+                      <Play className="w-2.5 h-2.5 fill-red-400" aria-hidden="true" />
+                      YouTube Video
+                    </span>
+                  )}
                   <span className="px-3 py-1 bg-white/5 text-gray-300 font-extrabold text-[10px] uppercase tracking-wider rounded-lg border border-white/10">
                     {activePhoto.country}
                   </span>

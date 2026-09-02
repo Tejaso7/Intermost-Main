@@ -203,7 +203,20 @@ class SiteSettingsView(APIView):
             'hero_bg_type': 'video',
             'hero_bg_url': 'https://assets.mixkit.co/videos/preview/mixkit-medical-students-walking-in-a-hallway-40995-large.mp4',
             'about_images': ['/images/about.jpg'],
-            'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)]
+            'alumni_marquee_images': [f'/images/alu/alumini pdf-images-{i}-min.jpg' for i in range(15)],
+            'section_visibility': {
+                'hero': True,
+                'news': True,
+                'countries': True,
+                'why_choose_us': True,
+                'stats': True,
+                'recognition': True,
+                'testimonials': True,
+                'glimpses': True,
+                'shorts': True,
+                'cta': True,
+                'contact': True
+            }
         }
 
 
@@ -596,6 +609,10 @@ class GlimpseListCreateView(APIView):
         serialized = []
         for g in glimpses:
             g['_id'] = str(g['_id'])
+            if 'is_active' not in g:
+                g['is_active'] = True
+            if 'video_url' not in g:
+                g['video_url'] = ''
             if 'created_at' in g and isinstance(g['created_at'], datetime):
                 g['created_at'] = g['created_at'].isoformat()
             if 'updated_at' in g and isinstance(g['updated_at'], datetime):
@@ -618,6 +635,8 @@ class GlimpseListCreateView(APIView):
             'image': data.get('image', ''),
             'caption': data.get('caption', ''),
             'country': data.get('country', 'General'),
+            'video_url': data.get('video_url', data.get('youtube_url', '')),
+            'is_active': bool(data.get('is_active', True)),
             'display_order': int(data.get('display_order', 0)),
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
@@ -809,6 +828,10 @@ class GlimpseDetailView(APIView):
             return Response({'error': 'Not found'}, status=status.HTTP_404_NOT_FOUND)
             
         glimpse['_id'] = str(glimpse['_id'])
+        if 'is_active' not in glimpse:
+            glimpse['is_active'] = True
+        if 'video_url' not in glimpse:
+            glimpse['video_url'] = ''
         if 'created_at' in glimpse and isinstance(glimpse['created_at'], datetime):
             glimpse['created_at'] = glimpse['created_at'].isoformat()
         if 'updated_at' in glimpse and isinstance(glimpse['updated_at'], datetime):

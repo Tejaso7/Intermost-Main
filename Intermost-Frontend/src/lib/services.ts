@@ -8,8 +8,11 @@ import api, {
   TeamMember,
   Office,
   SiteSettings,
+  SectionVisibility,
   PaginatedResponse,
 } from './api';
+
+export type { SectionVisibility };
 
 // Countries API
 export const countriesApi = {
@@ -822,6 +825,8 @@ export interface Glimpse {
   image: string;
   caption: string;
   country: string;
+  video_url?: string;
+  is_active?: boolean;
   display_order: number;
   created_at?: string;
   updated_at?: string;

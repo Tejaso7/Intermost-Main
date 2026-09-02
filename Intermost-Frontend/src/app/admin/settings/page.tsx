@@ -16,10 +16,10 @@ import {
   Sliders,
   AlertTriangle,
 } from 'lucide-react';
-import { coreApi } from '@/lib/services';
+import { coreApi, type SectionVisibility } from '@/lib/services';
 import toast from 'react-hot-toast';
 import ImageUpload from '@/components/admin/ImageUpload';
-import { Camera, Image as ImageIcon, Plus, Trash2, ArrowLeft, ArrowRight } from 'lucide-react'; // additional icons
+import { Camera, Image as ImageIcon, Plus, Trash2, ArrowLeft, ArrowRight, LayoutGrid, Sparkles, Newspaper, ShieldCheck, BarChart3, Award, MessageSquareQuote, Zap } from 'lucide-react';
 
 interface SiteSettings {
   site_name: string;
@@ -56,13 +56,14 @@ interface SiteSettings {
   hero_bg_type?: 'image' | 'video';
   hero_bg_url?: string;
   about_images?: string[];
+  section_visibility?: SectionVisibility;
 }
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [savingEnv, setSavingEnv] = useState(false);
-  const [activeTab, setActiveTab] = useState<'website' | 'env'>('website');
+  const [activeTab, setActiveTab] = useState<'website' | 'sections' | 'env'>('website');
   const [envContent, setEnvContent] = useState('');
   
   // Config OTP security states
@@ -203,6 +204,51 @@ export default function SettingsPage() {
     }));
   };
 
+  const sectionsList: { key: keyof SectionVisibility; title: string; desc: string; icon: any }[] = [
+    { key: 'hero', title: 'Hero Banner Section', desc: 'Main title banner, quick inquiry form & video/photo background', icon: Sparkles },
+    { key: 'news', title: 'Latest News & Updates', desc: 'Medical education news alerts & ticker banner', icon: Newspaper },
+    { key: 'countries', title: 'Popular Country Destinations', desc: 'Country cards grid (Russia, Georgia, Uzbekistan, etc.)', icon: Globe },
+    { key: 'why_choose_us', title: 'Why Choose Intermost', desc: 'Core highlights, guarantees & FMGE support features', icon: ShieldCheck },
+    { key: 'stats', title: 'Key Statistics & Achievements', desc: 'Students placed counter & university network numbers', icon: BarChart3 },
+    { key: 'recognition', title: 'Accreditations & Recognitions', desc: 'WHO, NMC, ECFMG, WDOMS logo ticker strip', icon: Award },
+    { key: 'testimonials', title: 'Student & Parent Reviews', desc: 'Video & written reviews slider of alumni', icon: MessageSquareQuote },
+    { key: 'glimpses', title: 'Campus Life & Student Journeys (Glimpses)', desc: 'Real photos & videos of anatomy labs, mess & hostels', icon: Camera },
+    { key: 'shorts', title: 'YouTube Shorts Slider', desc: 'Short format video reels preview carousel', icon: Youtube },
+    { key: 'cta', title: 'Call To Action (Free Counseling)', desc: 'Pre-footer consultation banner box', icon: Zap },
+    { key: 'contact', title: 'Contact & Inquiry Section', desc: 'Bottom contact details, office location & message form', icon: MapPin },
+  ];
+
+  const handleToggleSection = async (sectionKey: keyof SectionVisibility) => {
+    const currentVis = settings.section_visibility || {
+      hero: true, news: true, countries: true, why_choose_us: true, stats: true,
+      recognition: true, testimonials: true, glimpses: true, shorts: true, cta: true, contact: true
+    };
+    const newStatus = currentVis[sectionKey] === false ? true : false;
+    const updatedVis = { ...currentVis, [sectionKey]: newStatus };
+
+    setSettings(prev => ({ ...prev, section_visibility: updatedVis }));
+
+    const secName = sectionsList.find(s => s.key === sectionKey)?.title || sectionKey;
+    try {
+      const payloadToSave = {
+        ...settings,
+        section_visibility: updatedVis,
+        stats: {
+          students_placed: Number(settings.stats?.students_placed) || 0,
+          partner_universities: Number(settings.stats?.partner_universities) || 0,
+          years_experience: Number(settings.stats?.years_experience) || 0,
+          visa_success_rate: Number(settings.stats?.visa_success_rate) || 0,
+          pioneer_students: Number(settings.stats?.pioneer_students) || 0,
+        }
+      };
+      await coreApi.updateSettings(payloadToSave as any);
+      toast.success(newStatus ? `${secName} is now visible on website` : `${secName} is now hidden from website`);
+    } catch (error) {
+      toast.error(`Failed to update ${secName} visibility`);
+      console.error(error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -328,6 +374,87 @@ export default function SettingsPage() {
     });
   };
 
+  const renderSectionsControlPanel = () => {
+    const currentVis = settings.section_visibility || {
+      hero: true, news: true, countries: true, why_choose_us: true, stats: true,
+      recognition: true, testimonials: true, glimpses: true, shorts: true, cta: true, contact: true
+    };
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 md:p-8 space-y-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-150">
+          <div>
+            <h2 className="text-xl font-extrabold text-gray-900 flex items-center gap-2 font-display">
+              <LayoutGrid className="w-6 h-6 text-primary-600" />
+              Homepage Section Visibility (1-Click Controls)
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Click any section toggle below to instantly hide or show it on the live website. Changes apply immediately!
+            </p>
+          </div>
+          <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full self-start sm:self-auto">
+            Live Instant Updates Active
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {sectionsList.map((sec) => {
+            const Icon = sec.icon;
+            const isVisible = currentVis[sec.key] !== false;
+
+            return (
+              <div
+                key={sec.key}
+                className={`p-4 rounded-xl border transition-all flex items-center justify-between gap-4 ${
+                  isVisible
+                    ? 'bg-white border-gray-200 hover:border-primary-300 hover:shadow-sm'
+                    : 'bg-amber-50/30 border-amber-200 opacity-75'
+                }`}
+              >
+                <div className="flex items-start gap-3 min-w-0 flex-1">
+                  <div className={`p-2.5 rounded-xl shrink-0 ${isVisible ? 'bg-primary-50 text-primary-600' : 'bg-amber-100 text-amber-700'}`}>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-gray-900 text-sm truncate">{sec.title}</h3>
+                      <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md shrink-0 ${
+                        isVisible ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                      }`}>
+                        {isVisible ? 'Visible' : 'Hidden'}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">{sec.desc}</p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleToggleSection(sec.key)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-primary-500 ${
+                    isVisible ? 'bg-emerald-600' : 'bg-gray-300'
+                  }`}
+                  role="switch"
+                  aria-checked={isVisible}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      isVisible ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </motion.div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -341,14 +468,14 @@ export default function SettingsPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900 font-display">Settings</h1>
-        <p className="text-gray-500 mt-1">Manage your website settings and system configurations</p>
+        <p className="text-gray-500 mt-1">Manage your website settings, section visibilities, and system configurations</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-gray-200 gap-2">
         <button
           onClick={() => setActiveTab('website')}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+          className={`px-4 py-2.5 font-medium text-sm border-b-2 transition-colors cursor-pointer ${
             activeTab === 'website'
               ? 'border-primary-600 text-primary-600 font-semibold'
               : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -357,8 +484,19 @@ export default function SettingsPage() {
           Website Settings
         </button>
         <button
+          onClick={() => setActiveTab('sections')}
+          className={`px-4 py-2.5 font-medium text-sm border-b-2 transition-colors flex items-center gap-1.5 cursor-pointer ${
+            activeTab === 'sections'
+              ? 'border-primary-600 text-primary-600 font-semibold'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          <LayoutGrid className="w-4 h-4" />
+          Homepage Sections (Hide/Show)
+        </button>
+        <button
           onClick={() => setActiveTab('env')}
-          className={`px-4 py-2 font-medium text-sm border-b-2 transition-colors ${
+          className={`px-4 py-2.5 font-medium text-sm border-b-2 transition-colors cursor-pointer ${
             activeTab === 'env'
               ? 'border-primary-600 text-primary-600 font-semibold'
               : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -368,8 +506,13 @@ export default function SettingsPage() {
         </button>
       </div>
 
-      {activeTab === 'website' ? (
-        <form onSubmit={handleSubmit}>
+      {activeTab === 'sections' ? (
+        renderSectionsControlPanel()
+      ) : activeTab === 'website' ? (
+        <div className="space-y-6">
+          {renderSectionsControlPanel()}
+
+          <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Design & Media Settings */}
             <motion.div
@@ -985,6 +1128,7 @@ export default function SettingsPage() {
             </button>
           </motion.div>
         </form>
+        </div>
       ) : !configToken ? (
         <motion.div
           initial={{ opacity: 0, y: 20 }}

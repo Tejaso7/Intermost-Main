@@ -359,6 +359,20 @@ export interface Office {
 }
 
 // Site Settings Types
+export interface SectionVisibility {
+  hero?: boolean;
+  news?: boolean;
+  countries?: boolean;
+  why_choose_us?: boolean;
+  stats?: boolean;
+  recognition?: boolean;
+  testimonials?: boolean;
+  glimpses?: boolean;
+  shorts?: boolean;
+  cta?: boolean;
+  contact?: boolean;
+}
+
 export interface SiteSettings {
   site_name: string;
   tagline: string;
@@ -397,6 +411,7 @@ export interface SiteSettings {
   hero_bg_url?: string;
   about_images?: string[];
   alumni_marquee_images?: string[];
+  section_visibility?: SectionVisibility;
 }
 
 // Chat Types
