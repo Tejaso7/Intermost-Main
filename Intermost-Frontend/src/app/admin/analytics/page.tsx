@@ -273,17 +273,25 @@ export default function AnalyticsPage() {
   useEffect(() => {
     fetchData();
 
-    // 30s Realtime Polling
-    const interval = setInterval(async () => {
+    // 5s Realtime Visitor Auto-Sync for Live Dashboard Accuracy
+    const realtimeInterval = setInterval(async () => {
       try {
         const realtimeData = await analyticsApi.getRealtimeVisitors();
         setRealtime(realtimeData);
       } catch (error) {
         console.debug('Realtime auto-refresh silent retry');
       }
+    }, 5000);
+
+    // 30s Background Auto-Sync for summary metrics & geo records
+    const fullRefreshInterval = setInterval(() => {
+      fetchData();
     }, 30000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(realtimeInterval);
+      clearInterval(fullRefreshInterval);
+    };
   }, [filters, locationPagination.page, locationPagination.page_size]);
 
   const handleFilterChange = (newFilters: FilterState) => {

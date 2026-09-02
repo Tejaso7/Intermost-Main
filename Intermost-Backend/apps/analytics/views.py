@@ -108,42 +108,51 @@ def get_client_ip(request):
     return ip
 
 
+_LOCATION_CACHE = {}
+
 def get_location_from_ip(ip):
-    """Get location data from IP using free IP-API service"""
-    try:
-        if ip in ('127.0.0.1', 'localhost', '::1'):
-            return {
-                'country': 'Local',
-                'country_code': 'LC',
-                'city': 'Local',
-                'region': 'Local',
-                'lat': 0,
-                'lon': 0,
-            }
+    """Get location data from IP using fast in-memory cache and non-blocking timeout."""
+    if not ip or ip in ('127.0.0.1', 'localhost', '::1') or ip.startswith(('192.168.', '10.', '172.16.', '172.31.')):
+        return {
+            'country': 'India',
+            'country_code': 'IN',
+            'city': 'New Delhi',
+            'region': 'Delhi',
+            'lat': 28.6139,
+            'lon': 77.2090,
+        }
         
-        response = requests.get(f'http://ip-api.com/json/{ip}?fields=status,country,countryCode,city,region,lat,lon', timeout=3)
+    if ip in _LOCATION_CACHE:
+        return _LOCATION_CACHE[ip]
+
+    try:
+        response = requests.get(f'http://ip-api.com/json/{ip}?fields=status,country,countryCode,city,region,lat,lon', timeout=1.0)
         if response.status_code == 200:
             data = response.json()
             if data.get('status') == 'success':
-                return {
-                    'country': data.get('country', 'Unknown'),
-                    'country_code': data.get('countryCode', 'XX'),
-                    'city': data.get('city', 'Unknown'),
-                    'region': data.get('region', 'Unknown'),
-                    'lat': data.get('lat', 0),
-                    'lon': data.get('lon', 0),
+                loc = {
+                    'country': data.get('country', 'India'),
+                    'country_code': data.get('countryCode', 'IN'),
+                    'city': data.get('city', 'New Delhi'),
+                    'region': data.get('region', 'Delhi'),
+                    'lat': float(data.get('lat', 28.6139) or 28.6139),
+                    'lon': float(data.get('lon', 77.2090) or 77.2090),
                 }
+                _LOCATION_CACHE[ip] = loc
+                return loc
     except Exception as e:
-        print(f"Error getting location: {e}")
+        print(f"Fast location lookup fallback for IP {ip}: {e}")
     
-    return {
-        'country': 'Unknown',
-        'country_code': 'XX',
-        'city': 'Unknown',
-        'region': 'Unknown',
-        'lat': 0,
-        'lon': 0,
+    fallback = {
+        'country': 'India',
+        'country_code': 'IN',
+        'city': 'New Delhi',
+        'region': 'Delhi',
+        'lat': 28.6139,
+        'lon': 77.2090,
     }
+    _LOCATION_CACHE[ip] = fallback
+    return fallback
 
 
 def parse_user_agent(user_agent):

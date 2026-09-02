@@ -1,18 +1,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Hero from '@/components/home/Hero';
 import NewsSection from '@/components/home/NewsSection';
 import CountriesSection from '@/components/home/CountriesSection';
 import WhyChooseUs from '@/components/home/WhyChooseUs';
 import StatsSection from '@/components/home/StatsSection';
-import RecognitionSection from '@/components/home/RecognitionSection';
-import TestimonialsSection from '@/components/home/TestimonialsSection';
-import GlimpseGallerySection from '@/components/home/GlimpseGallerySection';
-import YouTubeShortsSection from '@/components/home/YouTubeShortsSection';
-import CTASection from '@/components/home/CTASection';
-import ContactSection from '@/components/home/ContactSection';
 import { coreApi, SectionVisibility } from '@/lib/services';
+
+const RecognitionSection = dynamic(() => import('@/components/home/RecognitionSection'), { ssr: true });
+const TestimonialsSection = dynamic(() => import('@/components/home/TestimonialsSection'), { ssr: true });
+const GlimpseGallerySection = dynamic(() => import('@/components/home/GlimpseGallerySection'), { ssr: true });
+const YouTubeShortsSection = dynamic(() => import('@/components/home/YouTubeShortsSection'), { ssr: true });
+const CTASection = dynamic(() => import('@/components/home/CTASection'), { ssr: true });
+const ContactSection = dynamic(() => import('@/components/home/ContactSection'), { ssr: true });
 
 export default function Home() {
   const [visibility, setVisibility] = useState<SectionVisibility>({
